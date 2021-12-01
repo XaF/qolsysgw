@@ -308,7 +308,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             code = self._cfg.ha_disarm_code or self._cfg.panel_disarm_code
             if self._cfg.ha_check_disarm_code:
                 payload['code'] = code
-            elif code.isdigit() or code is None:
+            elif code is None or code.isdigit():
                 payload['code'] = 'REMOTE_CODE'
             else:
                 payload['code'] = 'REMOTE_CODE_TEXT'
