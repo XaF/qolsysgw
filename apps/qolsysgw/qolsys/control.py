@@ -141,7 +141,7 @@ class QolsysControlDisarm(_QolsysControlCheckCode):
     def action(self):
         return QolsysActionDisarm(
             partition_id=self._partition_id,
-            disarm_code=self._disarm_code or self.code,
+            disarm_code=self._disarm_code or self._code,
         )
 
 

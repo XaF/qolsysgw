@@ -52,7 +52,7 @@ class MqttQolsysEventListener(MqttListener):
 class MqttQolsysControlListener(MqttListener):
     async def event_callback(self, event_name, data, kwargs):
         self._logger.debug(f'Received {event_name} with data={data} '\
-                f'and kwargs={kwargs} (NOT YET SUPPORTED)')
+                f'and kwargs={kwargs}')
 
         control_str = data.get('payload')
         if not control_str:

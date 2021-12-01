@@ -300,7 +300,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
                 'identifiers': [
                     self._cfg.panel_unique_id,
                 ],
-                'manufacturer': 'QOLSYS',
+                'manufacturer': 'Qolsys',
                 'model': 'IQ Panel 2+',
             }
 

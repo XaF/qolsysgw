@@ -239,8 +239,8 @@ class QolsysEventArming(QolsysEvent):
     def __str__(self):
         return f"<{type(self).__name__} "\
                 f"partition_id={self.partition_id} "\
-                f"arming_type={self.arming_type}"\
-                f"delay{self.delay}"\
+                f"arming_type={self.arming_type} "\
+                f"delay{self.delay} "\
                 f"version={self._version}>"
 
     @classmethod
