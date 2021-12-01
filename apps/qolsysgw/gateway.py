@@ -68,6 +68,7 @@ class QolsysGateway(Mqtt):
 
     async def initialize(self):
         LOGGER.info('Starting')
+        self._is_terminated = False
 
         cfg = self._cfg = QolsysGatewayConfig(self.args)
         mqtt_plugin_cfg = await self.get_plugin_config(namespace=cfg.mqtt_namespace)
@@ -141,6 +142,7 @@ class QolsysGateway(Mqtt):
                 LOGGER.exception(f"Error setting partition '{partition.id}' "\
                         f"({partition.name}) unavailable")
 
+        self._is_terminated = True
         LOGGER.info('Terminated')
 
     async def qolsys_connected_callback(self):
@@ -148,6 +150,9 @@ class QolsysGateway(Mqtt):
         self._factory.wrap(self._state).set_available()
 
     async def qolsys_disconnected_callback(self):
+        if self._is_terminated:
+            return
+
         LOGGER.debug(f'Qolsys callback for disconnection event')
         self._factory.wrap(self._state).set_unavailable()
 
