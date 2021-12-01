@@ -67,9 +67,16 @@ class QolsysGatewayConfig(object):
                         "Cannot use 'ha_disarm_code' if "\
                         "'panel_disarm_code' is not set")
 
-            for k in ['ha_check_disarm_code', 'code_arm_required', 'code_trigger_required']:
+            for k in ['code_arm_required', 'code_trigger_required']:
                 if self.get(k):
-                    raise QolsysGwConfigError(f"Cannot use '{k}' if no disarm code is set")
+                    raise QolsysGwConfigError(
+                        f"Cannot use '{k}' if no disarm code is set, as the "\
+                        "Qolsys Panel does not offer a built-in way to check "\
+                        "for the code on ARM or TRIGGER actions.")
+
+            # Without a configured disarm code, we cannot have home assistant
+            # checking it for us
+            self._override_config['ha_check_disarm_code'] = False
 
             # Without a configured disarm code, we will use the one provided
             # in home assistant to try and disarm the alarm
