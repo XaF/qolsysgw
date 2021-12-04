@@ -48,6 +48,25 @@ class QolsysEvent(object):
 
 
 class QolsysEventInfo(QolsysEvent):
+
+    __INFOCLASSES_CACHE = {}
+
+    @classmethod
+    def from_json(cls, data):
+        event_type = data.get('event')
+        if event_type != 'INFO':
+            raise UnableToParseEventException(f"Cannot parse event '{event_type}'")
+
+        info_type = data.get('info_type')
+        klass = find_subclass(cls, info_type, cache=cls.__INFOCLASSES_CACHE)
+        if not klass:
+            raise UnknownQolsysEventException
+
+        return klass.from_json(data)
+
+
+class QolsysEventInfoSummary(QolsysEventInfo):
+
     def __init__(self, partitions: list=None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -57,9 +76,9 @@ class QolsysEventInfo(QolsysEvent):
     def partitions(self):
         return list(self._partitions)
 
-    @partitions.setter
-    def partitions(self, partitions):
-        self._partitions = partitions
+    # @partitions.setter
+    # def partitions(self, partitions):
+        # self._partitions = partitions
 
     def __str__(self):
         return f"<{type(self).__name__} request_id={self.request_id} "\
@@ -71,22 +90,16 @@ class QolsysEventInfo(QolsysEvent):
         if isinstance(data, str):
             data = json.loads(data)
 
-        event_type = data.get('event')
-        if event_type != 'INFO':
-            raise UnableToParseEventException(f"Cannot parse event '{event_type}'")
+        info_type = data.get('info_type')
+        if info_type != 'SUMMARY':
+            raise UnableToParseEventException(
+                f"Cannot parse event with info tyoe '{info_type}'")
 
-        event_info = QolsysEventInfo(
+        return QolsysEventInfoSummary(
+            partitions=cls._parse_partitions(data),
             request_id=data.get('requestID'),
             raw_event=data,
         )
-
-        info_type = data.get('info_type')
-        if info_type == 'SUMMARY':
-            event_info.partitions = cls._parse_partitions(data)
-        else:
-            raise UnableToParseEventException(f"Unknown info_type '{info_type}'")
-
-        return event_info
 
     @classmethod
     def _parse_partitions(cls, data):
@@ -113,9 +126,45 @@ class QolsysEventInfo(QolsysEvent):
         return partitions
 
 
-class QolsysEventZoneEventType(Enum):
-    ACTIVE = 'ZONE_ACTIVE'  # Sensor activated
-    UPDATE = 'ZONE_UPDATE'  # Sensor full status update
+class QolsysEventInfoSecureArm(QolsysEventInfo):
+
+    def __init__(self, partition_id: int, value: bool, version: int,
+                 *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self._partition_id = partition_id
+        self._value = value
+        self._version = version
+
+    @property
+    def partition_id(self) -> int:
+        return self._partition_id
+
+    @property
+    def value(self) -> bool:
+        return self._value
+
+    def __str__(self):
+        return f"<{type(self).__name__} request_id={self.request_id} "\
+                f"partition_id={self.partition_id} value={self.value}>"
+
+    @classmethod
+    def from_json(cls, data):
+        if isinstance(data, str):
+            data = json.loads(data)
+
+        info_type = data.get('info_type')
+        if info_type != 'SECURE_ARM':
+            raise UnableToParseEventException(
+                f"Cannot parse event with info tyoe '{info_type}'")
+
+        return QolsysEventInfoSecureArm(
+            partition_id=data.get('partition_id'),
+            value=data.get('value'),
+            version=data.get('version'),
+            request_id=data.get('requestID'),
+            raw_event=data,
+        )
 
 
 class QolsysEventZoneEvent(QolsysEvent):
@@ -154,6 +203,7 @@ class QolsysEventZoneEvent(QolsysEvent):
 
 
 class QolsysEventZoneEventActive(QolsysEventZoneEvent):
+
     def __init__(self, zone_id: int, zone_status: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -184,6 +234,7 @@ class QolsysEventZoneEventActive(QolsysEventZoneEvent):
 
 
 class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
+
     def __init__(self, zone: QolsysSensor, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -215,6 +266,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
 
 
 class QolsysEventArming(QolsysEvent):
+
     def __init__(self, partition_id: int, arming_type: str, version: int,
                  delay: int=None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -260,12 +312,13 @@ class QolsysEventArming(QolsysEvent):
 
 
 class QolsysEventAlarm(QolsysEvent):
+
     def __init__(self, partition_id: int, alarm_type: str, version: int,
                  *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._partition_id = partition_id
-        self._alarm_type = alarm_type
+        self._alarm_type = alarm_type or None
         self._version = version
 
     @property

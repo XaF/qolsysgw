@@ -17,7 +17,7 @@ from qolsys.control import QolsysControl
 from qolsys.events import QolsysEvent
 from qolsys.events import QolsysEventAlarm
 from qolsys.events import QolsysEventArming
-from qolsys.events import QolsysEventInfo
+from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
 from qolsys.events import QolsysEventZoneEventUpdate
 from qolsys.exceptions import MissingDisarmCodeException
@@ -167,7 +167,7 @@ class QolsysGateway(Mqtt):
     async def mqtt_event_callback(self, event: QolsysEvent):
         LOGGER.debug(f'MQTT callback for event: {event}')
 
-        if isinstance(event, QolsysEventInfo):
+        if isinstance(event, QolsysEventInfoSummary):
             self._state.update(event)
 
         elif isinstance(event, QolsysEventZoneEventActive):
@@ -202,10 +202,12 @@ class QolsysGateway(Mqtt):
                 LOGGER.warning(f'Partition {event.partition_id} not found')
                 return
 
-            partition.triggered()
+            partition.triggered(alarm_type=event.alarm_type)
 
     async def mqtt_control_callback(self, control: QolsysControl):
-        if control.session_token != self._session_token:
+        if control.session_token != self._session_token and (
+                self._cfg.user_control_token is None or
+                control.session_token != self._cfg.user_control_token):
             LOGGER.error(f'invalid session token for {control}')
             return
 

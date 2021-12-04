@@ -1,6 +1,6 @@
 import logging
 
-from qolsys.events import QolsysEventInfo
+from qolsys.events import QolsysEventInfoSummary
 from qolsys.observable import QolsysObservable
 
 
@@ -10,12 +10,12 @@ LOGGER = logging.getLogger(__name__)
 class QolsysState(QolsysObservable):
     NOTIFY_UPDATE_PARTITIONS = 'update_partitions'
 
-    def __init__(self, event: QolsysEventInfo=None):
+    def __init__(self, event: QolsysEventInfoSummary=None):
         super().__init__()
 
         self._partitions = {}
         if event:
-            self.refresh(event)
+            self.update(event)
 
     @property
     def partitions(self):
@@ -24,7 +24,7 @@ class QolsysState(QolsysObservable):
     def partition(self, partition_id):
         return self._partitions.get(partition_id)
 
-    def update(self, event: QolsysEventInfo):
+    def update(self, event: QolsysEventInfoSummary):
         prev_partitions = self.partitions
 
         self._partitions = {}

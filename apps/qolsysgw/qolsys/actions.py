@@ -90,6 +90,6 @@ class QolsysActionTrigger(QolsysAction):
     def __init__(self, partition_id: int, alarm_type: str=None) -> None:
         self._data = {
             'action': 'ALARM',
-            'alarm_type': alarm_type or 'POLICE',
+            'alarm_type': alarm_type or self.ALARM_TYPE_POLICE,
             'partition_id': partition_id,
         }

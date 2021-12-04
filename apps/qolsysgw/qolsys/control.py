@@ -194,8 +194,33 @@ class QolsysControlTrigger(_QolsysControlCheckCode):
 
     _CODE_REQUIRED_ATTR = 'code_trigger_required'
 
+    def __init__(self, alarm_type: str=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._alarm_type = alarm_type
+
     @property
     def action(self):
         return QolsysActionTrigger(
             partition_id=self._partition_id,
+            alarm_type=self._alarm_type,
         )
+
+
+class QolsysControlTriggerPolice(QolsysControlTrigger):
+    def __init__(self, *args, **kwargs):
+        super().__init__(alarm_type=QolsysActionTrigger.ALARM_TYPE_POLICE,
+                         *args, **kwargs)
+
+
+class QolsysControlTriggerFire(QolsysControlTrigger):
+    def __init__(self, *args, **kwargs):
+        super().__init__(alarm_type=QolsysActionTrigger.ALARM_TYPE_FIRE,
+                         *args, **kwargs)
+
+
+class QolsysControlTriggerAuxiliary(QolsysControlTrigger):
+    def __init__(self, *args, **kwargs):
+        super().__init__(alarm_type=QolsysActionTrigger.ALARM_TYPE_AUXILIARY,
+                         *args, **kwargs)
+

@@ -11,18 +11,21 @@ LOGGER = logging.getLogger(__name__)
 class QolsysSensor(QolsysObservable):
     NOTIFY_UPDATE_PATTERN='update_{attr}'
     NOTIFY_UPDATE_STATUS='update_status'
+    NOTIFY_UPDATE_ATTRIBUTES='update_attributes'
 
     __SUBCLASSES_CACHE = {}
     _common_keys = [
         'name',
-        'group',
         'status',
-        'state',
         'zone_id',
+        'partition_id',
+    ]
+    ATTRIBUTES = [
+        'group',
+        'state',
         'zone_type',
         'zone_physical_type',
         'zone_alarm_type',
-        'partition_id',
     ]
 
     def __init__(self, sensor_id: str, name: str, group: str, status: str,
@@ -50,7 +53,8 @@ class QolsysSensor(QolsysObservable):
         # Because any of the attributes might have changed and we want to
         # be able to notify of all of those changes separately and only if they
         # happened, we have to add a bit of smart in there
-        for attr in ['id'] + self._common_keys:
+        attributes_updated = False
+        for attr in ['id'] + self._common_keys + self.ATTRIBUTES:
             local_attr = f'_{attr}'
             prev_value = getattr(self, local_attr)
             new_value = getattr(sensor, attr)
@@ -58,6 +62,12 @@ class QolsysSensor(QolsysObservable):
                 setattr(self, local_attr, new_value)
                 self.notify(change=self.NOTIFY_UPDATE_PATTERN.format(attr=attr),
                             prev_value=prev_value, new_value=new_value)
+
+                if attr in self.ATTRIBUTES:
+                    attributes_updated = True
+
+        if attributes_updated:
+            self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
 
     @property
     def id(self):
@@ -151,7 +161,8 @@ class QolsysSensor(QolsysObservable):
 
     @classmethod
     def from_json_common_data(cls, data):
-        common_data = {k: v for k, v in data.items() if k in cls._common_keys}
+        common_data = {k: v for k, v in data.items()
+                       if k in cls._common_keys or k in cls.ATTRIBUTES}
         common_data['sensor_id'] = data['id']
         return common_data
 

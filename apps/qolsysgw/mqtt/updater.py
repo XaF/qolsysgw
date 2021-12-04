@@ -59,6 +59,8 @@ class MqttUpdater(object):
             self._factory.wrap(sensor).configure(partition=partition)
         elif change == QolsysPartition.NOTIFY_UPDATE_STATUS:
             self._factory.wrap(partition).update_state()
+        elif change == QolsysPartition.NOTIFY_UPDATE_ALARM_TYPE:
+            self._factory.wrap(partition).update_attributes()
 
     def _sensor_update(self, sensor: QolsysSensor, change, prev_value=None, new_value=None):
         self._logger.debug(f"Received update from sensor '{sensor.name}' for "\
@@ -67,12 +69,11 @@ class MqttUpdater(object):
 
         if change == QolsysSensor.NOTIFY_UPDATE_STATUS:
             self._factory.wrap(sensor).update_state()
+        elif change == QolsysSensor.NOTIFY_UPDATE_ATTRIBUTES:
+            self._factory.wrap(sensor).update_attributes()
 
 
 class MqttWrapper(object):
-
-    STATE_TOPIC_PREFIX = 'mqtt-states'
-    AVAILABILITY_TOPIC_PREFIX = 'mqtt-availability'
 
     def __init__(self, mqtt_publish: callable, cfg: QolsysGatewayConfig,
                  mqtt_plugin_cfg, session_token: str) -> None:
@@ -106,17 +107,22 @@ class MqttWrapper(object):
 
     @property
     def state_topic(self):
-        return posixpath.join(self.STATE_TOPIC_PREFIX,
+        return posixpath.join(self._cfg.discovery_topic,
                               self.topic_path, 'state')
 
     @property
+    def attributes_topic(self):
+        return posixpath.join(self._cfg.discovery_topic,
+                              self.topic_path, 'attributes')
+
+    @property
     def availability_topic(self):
-        return posixpath.join(self.AVAILABILITY_TOPIC_PREFIX,
+        return posixpath.join(self._cfg.discovery_topic,
                               self.topic_path, 'availability')
 
     @property
     def device_availability_topic(self):
-        return posixpath.join(self.AVAILABILITY_TOPIC_PREFIX,
+        return posixpath.join(self._cfg.discovery_topic,
                               'alarm_control_panel',
                               self._cfg.panel_unique_id or 'qolsys',
                               'availability')
@@ -166,6 +172,13 @@ class MqttWrapper(object):
 
         self.set_available()
         self.update_state()
+        self.update_attributes()
+
+    def update_attributes(self):
+        pass
+
+    def update_state(self):
+        pass
 
     def set_available(self):
         self._mqtt_publish(
@@ -287,6 +300,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             'command_template': json.dumps(command_template),
             'availability_mode': 'all',
             'availability': self.configure_availability,
+            'json_attributes_topic': self.attributes_topic,
         }
 
         # If we have a unique ID for the panel, we can setup a unique ID for
@@ -304,6 +318,9 @@ class MqttWrapperQolsysPartition(MqttWrapper):
                 'model': 'IQ Panel 2+',
             }
 
+        if self._cfg.default_trigger_command:
+            payload['payload_trigger'] = self._cfg.default_trigger_command
+
         if self._cfg.code_arm_required or self._cfg.code_disarm_required:
             code = self._cfg.ha_disarm_code or self._cfg.panel_disarm_code
             if self._cfg.ha_check_disarm_code:
@@ -314,6 +331,17 @@ class MqttWrapperQolsysPartition(MqttWrapper):
                 payload['code'] = 'REMOTE_CODE_TEXT'
 
         return payload
+
+    def update_attributes(self):
+        self._mqtt_publish(
+            namespace=self._cfg.mqtt_namespace,
+            topic=self.attributes_topic,
+            retain=self._mqtt_retain,
+            payload=json.dumps({
+                'secure_arm': self._partition.secure_arm,
+                'alarm_type': self._partition.alarm_type,
+            }),
+        )
 
     def update_state(self):
         self._mqtt_publish(
@@ -380,6 +408,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
             'payload_off': self.PAYLOAD_OFF,
             'availability_mode': 'all',
             'availability': self.configure_availability,
+            'json_attributes_topic': self.attributes_topic,
         }
 
         # If we have a unique ID for the panel, we can setup a unique ID for
@@ -408,6 +437,19 @@ class MqttWrapperQolsysSensor(MqttWrapper):
             # }
 
         return payload
+
+    def update_attributes(self):
+        attributes = {
+            k: getattr(self._sensor, k)
+            for k in self._sensor.ATTRIBUTES
+        }
+
+        self._mqtt_publish(
+            namespace=self._cfg.mqtt_namespace,
+            topic=self.attributes_topic,
+            retain=self._mqtt_retain,
+            payload=json.dumps(attributes),
+        )
 
     def update_state(self):
         self._mqtt_publish(

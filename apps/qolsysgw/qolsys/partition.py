@@ -10,6 +10,7 @@ class QolsysPartition(QolsysObservable):
     NOTIFY_ADD_SENSOR = 'add_sensor'
     NOTIFY_REMOVE_SENSOR = 'remove_sensor'
     NOTIFY_UPDATE_STATUS = 'update_status'
+    NOTIFY_UPDATE_ALARM_TYPE = 'update_alarm_type'
 
     def __init__(self, partition_id: int, name: str, status: str,
                  secure_arm: bool) -> None:
@@ -20,6 +21,7 @@ class QolsysPartition(QolsysObservable):
         self._status = status
         self._secure_arm = secure_arm
         self._sensors = {}
+        self._alarm_type = None
 
     @property
     def id(self):
@@ -38,6 +40,10 @@ class QolsysPartition(QolsysObservable):
         return self._secure_arm
 
     @property
+    def alarm_type(self):
+        return self._alarm_type
+
+    @property
     def sensors(self):
         return self._sensors.values()
 
@@ -53,8 +59,24 @@ class QolsysPartition(QolsysObservable):
             self.notify(change=self.NOTIFY_UPDATE_STATUS,
                         prev_value=prev_value, new_value=new_value)
 
-    def triggered(self):
+        self.alarm_type = None
+
+    @alarm_type.setter
+    def alarm_type(self, value):
+        if value is not None:
+            value = value.upper()
+
+        if self._alarm_type != value:
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) alarm type updated to '{value}'")
+            prev_value = self._alarm_type
+            self._alarm_type = value
+
+            self.notify(change=self.NOTIFY_UPDATE_ALARM_TYPE,
+                        prev_value=prev_value, new_value=value)
+
+    def triggered(self, alarm_type: str=None):
         self.status = 'ALARM'
+        self.alarm_type = alarm_type
 
     def zone(self, zone_id, default=None):
         return self._sensors.get(zone_id, default)
