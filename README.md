@@ -1,5 +1,7 @@
 # Qolsys Gateway - `qolsysgw`
 
+![hacs validation](https://github.com/XaF/qolsysgw/actions/workflows/hacs-validation.yaml/badge.svg)
+
 Qolsys Gateway (`qolsysgw`) is an [AppDaemon][appdaemon]
 automation that servers as a gateway between a [Qolsys IQ Panel 2+][qolsys-panel]
 and [Home Assistant][hass]. Qolsys Gateway works by establishing a connection
