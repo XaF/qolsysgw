@@ -59,6 +59,8 @@ class MqttUpdater(object):
             self._factory.wrap(sensor).configure(partition=partition)
         elif change == QolsysPartition.NOTIFY_UPDATE_STATUS:
             self._factory.wrap(partition).update_state()
+        elif change == QolsysPartition.NOTIFY_UPDATE_SECURE_ARM:
+            self._factory.wrap(partition).configure()
         elif change == QolsysPartition.NOTIFY_UPDATE_ALARM_TYPE:
             self._factory.wrap(partition).update_attributes()
 
@@ -291,11 +293,15 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             # sharing the code in MQTT after initialization
             command_template['code'] = '{{ code }}'
 
+        secure_arm = (self._partition.secure_arm and
+                      not self._partition.panel_disarm_code)
+
         payload = {
             'name': self.name,
             'state_topic': self.state_topic,
-            'code_arm_required': self._cfg.code_arm_required,
+            'code_arm_required': self._cfg.code_arm_required or secure_arm,
             'code_disarm_required': self._cfg.code_disarm_required,
+            'code_trigger_required': self._cfg.code_trigger_required or secure_arm,
             'command_topic': self._cfg.control_topic,
             'command_template': json.dumps(command_template),
             'availability_mode': 'all',

@@ -17,6 +17,7 @@ from qolsys.control import QolsysControl
 from qolsys.events import QolsysEvent
 from qolsys.events import QolsysEventAlarm
 from qolsys.events import QolsysEventArming
+from qolsys.events import QolsysEventInfoSecureArm
 from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
 from qolsys.events import QolsysEventZoneEventUpdate
@@ -169,6 +170,17 @@ class QolsysGateway(Mqtt):
 
         if isinstance(event, QolsysEventInfoSummary):
             self._state.update(event)
+
+        elif isinstance(event, QolsysEventInfoSecureArm):
+            LOGGER.debug(f'INFO SecureArm partition_id={event.partition_id} '\
+                         f'value={event.value}')
+
+            partition = self._state.partition(event.partition_id)
+            if partition is None:
+                LOGGER.warning(f'Partition {event.partition_id} not found')
+                return
+
+            partition.secure_arm = event.value
 
         elif isinstance(event, QolsysEventZoneEventActive):
             LOGGER.debug(f'ACTIVE zone={event.zone}')

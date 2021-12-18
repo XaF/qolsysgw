@@ -189,7 +189,8 @@ class QolsysControlArmNight(QolsysControlArmHome):
     # pass
 
 
-# This depends on https://github.com/home-assistant/core/pull/60525
+# This depends on https://github.com/home-assistant/core/pull/60525, which
+# has been merged and is available starting with Home Assitant 2021.12
 class QolsysControlTrigger(_QolsysControlCheckCode):
 
     _CODE_REQUIRED_ATTR = 'code_trigger_required'

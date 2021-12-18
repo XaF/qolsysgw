@@ -18,12 +18,6 @@ actions and events, please make a pull request.
 
 
 
-## ENABLING AND DISABLING SECURE_ARM ON THE PANEL
-{"event":"INFO","info_type":"SECURE_ARM","partition_id":0,"value":true,"version":1,"requestID":"3910555f-36ed-4308-a78c-271d1f5cb302"}
-{"event":"INFO","info_type":"SECURE_ARM","partition_id":0,"value":false,"version":1,"requestID":"a9e4b682-3948-4f64-823f-0a62991f3f00"}
-
-
-
 ## Actions
 
 All actions seem to be sharing a common part of their payload, and specific
@@ -51,7 +45,6 @@ an `INFO` event as response from the panel.
   "version": 0
 }
 ```
-
 
 ### ARMING
 
@@ -204,6 +197,13 @@ UUID-formatted identifiant of the request.
 
 ### INFO
 
+The `INFO` event type gives information about the state of the system, either
+following an `INFO` action type (requesting the alarm system to provide the
+information) or simply because of a change in state of the system (e.g. someone
+manually changing a parameter in the alarm system).
+
+#### SUMMARY
+
 ```json
 {
   "event": "INFO",
@@ -255,6 +255,23 @@ The `zone_list` field contains a list of sensors, for which the possible `type` 
 - `Smoke Detector` for the smoke detectors
 - `CO Detector` for the CO detectors
 - `Water` for the water leaks detectors
+
+#### SECURE_ARM
+
+```json
+{
+  "event": "INFO",
+  "info_type": "SECURE_ARM",
+  "partition_id": 0,
+  "value": true,
+  "version": 1,
+  "requestID": "<request_id>"
+}
+```
+
+The `value` can be `true` or `false`, depending if Secure Arm has respectively been
+enabled or disabled. When Secure Arm is enabled, the alarm system requires a valid
+code to arm the alarm system.
 
 
 ### ZONE_EVENT

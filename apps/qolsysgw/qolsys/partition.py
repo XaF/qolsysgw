@@ -7,10 +7,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 class QolsysPartition(QolsysObservable):
+
     NOTIFY_ADD_SENSOR = 'add_sensor'
     NOTIFY_REMOVE_SENSOR = 'remove_sensor'
-    NOTIFY_UPDATE_STATUS = 'update_status'
     NOTIFY_UPDATE_ALARM_TYPE = 'update_alarm_type'
+    NOTIFY_UPDATE_SECURE_ARM = 'update_secure_arm'
+    NOTIFY_UPDATE_STATUS = 'update_status'
 
     def __init__(self, partition_id: int, name: str, status: str,
                  secure_arm: bool) -> None:
@@ -60,6 +62,17 @@ class QolsysPartition(QolsysObservable):
                         prev_value=prev_value, new_value=new_value)
 
         self.alarm_type = None
+
+    @secure_arm.setter
+    def secure_arm(self, value):
+        new_value = bool(value)
+        if self._secure_arm != new_value:
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) secure arm updated to '{new_value}'")
+            prev_value = self._secure_arm
+            self._secure_arm = new_value
+
+            self.notify(change=self.NOTIFY_UPDATE_SECURE_ARM,
+                        prev_value=prev_value, new_value=new_value)
 
     @alarm_type.setter
     def alarm_type(self, value):
