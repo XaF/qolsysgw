@@ -294,7 +294,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             command_template['code'] = '{{ code }}'
 
         secure_arm = (self._partition.secure_arm and
-                      not self._partition.panel_disarm_code)
+                      not self._cfg.panel_disarm_code)
 
         payload = {
             'name': self.name,
