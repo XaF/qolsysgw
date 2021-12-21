@@ -32,6 +32,10 @@ class QolsysControl(object):
         return self._partition_id
 
     @property
+    def code(self):
+        return self._code
+
+    @property
     def session_token(self):
         return self._session_token
 
@@ -47,7 +51,7 @@ class QolsysControl(object):
     def requires_config(self):
         return self._requires_config
 
-    def configure(self, cfg):
+    def configure(self, cfg, state):
         pass
 
     def check(self):
@@ -92,11 +96,15 @@ class _QolsysControlCheckCode(QolsysControl):
         super().__init__(*args, **kwargs)
 
         self._requires_config = True
+        self._panel_code = None
 
-    def configure(self, cfg):
-        self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR)
+    def configure(self, cfg, state):
+        self._panel_needs_code = hasattr(self, '_partition_id') and state.partition(self._partition_id).secure_arm
+        self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or self._secure_arm
+
+        self._panel_code = cfg.panel_disarm_code
+
         self._check_code = self._code_required and not cfg.ha_check_disarm_code
-
         if self._check_code:
             self._valid_code = cfg.ha_disarm_code or cfg.panel_disarm_code
 
@@ -112,36 +120,31 @@ class _QolsysControlCheckCode(QolsysControl):
             if self._valid_code and self._code != self._valid_code:
                 raise InvalidArmDisarmCodeException
 
+        if self._panel_needs_code:
+            if self._panel_code is None:
+                if self._code:
+                    LOGGER.info('Using code sent from home assistant since '\
+                                'no disarm code configured')
+                    self._panel_code = self._code
+                else:
+                    raise MissingDisarmCodeException(
+                        'Cannot disarm without a configured disarm code')
+
 
 class QolsysControlDisarm(_QolsysControlCheckCode):
     
     _CODE_REQUIRED_ATTR = 'code_disarm_required'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def configure(self, cfg, state):
+        super().configure(cfg, state)
 
-        self._requires_config = True
-        self._disarm_code = None
-
-    def configure(self, cfg):
-        self._disarm_code = cfg.panel_disarm_code
-
-    def check(self):
-        super().check()
-
-        if self._disarm_code is None:
-            if not self.code:
-                LOGGER.info('Using code sent from home assistant since '\
-                            'no disarm code configured')
-            else:
-                raise MissingDisarmCodeException(
-                    'Cannot disarm without a configured disarm code')
+        self._panel_needs_code = True
 
     @property
     def action(self):
         return QolsysActionDisarm(
             partition_id=self._partition_id,
-            disarm_code=self._disarm_code or self._code,
+            panel_code=self._panel_code,
         )
 
 
@@ -156,7 +159,9 @@ class QolsysControlArmAway(QolsysControlArm):
         self._delay = delay
         self._requires_config = self._requires_config or delay is None
 
-    def configure(self, cfg):
+    def configure(self, cfg, state):
+        super().configure(cfg, state)
+
         if self._delay is None:
             self._delay = cfg.arm_away_exit_delay
 
@@ -164,6 +169,7 @@ class QolsysControlArmAway(QolsysControlArm):
     def action(self):
         return QolsysActionArmAway(
             partition_id=self._partition_id,
+            panel_code=self._panel_code,
             delay=self._delay,
         )
 
@@ -177,6 +183,7 @@ class QolsysControlArmHome(QolsysControlArm):
     def action(self):
         return QolsysActionArmStay(
             partition_id=self._partition_id,
+            panel_code=self._panel_code,
         )
 
 
@@ -199,6 +206,12 @@ class QolsysControlTrigger(_QolsysControlCheckCode):
         super().__init__(*args, **kwargs)
 
         self._alarm_type = alarm_type
+        self._requires_config = True
+
+    def configure(self, cfg, state):
+        super().configure(cfg, state)
+
+        self._panel_needs_code = False
 
     @property
     def action(self):

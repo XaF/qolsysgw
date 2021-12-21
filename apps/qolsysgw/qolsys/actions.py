@@ -48,23 +48,24 @@ class QolsysActionArm(QolsysAction):
     ARMING_TYPE_ARM_AWAY = 'ARM_AWAY'
     ARMING_TYPE_ARM_STAY = 'ARM_STAY'
 
-    def __init__(self, arm_type: str, partition_id: int) -> None:
+    _PARAMS_TO_REDACT = ['usercode']
+
+    def __init__(self, arm_type: str, partition_id: int,
+                 panel_code: str=None) -> None:
         self._data = {
             'action': 'ARMING',
             'arming_type': arm_type,
             'partition_id': partition_id,
         }
 
+        if panel_code:
+            self._data['usercode'] = panel_code
+
 
 class QolsysActionDisarm(QolsysActionArm):
-
-    _PARAMS_TO_REDACT = ['usercode']
-
-    def __init__(self, disarm_code: str=None, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_DISARM,
                          *args, **kwargs)
-
-        self._data['usercode'] = disarm_code
 
 
 class QolsysActionArmAway(QolsysActionArm):

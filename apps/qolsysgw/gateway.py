@@ -224,7 +224,7 @@ class QolsysGateway(Mqtt):
             return
 
         if control.requires_config:
-            control.configure(self._cfg)
+            control.configure(self._cfg, self._state)
 
         try:
             control.check
