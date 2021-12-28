@@ -5,6 +5,7 @@ import posixpath
 
 from mqtt.exceptions import UnknownDeviceClassException
 from mqtt.exceptions import UnknownMqttWrapperException
+from mqtt.utils import get_mac_from_host
 
 from qolsys.config import QolsysGatewayConfig
 from qolsys.partition import QolsysPartition
@@ -323,6 +324,14 @@ class MqttWrapperQolsysPartition(MqttWrapper):
                 'manufacturer': 'Qolsys',
                 'model': 'IQ Panel 2+',
             }
+
+            # If we are able to resolve the mac address, this will allow to
+            # link the device to other related elements in home assistant
+            mac = get_mac_from_host(self._cfg.panel_host)
+            if mac:
+                payload['device']['connections'] = [
+                    ['mac', mac],
+                ]
 
         if self._cfg.default_trigger_command:
             payload['payload_trigger'] = self._cfg.default_trigger_command
