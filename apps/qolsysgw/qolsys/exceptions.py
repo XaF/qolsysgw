@@ -19,8 +19,8 @@ class UnknownQolsysEventException(QolsysException):
 class UnknownQolsysSensorException(QolsysException):
     pass
 
-class MissingDisarmCodeException(QolsysException):
+class MissingUserCodeException(QolsysException):
     pass
 
-class InvalidArmDisarmCodeException(QolsysException):
+class InvalidUserCodeException(QolsysException):
     pass

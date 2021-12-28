@@ -21,7 +21,7 @@ from qolsys.events import QolsysEventInfoSecureArm
 from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
 from qolsys.events import QolsysEventZoneEventUpdate
-from qolsys.exceptions import MissingDisarmCodeException
+from qolsys.exceptions import MissingUserCodeException
 from qolsys.socket import QolsysSocket
 from qolsys.state import QolsysState
 
@@ -227,8 +227,8 @@ class QolsysGateway(Mqtt):
             control.configure(self._cfg, self._state)
 
         try:
-            control.check
-        except MissingDisarmCodeException as e:
+            control.check()
+        except MissingUserCodeException as e:
             LOGGER.error(f'{e} for control event {control}')
             return
 

@@ -6,8 +6,8 @@ from qolsys.actions import QolsysActionArmStay
 from qolsys.actions import QolsysActionDisarm
 from qolsys.actions import QolsysActionTrigger
 from qolsys.exceptions import UnknownQolsysControlException
-from qolsys.exceptions import MissingDisarmCodeException
-from qolsys.exceptions import InvalidArmDisarmCodeException
+from qolsys.exceptions import MissingUserCodeException
+from qolsys.exceptions import InvalidUserCodeException
 from qolsys.utils import find_subclass
 
 
@@ -98,14 +98,15 @@ class _QolsysControlCheckCode(QolsysControl):
         self._requires_config = True
         self._panel_code = None
 
-        self._action_requires_panel_code = True
-
     def configure(self, cfg, state):
         self._secure_arm = hasattr(self, '_partition_id') and \
             state.partition(self._partition_id).secure_arm
 
+        if self._PANEL_CODE_REQUIRED == 'secure_arm':
+            self._PANEL_CODE_REQUIRED = self._secure_arm
+
         self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or \
-            self._secure_arm
+            self._PANEL_CODE_REQUIRED
 
         self._panel_code = cfg.panel_user_code
 
@@ -123,27 +124,25 @@ class _QolsysControlCheckCode(QolsysControl):
             # an exception, as we want to try and use that provided code
             # to disarm the alarm
             if self._valid_code and self._code != self._valid_code:
-                raise InvalidArmDisarmCodeException
+                raise InvalidArmUserCodeException
 
-        if self._action_requires_panel_code:
+        if self._PANEL_CODE_REQUIRED:
+            LOGGER.debug(f"Panel code is required for {self}")
             if self._panel_code is None:
+                LOGGER.debug('Panel code is not provided in config')
                 if self._code:
                     LOGGER.info('Using code sent from home assistant since '\
                                 'no panel code configured')
                     self._panel_code = self._code
                 else:
-                    raise MissingDisarmCodeException(
+                    raise MissingUserCodeException(
                         'Cannot perform action without a configured panel code')
 
 
 class QolsysControlDisarm(_QolsysControlCheckCode):
     
     _CODE_REQUIRED_ATTR = 'code_disarm_required'
-
-    def configure(self, cfg, state):
-        super().configure(cfg, state)
-
-        self._panel_needs_code = True
+    _PANEL_CODE_REQUIRED = True
 
     @property
     def action(self):
@@ -155,6 +154,7 @@ class QolsysControlDisarm(_QolsysControlCheckCode):
 
 class QolsysControlArm(_QolsysControlCheckCode):
     _CODE_REQUIRED_ATTR = 'code_arm_required'
+    _PANEL_CODE_REQUIRED = 'secure_arm'
 
 
 class QolsysControlArmAway(QolsysControlArm):
@@ -206,12 +206,12 @@ class QolsysControlArmNight(QolsysControlArmHome):
 class QolsysControlTrigger(_QolsysControlCheckCode):
 
     _CODE_REQUIRED_ATTR = 'code_trigger_required'
+    _PANEL_CODE_REQUIRED = False
 
     def __init__(self, alarm_type: str=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._alarm_type = alarm_type
-        self._action_requires_panel_code = False
 
     @property
     def action(self):
