@@ -13,6 +13,7 @@ class QolsysGatewayConfig(object):
     _DEFAULT_CONFIG = {
         'panel_host': _SENTINEL,
         'panel_port': None,
+        'panel_mac': None,
         'panel_token': _SENTINEL,
         'panel_user_code': None,
         'panel_unique_id': 'qolsys_panel',

@@ -327,7 +327,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
 
             # If we are able to resolve the mac address, this will allow to
             # link the device to other related elements in home assistant
-            mac = get_mac_from_host(self._cfg.panel_host)
+            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
             if mac:
                 payload['device']['connections'] = [
                     ['mac', mac],

@@ -287,6 +287,21 @@ With:
   ```
   </details>
 
+- <details><summary><strong>panel_mac:</strong> the mac address of your Qolsys Panel.
+  This is something you can find from your router, and might allow you to link the
+  device created in Home Assistant by Qolsys Gateway to other entries related to your
+  Panel. Not used by default, and Qolsys Gateway will try to resolve the mac address
+  using ARP - which does not work when using appdaemon in docker, except if using the
+  host network mode -, or ignore it entirely if not possible.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    qolsys_mac: aa:bb:cc:dd:11:22
+    # ...
+  ```
+  </details>
+
 - <details><summary><strong>panel_user_code:</strong> the code to send to your
   Qolsys Panel to disarm your system (and arm when in secure arm mode). This needs
   to be a valid user code added to your Qolsys Panel. It is recommended to use a
@@ -444,7 +459,8 @@ With:
   </details>
 
 - <details><summary><strong>default_trigger_command:</strong> the trigger
-  command to use among the [valid control commands that Qolsys Gateway support](./docs/qolsysgw-control-commands.md).
+  command to use among the <a href="./docs/qolsysgw-control-commands.md">valid
+  control commands that Qolsys Gateway support</a>.
   Defaults to <code>TRIGGER</code>.</summary>
 
   ```yaml
