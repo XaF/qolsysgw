@@ -14,7 +14,7 @@ class QolsysGatewayConfig(object):
         'panel_host': _SENTINEL,
         'panel_port': None,
         'panel_token': _SENTINEL,
-        'panel_disarm_code': None,
+        'panel_user_code': None,
         'panel_unique_id': 'qolsys_panel',
         'panel_device_name': 'Qolsys Panel',
         'arm_away_exit_delay': None,
@@ -26,8 +26,8 @@ class QolsysGatewayConfig(object):
         'event_topic': 'qolsys/{panel_unique_id}/event',
         'user_control_token': None,
 
-        'ha_check_disarm_code': True,
-        'ha_disarm_code': None,
+        'ha_check_user_code': True,
+        'ha_user_code': None,
         'code_arm_required': False,
         'code_disarm_required': False,
         'code_trigger_required': False,
@@ -58,11 +58,11 @@ class QolsysGatewayConfig(object):
         if errors > 0:
             raise QolsysGwConfigIncomplete
 
-        if self.get('panel_disarm_code') is None:
-            if self.get('ha_disarm_code'):
+        if self.get('panel_user_code') is None:
+            if self.get('ha_user_code'):
                 raise QolsysGwConfigError(
-                        "Cannot use 'ha_disarm_code' if "\
-                        "'panel_disarm_code' is not set")
+                        "Cannot use 'ha_user_code' if "\
+                        "'panel_user_code' is not set")
 
             for k in ['code_arm_required', 'code_trigger_required']:
                 if self.get(k):
@@ -73,7 +73,7 @@ class QolsysGatewayConfig(object):
 
             # Without a configured disarm code, we cannot have home assistant
             # checking it for us
-            self._override_config['ha_check_disarm_code'] = False
+            self._override_config['ha_check_user_code'] = False
 
             # Without a configured disarm code, we will use the one provided
             # in home assistant to try and disarm the alarm

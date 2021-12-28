@@ -13,7 +13,7 @@ These commands are listened for on the `control_topic`.
 
 This control command is to ask Qolsys Gateway to disarm the given partition.
 In cases where Qolsys Gateway is to verify the code (`code_disarm_required`
-set to `true` and `ha_check_disarm_code` set to `false`), or if the panel
+set to `true` and `ha_check_user_code` set to `false`), or if the panel
 disarm code was not provided in the configuration, the `code` field needs to
 be provided. It will either be used to check for the validity of the code, or
 sent directly to the panel, which can then either disarm or ignore the

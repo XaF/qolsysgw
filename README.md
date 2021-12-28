@@ -287,18 +287,18 @@ With:
   ```
   </details>
 
-- <details><summary><strong>panel_disarm_code:</strong> the code to send to your
-  Qolsys Panel to disarm your system. This needs to be a valid user code added to
-  your Qolsys Panel. It is recommended to use a distinct user code if setup, so
-  you have the ability to roll it as needed. If unset (or <code>null</code>), you
-  will not be able to disarm your alarm system without providing a code in
-  Home Assistant.
+- <details><summary><strong>panel_user_code:</strong> the code to send to your
+  Qolsys Panel to disarm your system (and arm when in secure arm mode). This needs
+  to be a valid user code added to your Qolsys Panel. It is recommended to use a
+  distinct user code if setup, so you have the ability to roll it as needed.
+  If unset (or <code>null</code>), you will not be able to disarm your alarm system
+  without providing a code in Home Assistant.
   Defaults to <code>null</code>.</summary>
 
   ```yaml
   qolsys_panel:
     # ...
-    panel_disarm_code: 1234 # there is a code '1234' allowing me to disarm my Qolsys Panel
+    panel_user_code: 1234 # there is a code '1234' allowing me to disarm my Qolsys Panel
     # ...
   ```
   </details>
@@ -352,8 +352,8 @@ With:
   ```
   </details>
 
-- <details><summary><strong>ha_check_disarm_code:</strong> whether or not
-  the check of the disarm code should be done in the Home Assistant user
+- <details><summary><strong>ha_check_user_code:</strong> whether or not
+  the check of the user code should be done in the Home Assistant user
   interface. If set to <code>false</code>, the code will never be checked
   in home assistant even if required for arming, disarming or triggering
   the alarm, and will always be sent to Qolsys Gateway for checking. If
@@ -363,42 +363,42 @@ With:
   to Home Assistant by Qolsys Gateway to make sure it is receiving control
   messages from the right instance). Note that in case of issues of checking
   a code in Qolsys Gateway, things will simply fail silently.
-  <em>Requires <code>panel_disarm_code</code> to be set, will silently
+  <em>Requires <code>panel_user_code</code> to be set, will silently
   revert to <code>false</code> otherwise.</em>
   Defaults to <code>true</code>.</summary>
 
   ```yaml
   qolsys_panel:
     # ...
-    ha_check_disarm_code: false # we want Qolsys Gateway to receive the code and perform the check
+    ha_check_user_code: false # we want Qolsys Gateway to receive the code and perform the check
     # ...
   ```
   </details>
 
-- <details><summary><strong>ha_disarm_code:</strong> if you want to use a
+- <details><summary><strong>ha_user_code:</strong> if you want to use a
   different disarm code in Home Assistant than the actual disarm code that
   Qolsys Gateway will use with the panel, you can define it here. You can
   use numeric codes (will show a numeric pad in Home Assistant's user
   interface) or any characters (will show a text box).
-  If <code>ha_check_disarm_code</code> is set to <code>true</code>, then
+  If <code>ha_check_user_code</code> is set to <code>true</code>, then
   the verification of that code will be done in Home Assistant directly. If
   set to <code>false</code>, Qolsys Gateway will use that code to compare
   against what Home Assistant will send in the control topic.
-  <em>Requires <code>panel_disarm_code</code> to be set, will raise an
+  <em>Requires <code>panel_user_code</code> to be set, will raise an
   error otherwise.</em>
   Defaults to <code>null</code>.</summary>
 
   ```yaml
   qolsys_panel:
     # ...
-    ha_disarm_code: $up3r$ecre7!! # this will be the code expected from the user
+    ha_user_code: $up3r$ecre7!! # this will be the code expected from the user
     # ...
   ```
   </details>
 
 - <details><summary><strong>code_arm_required:</strong> whether or not
   we require to type-in the code to arm the alarm system.
-  <em>Requires <code>panel_disarm_code</code> to be set, will raise an
+  <em>Requires <code>panel_user_code</code> to be set, will raise an
   error otherwise as the Qolsys Panel does not require any code to arm
   the alarm system, and Qolsys Gateway cannot do that check without a
   configured code.</em>
@@ -415,7 +415,7 @@ With:
 - <details><summary><strong>code_disarm_required:</strong> whether or not
   we require to type-in the code to arm the alarm system.
   <em>Will silently be forced to <code>true</code> if
-  <code>panel_disarm_code</code> is not set, as Qolsys Gateway will not be
+  <code>panel_user_code</code> is not set, as Qolsys Gateway will not be
   able to disarm the alarm system without a code.</em>
   Defaults to <code>false</code>.</summary>
 
@@ -429,7 +429,7 @@ With:
 
 - <details><summary><strong>code_trigger_required:</strong> whether or not
   we require to type-in the code to trigger the alarm system.
-  <em>Requires <code>panel_disarm_code</code> to be set, will raise an
+  <em>Requires <code>panel_user_code</code> to be set, will raise an
   error otherwise as the Qolsys Panel does not require any code to trigger
   the alarm system, and Qolsys Gateway cannot do that check without a
   configured code.</em>

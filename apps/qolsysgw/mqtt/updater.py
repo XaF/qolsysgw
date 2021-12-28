@@ -287,7 +287,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             'session_token': self._session_token,
         }
         if (self._cfg.code_arm_required or self._cfg.code_disarm_required) and\
-                not self._cfg.ha_check_disarm_code:
+                not self._cfg.ha_check_user_code:
             # It is the only situation where we actually need to transmit
             # the code regularly through mqtt. In any other situation, we can
             # use the session token for comparison, which will allow to avoid
@@ -295,7 +295,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             command_template['code'] = '{{ code }}'
 
         secure_arm = (self._partition.secure_arm and
-                      not self._cfg.panel_disarm_code)
+                      not self._cfg.panel_user_code)
 
         payload = {
             'name': self.name,
@@ -337,8 +337,8 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             payload['payload_trigger'] = self._cfg.default_trigger_command
 
         if self._cfg.code_arm_required or self._cfg.code_disarm_required:
-            code = self._cfg.ha_disarm_code or self._cfg.panel_disarm_code
-            if self._cfg.ha_check_disarm_code:
+            code = self._cfg.ha_user_code or self._cfg.panel_user_code
+            if self._cfg.ha_check_user_code:
                 payload['code'] = code
             elif code is None or code.isdigit():
                 payload['code'] = 'REMOTE_CODE'

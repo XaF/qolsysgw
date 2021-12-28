@@ -107,11 +107,11 @@ class _QolsysControlCheckCode(QolsysControl):
         self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or \
             self._secure_arm
 
-        self._panel_code = cfg.panel_disarm_code
+        self._panel_code = cfg.panel_user_code
 
-        self._check_code = self._code_required and not cfg.ha_check_disarm_code
+        self._check_code = self._code_required and not cfg.ha_check_user_code
         if self._check_code:
-            self._valid_code = cfg.ha_disarm_code or cfg.panel_disarm_code
+            self._valid_code = cfg.ha_user_code or cfg.panel_user_code
 
     def check(self):
         super().check()
