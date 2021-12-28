@@ -442,14 +442,14 @@ class MqttWrapperQolsysSensor(MqttWrapper):
                 'manufacturer': 'QOLSYS',
                 'model': 'IQ Panel 2+',
             }
-            # TODO: Should each sensor be its own device ?
-            # payload['device'] = {
-                # 'name': f'{self.name} Sensor',
-                # 'identifiers': [
-                    # self._sensor.id,
-                # ],
-                # 'via_device': self._cfg.panel_unique_id,
-            # }
+
+            # If we are able to resolve the mac address, this will allow to
+            # link the device to other related elements in home assistant
+            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
+            if mac:
+                payload['device']['connections'] = [
+                    ['mac', mac],
+                ]
 
         return payload
 
