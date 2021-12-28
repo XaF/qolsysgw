@@ -22,14 +22,14 @@ class QolsysState(QolsysObservable):
         return self._partitions.values()
 
     def partition(self, partition_id):
-        return self._partitions.get(partition_id)
+        return self._partitions.get(int(partition_id))
 
     def update(self, event: QolsysEventInfoSummary):
         prev_partitions = self.partitions
 
         self._partitions = {}
         for partition in event.partitions:
-            self._partitions[partition.id] = partition
+            self._partitions[int(partition.id)] = partition
         
         self.notify(change=self.NOTIFY_UPDATE_PARTITIONS,
                     prev_value=prev_partitions,

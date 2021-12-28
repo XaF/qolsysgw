@@ -98,9 +98,14 @@ class _QolsysControlCheckCode(QolsysControl):
         self._requires_config = True
         self._panel_code = None
 
+        self._action_requires_panel_code = True
+
     def configure(self, cfg, state):
-        self._panel_needs_code = hasattr(self, '_partition_id') and state.partition(self._partition_id).secure_arm
-        self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or self._secure_arm
+        self._secure_arm = hasattr(self, '_partition_id') and \
+            state.partition(self._partition_id).secure_arm
+
+        self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or \
+            self._secure_arm
 
         self._panel_code = cfg.panel_disarm_code
 
@@ -120,15 +125,15 @@ class _QolsysControlCheckCode(QolsysControl):
             if self._valid_code and self._code != self._valid_code:
                 raise InvalidArmDisarmCodeException
 
-        if self._panel_needs_code:
+        if self._action_requires_panel_code:
             if self._panel_code is None:
                 if self._code:
                     LOGGER.info('Using code sent from home assistant since '\
-                                'no disarm code configured')
+                                'no panel code configured')
                     self._panel_code = self._code
                 else:
                     raise MissingDisarmCodeException(
-                        'Cannot disarm without a configured disarm code')
+                        'Cannot perform action without a configured panel code')
 
 
 class QolsysControlDisarm(_QolsysControlCheckCode):
@@ -206,12 +211,7 @@ class QolsysControlTrigger(_QolsysControlCheckCode):
         super().__init__(*args, **kwargs)
 
         self._alarm_type = alarm_type
-        self._requires_config = True
-
-    def configure(self, cfg, state):
-        super().configure(cfg, state)
-
-        self._panel_needs_code = False
+        self._action_requires_panel_code = False
 
     @property
     def action(self):

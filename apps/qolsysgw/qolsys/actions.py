@@ -59,7 +59,7 @@ class QolsysActionArm(QolsysAction):
         }
 
         if panel_code:
-            self._data['usercode'] = panel_code
+            self._data['usercode'] = str(panel_code)
 
 
 class QolsysActionDisarm(QolsysActionArm):
