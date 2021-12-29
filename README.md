@@ -158,12 +158,71 @@ appdaemon:
 </details>
 
 
+### Installing HACS (optional, recommended)
+
+HACS is the Home Assistant Community Store and allows for community integrations and
+automations to be updated cleanly and easily from the Home Assistant web user interface.
+If it is simple to install Qolsys Gateway without HACS, keeping up to date requires
+manual steps that HACS will handle for you: you will be notified of updates, and they
+can be installed by a click on a button.
+
+If you want to use HACS, you will have to follow [their documentation on how to install HACS][hacs-install].
+
+
 ### Installing Qolsys Gateway
 
 Installing Qolsys Gateway is pretty simple once all the applications above
-are setup, and can be summarized by putting the content of the `apps/` directory
-of this repository (the `qolsysgw/` directory) into the `apps/` directory of your
-AppDaemon installation.
+are setup. You can either follow the path using HACS (a bit more steps initially,
+easier on the longer run) or use the manual setup approach.
+
+#### With HACS (recommended)
+
+To install Qolsys Gateway with HACS, you will need to make sure that you enabled
+AppDaemon automations in HACS, as these are not enabled by default:
+
+1. Click on `Configuration` on the left menu bar in Home Assistant Web UI
+2. Select `Devices & Services`
+3. Select `Integrations`
+4. Find `HACS` and click on `Configure`
+5. In the window that opens, make sure that `Enable AppDaemon apps discovery & tracking`
+   is checked, or check it and click `Submit`
+6. If you just enabled this (or just installed HACS), you might have to wait a few minutes
+   as all repositories are being fetched; you might hit a GitHub rate limit, which might
+   then require you to wait a few hours for HACS to be fully configured. In this case,
+   you won't be able to proceed to the next steps until HACS is ready.
+
+Qolsys Gateway is not yet in the default applications available in HACS, but [has
+been submitted to be available by default][hacs-pr]. Until this pull request is
+merged, you will need to add Qolsys Gateway as a custom repository in HACS. In order
+to do so:
+
+1. Click on `HACS` on the left menu bar in Home Assistant Web UI
+2. Click on `Automations` in the right panel
+3. Click on the three dots in the top right corner
+4. Select `Custom repositories`
+5. In the form that appears, write `https://github.com/XaF/qolsysgw` as repository,
+   and select `AppDaemon` as category
+6. Click on `ADD`
+7. Qolsys Gateway is now available to be installed and managed with HACS
+
+Now, to install Qolsys Gateway with HACS, follow these steps:
+
+1. Click on `HACS` on the left menu bar in Home Assistant Web UI
+2. Click on `Automations` in the right panel
+3. Click on `Explore & download repositories` in the bottom right corner
+4. Search for `qolsysgw`, and click on `Qolsys Gateway` in the list that appears
+5. In the bottom right corner of the panel that appears, click on
+   `Download this repository with HACS`
+6. A confirmation panel will appear, click on `Download`, and wait for HACS to
+   proceed with the download
+6. Qolsys Gateway is now installed, and HACS will inform you when updates are available
+
+
+#### Manually
+
+Installing Qolsys Gateway manually can be summarized by putting the content of the
+`apps/` directory of this repository (the `qolsysgw/` directory) into the `apps/`
+directory of your AppDaemon installation.
 
 For instance, if your Home Assistant configuration directory is in `/hass/config/`,
 you most likely have AppDaemon setup in `/hass/config/appdaemon/`, and you can thus
@@ -171,6 +230,24 @@ put `qolsysgw/` into `/hass/config/appdaemon/apps/`.
 
 
 ## Configuration
+
+### Configuring the MQTT integration in Home Assistant
+
+The MQTT integration of Home Assistant needs to be configured with your
+MQTT broker in order for Qolsys Gateway to work. If you haven't setup the
+MQTT integration yet, you can do so with the following steps:
+
+1. Click on `Configuration` on the left menu bar in Home Assistant Web UI
+2. Select `Devices & Services`
+3. Select `Integrations`
+4. Click on `Add Integration` in the bottom right corner
+5. Search for `MQTT`, and click on the MQTT integration
+6. Fill in the information as configured for your MQTT broker (hostname,
+   port, and username and password if setting things up with an
+   authenticated connection)
+7. Click on `Submit`, Home Assistant will try and connect to the MQTT broker,
+   and the integration will be setup upon success.
+
 
 ### Configuring your Qolsys IQ Panel 2+
 
@@ -614,6 +691,8 @@ List of links used in that page, sorted alphabetically by tag
 [appdaemon-mqtt-plugin]: https://appdaemon.readthedocs.io/en/latest/CONFIGURE.html#configuration-of-the-mqtt-plugin
 [appdaemon]: https://github.com/AppDaemon/appdaemon
 [asyncio]: https://docs.python.org/3/library/asyncio.html
+[hacs-install]: https://hacs.xyz/docs/setup/download
+[hacs-pr]: https://github.com/hacs/default/pull/1173
 [hass-community-thread]: https://community.home-assistant.io/t/qolsys-iq-panel-2-and-3rd-party-integration/231405
 [hass-install]: https://www.home-assistant.io/installation/
 [hass-mqtt-broker]: https://www.home-assistant.io/docs/mqtt/broker
