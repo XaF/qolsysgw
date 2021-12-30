@@ -20,8 +20,12 @@ from Home Assistant, manually or through automations.
    - [Installing Home Assistant](#installing-home-assistant)
    - [Installing an MQTT Broker](#installing-an-mqtt-broker)
    - [Installing AppDaemon](#installing-appdaemon)
+   - [Installing HACS (optional, recommended)](#installing-hacs-optional-recommended)
    - [Installing Qolsys Gateway](#installing-qolsys-gateway)
+      - [With HACS (recommended)](#with-hacs-recommended)
+      - [Manually](#manually)
 - [Configuration](#configuration)
+   - [Configuring the MQTT integration in Home Assistant](#configuring-the-mqtt-integration-in-home-assistant)
    - [Configuring your Qolsys IQ Panel 2+](#configuring-your-qolsys-iq-panel-2)
    - [Configuring Qolsys Gateway](#configuring-qolsys-gateway)
       - [Required configuration](#required-configuration)
@@ -200,7 +204,7 @@ to do so:
 2. Click on `Automations` in the right panel
 3. Click on the three dots in the top right corner
 4. Select `Custom repositories`
-5. In the form that appears, write `https://github.com/XaF/qolsysgw` as repository,
+5. In the form that appears, write `XaF/qolsysgw` as repository,
    and select `AppDaemon` as category
 6. Click on `ADD`
 7. Qolsys Gateway is now available to be installed and managed with HACS
@@ -359,7 +363,7 @@ With:
   ```yaml
   qolsys_panel:
     # ...
-    qolsys_port: 4242 # use the port 4242
+    panel_port: 4242 # use the port 4242
     # ...
   ```
   </details>
@@ -374,7 +378,7 @@ With:
   ```yaml
   qolsys_panel:
     # ...
-    qolsys_mac: aa:bb:cc:dd:11:22
+    panel_mac: aa:bb:cc:dd:11:22
     # ...
   ```
   </details>
