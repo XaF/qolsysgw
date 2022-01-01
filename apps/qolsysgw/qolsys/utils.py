@@ -25,13 +25,16 @@ def all_subclasses(cls):
         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
 
-def find_subclass(cls, subtype: str, cache: dict=None, normalize=True):
+def find_subclass(cls, subtype: str, cache: dict=None, normalize=True, preserve_capitals=False):
     if cache and subtype in cache:
         return cache[subtype]
 
     normalized_subtype = subtype
     if normalize:
         normalized_subtype = re.compile('[\W_]+').sub(' ', normalized_subtype)
+        if preserve_capitals:
+            normalized_subtype = re.compile('(?<=[^\s])([A-Z])').sub(
+                ' \\1', normalized_subtype)
         normalized_subtype = normalized_subtype.title()
         normalized_subtype = re.compile('\s').sub('', normalized_subtype)
 
