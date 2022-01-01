@@ -263,6 +263,8 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
             )
         except UnknownQolsysSensorException:
             LOGGER.warning(f"sensor of unknown type: {zone}")
+            raise UnableToParseEventException(
+                f"Cannot parse zone event as unknown sensor type: {zone}")
 
 
 class QolsysEventArming(QolsysEvent):

@@ -153,7 +153,8 @@ class QolsysSensor(QolsysObservable):
             data = json.loads(data)
 
         sensor_type = data.get('type')
-        klass = find_subclass(cls, sensor_type, cache=cls.__SUBCLASSES_CACHE)
+        klass = find_subclass(cls, sensor_type, cache=cls.__SUBCLASSES_CACHE,
+                              preserve_capitals=True)
         if not klass:
             raise UnknownQolsysSensorException
 
