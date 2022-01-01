@@ -118,7 +118,12 @@ class QolsysSocket(object):
 
                 if writer:
                     writer.close()
-                    await writer.wait_closed()
+                    try:
+                        await writer.wait_closed()
+                    except:
+                        self._logger.exception('unable to wait for writer to '\
+                            'be fully closed; this might not be an issue if '\
+                            'the connection was closed on the other side')
 
             if self._listen and delay_reconnect:
                 self._logger.info(f'sleeping {delay_reconnect} second(s) before reconnecting')
