@@ -10,6 +10,7 @@ from qolsys.actions import QolsysAction
 from qolsys.actions import QolsysActionInfo
 from qolsys.events import QolsysEvent
 from qolsys.exceptions import UnknownQolsysEventException
+from qolsys.exceptions import UnknownQolsysSensorException
 from qolsys.utils import LoggerCallback
 
 
