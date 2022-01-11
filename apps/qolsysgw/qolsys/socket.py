@@ -100,6 +100,9 @@ class QolsysSocket(object):
                     except UnknownQolsysEventException:
                         self._logger.debug(f'Unknown Qolsys event: {line}')
                         continue
+                    except UnknownQolsysSensorException:
+                        self._logger.debug(f'Unknown sensor in Qolsys event: {line}')
+                        continue
                     
                     try:
                         await self._callback(event)

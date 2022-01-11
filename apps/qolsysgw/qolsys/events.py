@@ -93,7 +93,7 @@ class QolsysEventInfoSummary(QolsysEventInfo):
         info_type = data.get('info_type')
         if info_type != 'SUMMARY':
             raise UnableToParseEventException(
-                f"Cannot parse event with info tyoe '{info_type}'")
+                f"Cannot parse event with info type '{info_type}'")
 
         return QolsysEventInfoSummary(
             partitions=cls._parse_partitions(data),
@@ -156,7 +156,7 @@ class QolsysEventInfoSecureArm(QolsysEventInfo):
         info_type = data.get('info_type')
         if info_type != 'SECURE_ARM':
             raise UnableToParseEventException(
-                f"Cannot parse event with info tyoe '{info_type}'")
+                f"Cannot parse event with info type '{info_type}'")
 
         return QolsysEventInfoSecureArm(
             partition_id=data.get('partition_id'),
@@ -263,8 +263,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
             )
         except UnknownQolsysSensorException:
             LOGGER.warning(f"sensor of unknown type: {zone}")
-            raise UnableToParseEventException(
-                f"Cannot parse zone event as unknown sensor type: {zone}")
+            raise
 
 
 class QolsysEventArming(QolsysEvent):
