@@ -79,7 +79,7 @@ workflows:
 
 ## Requirements
 
-- A Qolsys IQ Panel 2+ (might work with the Qolsys IQ Panel 2, but untested),
+- A Qolsys IQ Panel 2 or 2+ (software version 2.5.3 or greater),
   for which you have the **dealer code** (defaults to `2222`). In some cases,
   the _installer code_ (defaults to `1111`) might be sufficient, but in my
   experience, it was not, as the required menus were not visible.
