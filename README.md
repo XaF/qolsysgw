@@ -406,7 +406,8 @@ With:
   to any other positive value will set that delay. This will not change
   the default behavior of the panel when handled manually, simply what
   will happen when arming away from Home Assistant through Qolsys Gateway. 
-  <em>Note that if an exit delay is configured and no door is opened or closed
+  <em>Note that if "Auto Stay" is enabled (may be the default in some cases),
+  an exit delay is configured, and no door is opened or closed
   during the delay, the panel will be set to "Arm Stay" instead.</em>
   Defaults to <code>null</code>.</summary>
 
