@@ -196,20 +196,6 @@ AppDaemon automations in HACS, as these are not enabled by default:
    then require you to wait a few hours for HACS to be fully configured. In this case,
    you won't be able to proceed to the next steps until HACS is ready.
 
-Qolsys Gateway is not yet in the default applications available in HACS, but [has
-been submitted to be available by default][hacs-pr]. Until this pull request is
-merged, you will need to add Qolsys Gateway as a custom repository in HACS. In order
-to do so:
-
-1. Click on `HACS` on the left menu bar in Home Assistant Web UI
-2. Click on `Automations` in the right panel
-3. Click on the three dots in the top right corner
-4. Select `Custom repositories`
-5. In the form that appears, write `XaF/qolsysgw` as repository,
-   and select `AppDaemon` as category
-6. Click on `ADD`
-7. Qolsys Gateway is now available to be installed and managed with HACS
-
 Now, to install Qolsys Gateway with HACS, follow these steps:
 
 1. Click on `HACS` on the left menu bar in Home Assistant Web UI
