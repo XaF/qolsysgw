@@ -1,0 +1,7 @@
+
+Net to Media Table: IPv4
+Device   IP Address               Mask      Flags   Phys Addr
+------ -------------------- --------------- ----- ---------------
+dmfe0  router.mynet.org     255.255.255.255       00:06:2a:77:4f:0d
+dmfe0  server1.mynet.org    255.255.255.255       00:03:ba:24:de:11
+dmfe0  myself               255.255.255.255 SP    00:03:ba:91:03:18
