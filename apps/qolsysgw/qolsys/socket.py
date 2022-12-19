@@ -1,10 +1,7 @@
 import asyncio
 import json
 import logging
-import socket
 import ssl
-import threading
-import time
 
 from qolsys.actions import QolsysAction
 from qolsys.actions import QolsysActionInfo
@@ -18,11 +15,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class QolsysSocket(object):
-    def __init__(self, hostname: str, port: int=None, token: str=None,
+    def __init__(self, hostname: str, port: int = None, token: str = None,
                  logger=None, callback: callable = None,
-                 connected_callback: callable=None,
-                 disconnected_callback: callable=None,
-                 keep_alive: int=None) -> None:
+                 connected_callback: callable = None,
+                 disconnected_callback: callable = None,
+                 keep_alive: int = None) -> None:
         self._hostname = hostname
         self._port = port or 12345
         self._token = token or ''
@@ -31,7 +28,7 @@ class QolsysSocket(object):
         self._callback = callback or LoggerCallback()
         self._connected_callback = connected_callback or LoggerCallback('Connected callback')
         self._disconnected_callback = disconnected_callback or LoggerCallback('Disconnected callback')
-        self._keep_alive = keep_alive or 60 * 4 # 4mn, since the panel generally timeouts at 5mn
+        self._keep_alive = keep_alive or 60 * 4  # 4mn, since the panel generally timeouts at 5mn
 
         self._writer = None
 
@@ -58,8 +55,10 @@ class QolsysSocket(object):
             await asyncio.sleep(self._keep_alive)
 
     async def listen(self):
-        context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLSv1_2)
-        context.options = ssl.CERT_NONE
+        # Replace with https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS_CLIENT ?
+        context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_CLIENT)
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
 
         server = (self._hostname, self._port)
 
@@ -68,10 +67,10 @@ class QolsysSocket(object):
         while self._listen:
             writer = None
             try:
-                self._logger.info(
-                        f'Establishing connection to {server[0]}:{server[1]}')
+                self._logger.info('Establishing connection to '
+                                  f'{server[0]}:{server[1]}')
                 reader, writer = await asyncio.open_connection(
-                        *server, ssl=context, server_hostname='')
+                    *server, ssl=context, server_hostname='')
                 self._writer = writer
 
                 await self.send(QolsysActionInfo())
@@ -104,15 +103,15 @@ class QolsysSocket(object):
                     except UnknownQolsysSensorException:
                         self._logger.debug(f'Unknown sensor in Qolsys event: {line}')
                         continue
-                    
+
                     try:
                         await self._callback(event)
-                    except:
+                    except:  # noqa: E722
                         self._logger.exception(f'Error calling callback for event: {line}')
             except asyncio.exceptions.CancelledError:
                 self._listen = False
                 self._logger.info('listening cancelled')
-            except:
+            except:  # noqa: E722
                 delay_reconnect = min(delay_reconnect * 2 or 1, 60)
                 self._logger.exception('error while listening')
             finally:
@@ -124,12 +123,12 @@ class QolsysSocket(object):
                     writer.close()
                     try:
                         await writer.wait_closed()
-                    except:
-                        self._logger.exception('unable to wait for writer to '\
-                            'be fully closed; this might not be an issue if '\
+                    except:  # noqa: E722
+                        self._logger.exception(
+                            'unable to wait for writer to '
+                            'be fully closed; this might not be an issue if '
                             'the connection was closed on the other side')
 
             if self._listen and delay_reconnect:
                 self._logger.info(f'sleeping {delay_reconnect} second(s) before reconnecting')
                 await asyncio.sleep(delay_reconnect)
-

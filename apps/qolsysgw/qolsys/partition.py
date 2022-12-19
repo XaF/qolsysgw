@@ -87,7 +87,7 @@ class QolsysPartition(QolsysObservable):
             self.notify(change=self.NOTIFY_UPDATE_ALARM_TYPE,
                         prev_value=prev_value, new_value=value)
 
-    def triggered(self, alarm_type: str=None):
+    def triggered(self, alarm_type: str = None):
         self.status = 'ALARM'
         self.alarm_type = alarm_type
 
@@ -97,10 +97,10 @@ class QolsysPartition(QolsysObservable):
     def add_sensor(self, sensor):
         psensor = self._sensors.get(sensor.zone_id)
         if psensor is not None:
-            LOGGER.error(f"Zone ID '{sensor.zone_id}' already used by sensor "\
-                    f"'{psensor.id}' ({psensor.name}) but sensor "\
-                    f"'{sensor.id}' ({sensor.name}) declares the same zone; "\
-                    "skipping")
+            LOGGER.error(f"Zone ID '{sensor.zone_id}' already used by sensor "
+                         f"'{psensor.id}' ({psensor.name}) but sensor "
+                         f"'{sensor.id}' ({sensor.name}) declares the same "
+                         "zone; skipping")
             return
 
         self._sensors[sensor.zone_id] = sensor
@@ -117,16 +117,15 @@ class QolsysPartition(QolsysObservable):
         self.remove_zone(sensor.zone_id)
 
     def remove_zone(self, zone_id):
-        zone = self.sensors[zone_id]
-        
-        del self.sensors[zone_id]
-        
+        zone = self._sensors[zone_id]
+
+        del self._sensors[zone_id]
+
         self.notify(change=self.NOTIFY_REMOVE_SENSOR,
                     prev_value=zone)
 
     def __str__(self):
-        return f"<QolsysPartition id={self.id} name={self.name} "\
-                f"status={self.status} secure_arm={self.secure_arm} "\
-                f"sensors({len(self.sensors)})="\
-                f"[{', '.join([str(s) for s in self.sensors])}]>"
-
+        return (f"<QolsysPartition id={self.id} name={self.name} "
+                f"status={self.status} secure_arm={self.secure_arm} "
+                f"sensors({len(self.sensors)})="
+                f"[{', '.join([str(s) for s in self.sensors])}]>")

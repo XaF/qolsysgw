@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 class MqttListener(object):
     def __init__(self, app: Mqtt, namespace: str, topic: str,
-                 callback: callable=None, logger=None):
+                 callback: callable = None, logger=None):
         self._callback = callback or defaultLoggerCallback
         self._logger = logger or LOGGER
 
@@ -45,14 +45,14 @@ class MqttQolsysEventListener(MqttListener):
 
         try:
             await self._callback(event)
-        except:
+        except:  # noqa: E722
             self._logger.exception(f'Error calling callback for event: {event}')
 
 
 class MqttQolsysControlListener(MqttListener):
     async def event_callback(self, event_name, data, kwargs):
-        self._logger.debug(f'Received {event_name} with data={data} '\
-                f'and kwargs={kwargs}')
+        self._logger.debug(f'Received {event_name} with data={data} '
+                           f'and kwargs={kwargs}')
 
         control_str = data.get('payload')
         if not control_str:
@@ -71,6 +71,5 @@ class MqttQolsysControlListener(MqttListener):
 
         try:
             await self._callback(control)
-        except:
+        except:  # noqa: E722
             self._logger.exception(f'Error calling callback for control: {control}')
-

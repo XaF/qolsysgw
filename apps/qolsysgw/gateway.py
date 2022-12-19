@@ -1,6 +1,4 @@
-import asyncio
 import logging
-import sys
 import traceback
 import uuid
 
@@ -11,7 +9,6 @@ from mqtt.listener import MqttQolsysControlListener
 from mqtt.updater import MqttUpdater
 from mqtt.updater import MqttWrapperFactory
 
-from qolsys.actions import QolsysAction
 from qolsys.config import QolsysGatewayConfig
 from qolsys.control import QolsysControl
 from qolsys.events import QolsysEvent
@@ -22,6 +19,7 @@ from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
 from qolsys.events import QolsysEventZoneEventUpdate
 from qolsys.exceptions import MissingUserCodeException
+from qolsys.exceptions import InvalidUserCodeException
 from qolsys.socket import QolsysSocket
 from qolsys.state import QolsysState
 
@@ -85,22 +83,22 @@ class QolsysGateway(Mqtt):
         self._state = QolsysState()
         try:
             self._factory.wrap(self._state).set_unavailable()
-        except:
+        except:  # noqa: E722
             LOGGER.exception('Error setting state unavailable; pursuing')
 
-        mqtt_updater = MqttUpdater(
+        MqttUpdater(
             state=self._state,
             factory=self._factory
         )
 
-        mqtt_event_listener = MqttQolsysEventListener(
+        MqttQolsysEventListener(
             app=self,
             namespace=cfg.mqtt_namespace,
             topic=cfg.event_topic,
             callback=self.mqtt_event_callback,
         )
 
-        mqtt_control_listener = MqttQolsysControlListener(
+        MqttQolsysControlListener(
             app=self,
             namespace=cfg.mqtt_namespace,
             topic=cfg.control_topic,
@@ -133,28 +131,28 @@ class QolsysGateway(Mqtt):
             for sensor in partition.sensors:
                 try:
                     self._factory.wrap(sensor).set_unavailable()
-                except:
-                    LOGGER.exception(f"Error setting sensor '{sensor.id}' "\
-                            f"({sensor.name}) unavailable")
+                except:  # noqa: E722
+                    LOGGER.exception(f"Error setting sensor '{sensor.id}' "
+                                     f"({sensor.name}) unavailable")
 
             try:
                 self._factory.wrap(partition).set_unavailable()
-            except:
-                LOGGER.exception(f"Error setting partition '{partition.id}' "\
-                        f"({partition.name}) unavailable")
+            except:  # noqa: E722
+                LOGGER.exception(f"Error setting partition '{partition.id}' "
+                                 f"({partition.name}) unavailable")
 
         self._is_terminated = True
         LOGGER.info('Terminated')
 
     async def qolsys_connected_callback(self):
-        LOGGER.debug(f'Qolsys callback for connection event')
+        LOGGER.debug('Qolsys callback for connection event')
         self._factory.wrap(self._state).set_available()
 
     async def qolsys_disconnected_callback(self):
         if self._is_terminated:
             return
 
-        LOGGER.debug(f'Qolsys callback for disconnection event')
+        LOGGER.debug('Qolsys callback for disconnection event')
         self._factory.wrap(self._state).set_unavailable()
 
     async def qolsys_event_callback(self, event: QolsysEvent):
@@ -172,7 +170,7 @@ class QolsysGateway(Mqtt):
             self._state.update(event)
 
         elif isinstance(event, QolsysEventInfoSecureArm):
-            LOGGER.debug(f'INFO SecureArm partition_id={event.partition_id} '\
+            LOGGER.debug(f'INFO SecureArm partition_id={event.partition_id} '
                          f'value={event.value}')
 
             partition = self._state.partition(event.partition_id)
@@ -196,7 +194,7 @@ class QolsysGateway(Mqtt):
             self._state.zone_update(event.zone)
 
         elif isinstance(event, QolsysEventArming):
-            LOGGER.debug(f'ARMING partition_id={event.partition_id} '\
+            LOGGER.debug(f'ARMING partition_id={event.partition_id} '
                          f'status={event.arming_type}')
 
             partition = self._state.partition(event.partition_id)
@@ -228,7 +226,7 @@ class QolsysGateway(Mqtt):
 
         try:
             control.check()
-        except MissingUserCodeException as e:
+        except (MissingUserCodeException, InvalidUserCodeException) as e:
             LOGGER.error(f'{e} for control event {control}')
             return
 
@@ -238,4 +236,3 @@ class QolsysGateway(Mqtt):
             return
 
         await self._qolsys_socket.send(action)
-

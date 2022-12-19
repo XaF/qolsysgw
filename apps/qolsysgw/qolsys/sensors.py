@@ -1,5 +1,7 @@
+import json
 import logging
 
+from qolsys.exceptions import UnableToParseSensorException
 from qolsys.exceptions import UnknownQolsysSensorException
 from qolsys.observable import QolsysObservable
 from qolsys.utils import find_subclass
@@ -9,9 +11,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 class QolsysSensor(QolsysObservable):
-    NOTIFY_UPDATE_PATTERN='update_{attr}'
-    NOTIFY_UPDATE_STATUS='update_status'
-    NOTIFY_UPDATE_ATTRIBUTES='update_attributes'
+    NOTIFY_UPDATE_PATTERN = 'update_{attr}'
+    NOTIFY_UPDATE_STATUS = 'update_status'
+    NOTIFY_UPDATE_ATTRIBUTES = 'update_attributes'
 
     __SUBCLASSES_CACHE = {}
     _common_keys = [
@@ -47,8 +49,8 @@ class QolsysSensor(QolsysObservable):
 
     def update(self, sensor: 'QolsysSensor'):
         if self.id != sensor.id:
-            LOGGER.warning(f"Updating sensor '{self.id}' ({self.name}) with "\
-                    f"sensor '{sensor.id}' (different id)")
+            LOGGER.warning(f"Updating sensor '{self.id}' ({self.name}) with "
+                           f"sensor '{sensor.id}' (different id)")
 
         # Because any of the attributes might have changed and we want to
         # be able to notify of all of those changes separately and only if they
@@ -126,9 +128,9 @@ class QolsysSensor(QolsysObservable):
         if self._status != new_value:
             LOGGER.debug(f"Sensor '{self.id}' ({self.name}) status updated to '{new_value}'")
             prev_value = self._status
-            
+
             self._status = new_value
-            
+
             self.notify(change=self.NOTIFY_UPDATE_STATUS,
                         prev_value=prev_value, new_value=new_value)
 
@@ -139,13 +141,13 @@ class QolsysSensor(QolsysObservable):
         self.status = 'Closed'
 
     def __str__(self):
-        return f"<{type(self).__name__} id={self.id} name={self.name} "\
-                f"group={self.group} status={self.status} "\
-                f"state={self.state} zone_id={self.zone_id} "\
-                f"zone_type={self.zone_type} "\
-                f"zone_physical_type={self.zone_physical_type} "\
-                f"zone_alarm_type={self.zone_alarm_type} "\
-                f"partition_id={self.partition_id}>"
+        return (f"<{type(self).__name__} id={self.id} name={self.name} "
+                f"group={self.group} status={self.status} "
+                f"state={self.state} zone_id={self.zone_id} "
+                f"zone_type={self.zone_type} "
+                f"zone_physical_type={self.zone_physical_type} "
+                f"zone_alarm_type={self.zone_alarm_type} "
+                f"partition_id={self.partition_id}>")
 
     @classmethod
     def from_json(cls, data):
@@ -153,6 +155,9 @@ class QolsysSensor(QolsysObservable):
             data = json.loads(data)
 
         sensor_type = data.get('type')
+        if not sensor_type:
+            raise UnknownQolsysSensorException
+
         klass = find_subclass(cls, sensor_type, cache=cls.__SUBCLASSES_CACHE,
                               preserve_capitals=True)
         if not klass:
@@ -171,7 +176,8 @@ class QolsysSensor(QolsysObservable):
     def from_json_subclass(cls, subtype, data, common=None):
         sensor_type = data.get('type')
         if sensor_type != subtype:
-            raise UnableToParseSensorException(f"Cannot parse sensor '{sensor_type}'")
+            raise UnableToParseSensorException(
+                f"Cannot parse sensor '{sensor_type}'")
 
         if common is None:
             common = cls.from_json_common_data(data)
@@ -252,4 +258,3 @@ class QolsysSensorWater(QolsysSensor):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Water', data, common)
-

@@ -61,15 +61,14 @@ class QolsysGatewayConfig(object):
 
         if self.get('panel_user_code') is None:
             if self.get('ha_user_code'):
-                raise QolsysGwConfigError(
-                        "Cannot use 'ha_user_code' if "\
-                        "'panel_user_code' is not set")
+                raise QolsysGwConfigError("Cannot use 'ha_user_code' if "
+                                          "'panel_user_code' is not set")
 
             for k in ['code_arm_required', 'code_trigger_required']:
                 if self.get(k):
                     raise QolsysGwConfigError(
-                        f"Cannot use '{k}' if no disarm code is set, as the "\
-                        "Qolsys Panel does not offer a built-in way to check "\
+                        f"Cannot use '{k}' if no disarm code is set, as the "
+                        "Qolsys Panel does not offer a built-in way to check "
                         "for the code on ARM or TRIGGER actions.")
 
             # Without a configured disarm code, we cannot have home assistant
@@ -89,9 +88,9 @@ class QolsysGatewayConfig(object):
                 'TRIGGER_FIRE',
                 'TRIGGER_POLICE',
             ]
-            if not trig_cmd in valid_trigger:
+            if trig_cmd not in valid_trigger:
                 raise QolsysGwConfigError(
-                    f"Invalid trigger command '{trig_cmd}'; must be one of "\
+                    f"Invalid trigger command '{trig_cmd}'; must be one of "
                     f"{', '.join(valid_trigger)}")
 
             self._override_config['default_trigger_command'] = trig_cmd
@@ -102,8 +101,8 @@ class QolsysGatewayConfig(object):
             v = self.get(k)
             if v:
                 self._override_config[k] = v.format(
-                        panel_unique_id=self.get('panel_unique_id') or 'qolsys',
-                        discovery_topic=self.get('discovery_topic'))
+                    panel_unique_id=self.get('panel_unique_id') or 'qolsys',
+                    discovery_topic=self.get('discovery_topic'))
 
     def get(self, name):
         value = self._override_config.get(name, self._SENTINEL)
@@ -116,4 +115,3 @@ class QolsysGatewayConfig(object):
         if value is self._SENTINEL:
             raise AttributeError
         return value
-

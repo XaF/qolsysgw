@@ -316,7 +316,7 @@ state, if they have not had any event in a while.
   "zone": {
     "id": "xxx-yyyy",
     "type": "Motion",
-    "name": "Closed",
+    "name": "Motion MMM",
     "group": "awayinstantmotion",
     "status": "Closed",
     "state": "0",
@@ -324,6 +324,33 @@ state, if they have not had any event in a while.
     "zone_physical_type": 2,
     "zone_alarm_type": 3,
     "zone_type": 2,
+    "partition_id": 0
+  },
+  "version": 1,
+  "requestID": "<request_id>"
+}
+```
+
+
+#### ZONE_ADD
+
+This event happens when a sensor is added.
+
+```json
+{
+  "event": "ZONE_EVENT",
+  "zone_event_type":" ZONE_ADD",
+  "zone": {
+    "id":" xxx-yyyy",
+    "type": "Door_Window",
+    "name": "Door NNN",
+    "group": "entryexitdelay",
+    "status": "Closed",
+    "state": "0",
+    "zone_id": 5,
+    "zone_physical_type": 1,
+    "zone_alarm_type": 3,
+    "zone_type": 1,
     "partition_id": 0
   },
   "version": 1,

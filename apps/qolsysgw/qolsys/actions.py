@@ -51,7 +51,7 @@ class QolsysActionArm(QolsysAction):
     _PARAMS_TO_REDACT = ['usercode']
 
     def __init__(self, arm_type: str, partition_id: int,
-                 panel_code: str=None) -> None:
+                 panel_code: str = None) -> None:
         self._data = {
             'action': 'ARMING',
             'arming_type': arm_type,
@@ -69,7 +69,7 @@ class QolsysActionDisarm(QolsysActionArm):
 
 
 class QolsysActionArmAway(QolsysActionArm):
-    def __init__(self, delay: int=None, *args, **kwargs) -> None:
+    def __init__(self, delay: int = None, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_ARM_AWAY,
                          *args, **kwargs)
 
@@ -88,7 +88,7 @@ class QolsysActionTrigger(QolsysAction):
     ALARM_TYPE_FIRE = 'FIRE'
     ALARM_TYPE_AUXILIARY = 'AUXILIARY'
 
-    def __init__(self, partition_id: int, alarm_type: str=None) -> None:
+    def __init__(self, partition_id: int, alarm_type: str = None) -> None:
         self._data = {
             'action': 'ALARM',
             'alarm_type': alarm_type or self.ALARM_TYPE_POLICE,
