@@ -10,7 +10,7 @@ LOGGER = logging.getLogger(__name__)
 class QolsysState(QolsysObservable):
     NOTIFY_UPDATE_PARTITIONS = 'update_partitions'
 
-    def __init__(self, event: QolsysEventInfoSummary=None):
+    def __init__(self, event: QolsysEventInfoSummary = None):
         super().__init__()
 
         self._partitions = {}
@@ -30,7 +30,7 @@ class QolsysState(QolsysObservable):
         self._partitions = {}
         for partition in event.partitions:
             self._partitions[int(partition.id)] = partition
-        
+
         self.notify(change=self.NOTIFY_UPDATE_PARTITIONS,
                     prev_value=prev_partitions,
                     new_value=self.partitions)
@@ -45,8 +45,8 @@ class QolsysState(QolsysObservable):
         # Find where the zone is currently at
         current_zone = self.zone(sensor.zone_id)
         if current_zone is None:
-            raise Exception(f'Zone not found for zone update: {sensor}, '\
-                    f'we might not be sync-ed anymore')  # TODO: make it a better exception
+            raise Exception(f'Zone not found for zone update: {sensor}, '
+                            'we might not be sync-ed anymore')  # TODO: make it a better exception
 
         if current_zone.partition_id == sensor.partition_id:
             self._partitions[sensor.partition_id].update_sensor(sensor)
@@ -65,4 +65,3 @@ class QolsysState(QolsysObservable):
             zone = partition.zone(zone_id)
             if zone is not None:
                 zone.closed()
-

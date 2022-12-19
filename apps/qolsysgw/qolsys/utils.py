@@ -10,8 +10,8 @@ class LoggerCallback(object):
         self.msg = msg or 'Logger callback'
 
     async def __call__(self, *args, **kwargs):
-        LOGGER.debug(f"{self.msg}{': ' if args or kwargs else ''}"\
-                     f"{f'args={args} ' if args else ''}"\
+        LOGGER.debug(f"{self.msg}{': ' if args or kwargs else ''}"
+                     f"{f'args={args} ' if args else ''}"
                      f"{f'kwargs={kwargs}' if kwargs else ''}")
 
 
@@ -25,18 +25,19 @@ def all_subclasses(cls):
         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
 
-def find_subclass(cls, subtype: str, cache: dict=None, normalize=True, preserve_capitals=False):
+def find_subclass(cls, subtype: str, cache: dict = None, normalize=True,
+                  preserve_capitals=False):
     if cache and subtype in cache:
         return cache[subtype]
 
     normalized_subtype = subtype
     if normalize:
-        normalized_subtype = re.compile('[\W_]+').sub(' ', normalized_subtype)
+        normalized_subtype = re.compile(r'[\W_]+').sub(' ', normalized_subtype)
         if preserve_capitals:
-            normalized_subtype = re.compile('(?<=[^\s])([A-Z])').sub(
+            normalized_subtype = re.compile(r'(?<=[^\s])([A-Z])').sub(
                 ' \\1', normalized_subtype)
         normalized_subtype = normalized_subtype.title()
-        normalized_subtype = re.compile('\s').sub('', normalized_subtype)
+        normalized_subtype = re.compile(r'\s').sub('', normalized_subtype)
 
     search = f"{cls.__name__}{normalized_subtype}"
 

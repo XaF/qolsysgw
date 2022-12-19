@@ -27,7 +27,7 @@ LOGGER = logging.getLogger(__name__)
 
 class MqttUpdater(object):
     def __init__(self, state: QolsysState, factory: 'MqttWrapperFactory',
-                 callback: callable=None, logger=None):
+                 callback: callable = None, logger=None):
         self._factory = factory
         self._callback = callback or defaultLoggerCallback
         self._logger = logger or LOGGER
@@ -50,9 +50,9 @@ class MqttUpdater(object):
                     self._factory.wrap(sensor).configure(partition=partition)
 
     def _partition_update(self, partition: QolsysPartition, change, prev_value=None, new_value=None):
-        self._logger.debug(f"Received update from partition "\
-                f"'{partition.name}' for CHANGE={change}, from "\
-                f"prev_value={prev_value} to new_value={new_value}")
+        self._logger.debug(f"Received update from partition "
+                           f"'{partition.name}' for CHANGE={change}, from "
+                           f"prev_value={prev_value} to new_value={new_value}")
 
         if change == QolsysPartition.NOTIFY_ADD_SENSOR:
             sensor = new_value
@@ -66,9 +66,9 @@ class MqttUpdater(object):
             self._factory.wrap(partition).update_attributes()
 
     def _sensor_update(self, sensor: QolsysSensor, change, prev_value=None, new_value=None):
-        self._logger.debug(f"Received update from sensor '{sensor.name}' for "\
-                f"CHANGE={change}, from prev_value={prev_value} to "\
-                f"new_value={new_value}")
+        self._logger.debug(f"Received update from sensor '{sensor.name}' for "
+                           f"CHANGE={change}, from prev_value={prev_value} to "
+                           f"new_value={new_value}")
 
         if change == QolsysSensor.NOTIFY_UPDATE_STATUS:
             self._factory.wrap(sensor).update_state()
@@ -97,11 +97,11 @@ class MqttWrapper(object):
         # behaviors if we remove or add sensors between runs, so there is
         # a configuration option to plainly disable it.
         self._mqtt_retain = self._cfg.mqtt_retain and \
-                (self._birth_topic == self._will_topic)
+            (self._birth_topic == self._will_topic)
 
     @property
     def entity_id(self):
-        return re.compile('\W').sub('_', self.name).lower()
+        return re.compile(r'\W').sub('_', self.name).lower()
 
     @property
     def config_topic(self):
@@ -216,27 +216,27 @@ class MqttWrapperQolsysState(MqttWrapper):
 
     @property
     def entity_id(self):
-        raise AttributeError(f"Property {entity_id} is not "\
-                f"available for {type(self).__name__}")
+        raise AttributeError(f"Property {{entity_id}} is not "
+                             f"available for {type(self).__name__}")
 
     @property
     def config_topic(self):
-        raise AttributeError(f"Property {config_topic} is not "\
-                f"available for {type(self).__name__}")
+        raise AttributeError(f"Property {{config_topic}} is not "
+                             f"available for {type(self).__name__}")
 
     @property
     def state_topic(self):
-        raise AttributeError(f"Property {state_topic} is not "\
-                f"available for {type(self).__name__}")
+        raise AttributeError(f"Property {{state_topic}} is not "
+                             f"available for {type(self).__name__}")
 
     def configure(self):
-        raise AttributeError(f"Method {configure} is not available "\
-                f"for {type(self).__name__}")
+        raise AttributeError(f"Method {{configure}} is not available "
+                             f"for {type(self).__name__}")
 
     @property
     def configure_availability(self):
-        raise AttributeError(f"Property {configure_availability} is not "\
-                f"available for {type(self).__name__}")
+        raise AttributeError(f"Property {{configure_availability}} is not "
+                             f"available for {type(self).__name__}")
 
 
 class MqttWrapperQolsysPartition(MqttWrapper):
@@ -245,9 +245,9 @@ class MqttWrapperQolsysPartition(MqttWrapper):
         'DISARM': 'disarmed',
         'ARM_STAY': 'armed_home',
         'ARM_AWAY': 'armed_away',
-        #'ARM_NIGHT': 'armed_night',
-        #'': 'armed_vacation',
-        #'': 'armed_custom_bypass',
+        # 'ARM_NIGHT': 'armed_night',
+        # '': 'armed_vacation',
+        # '': 'armed_custom_bypass',
         'ENTRY_DELAY': 'pending',
         'ALARM': 'triggered',
         'EXIT_DELAY': 'arming',
@@ -267,9 +267,9 @@ class MqttWrapperQolsysPartition(MqttWrapper):
     def ha_status(self):
         status = self.QOLSYS_TO_HA_STATUS.get(self._partition.status)
         if not status:
-            raise ValueError('We need to put a better error here, but '\
-                    'we found an unsupported status: '\
-                    f"'{self._partition.status}'")
+            raise ValueError('We need to put a better error here, but '
+                             'we found an unsupported status: '
+                             f"'{self._partition.status}'")
         return status
 
     @property
@@ -399,10 +399,11 @@ class MqttWrapperQolsysSensor(MqttWrapper):
                 return device_class
 
         errormsg = 'Unable to find a device class to map for '\
-                f"sensor type {type(self._sensor).__name__}"
+                   f"sensor type {type(self._sensor).__name__}"
         if self._cfg.default_sensor_device_class:
-            LOGGER.warning(f"{errormsg}, defaulting to "\
-                    f"'{self._cfg.default_sensor_device_class}' device class.")
+            LOGGER.warning(f"{errormsg}, defaulting to "
+                           f"'{self._cfg.default_sensor_device_class}' "
+                           "device class.")
             return self._cfg.default_sensor_device_class
         else:
             raise UnknownDeviceClassException(errormsg)
@@ -432,14 +433,14 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         # the UI, change it's name, assign it to areas, etc.
         if self._cfg.panel_unique_id:
             payload['unique_id'] = f"{self._cfg.panel_unique_id}_"\
-                    f"p{self._sensor.partition_id}"\
-                    f"z{self._sensor.zone_id}"
+                                   f"p{self._sensor.partition_id}"\
+                                   f"z{self._sensor.zone_id}"
             payload['device'] = {
                 'name': self._cfg.panel_device_name or partition.name,
                 'identifiers': [
                     self._cfg.panel_unique_id,
                 ],
-                'manufacturer': 'QOLSYS',
+                'manufacturer': 'Qolsys',
                 'model': 'IQ Panel 2+',
             }
 
@@ -498,4 +499,3 @@ class MqttWrapperFactory(object):
             raise UnknownMqttWrapperException
 
         return klass(obj, *self._args, **self._kwargs)
-

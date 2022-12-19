@@ -9,7 +9,7 @@ class QolsysObservable(object):
 
     def register(self, observer, callback=None):
         LOGGER.debug(f"Registering {repr(observer)} to {self} updates")
-        if callback == None:
+        if callback is None:
             callback = getattr(observer, 'update')
         self._observers[observer] = callback
 
@@ -21,4 +21,3 @@ class QolsysObservable(object):
         LOGGER.debug(f"Notifying {self} observers with: {payload}")
         for observer, callback in self._observers.items():
             callback(self, **payload)
-

@@ -1,7 +1,6 @@
 import json
 import logging
 
-from enum import Enum
 from types import SimpleNamespace
 
 from qolsys.exceptions import UnableToParseEventException
@@ -40,6 +39,9 @@ class QolsysEvent(object):
             data = json.loads(data)
 
         event_type = data.get('event')
+        if not event_type:
+            raise UnknownQolsysEventException
+
         klass = find_subclass(cls, event_type, cache=cls.__SUBCLASSES_CACHE)
         if not klass:
             raise UnknownQolsysEventException
@@ -67,7 +69,7 @@ class QolsysEventInfo(QolsysEvent):
 
 class QolsysEventInfoSummary(QolsysEventInfo):
 
-    def __init__(self, partitions: list=None, *args, **kwargs) -> None:
+    def __init__(self, partitions: list = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._partitions = partitions
@@ -81,9 +83,9 @@ class QolsysEventInfoSummary(QolsysEventInfo):
         # self._partitions = partitions
 
     def __str__(self):
-        return f"<{type(self).__name__} request_id={self.request_id} "\
-                f"partitions({len(self.partitions)})="\
-                f"[{', '.join([str(p) for p in self.partitions])}]>"
+        return (f"<{type(self).__name__} request_id={self.request_id} "
+                f"partitions({len(self.partitions)})="
+                f"[{', '.join([str(p) for p in self.partitions])}]>")
 
     @classmethod
     def from_json(cls, data):
@@ -145,8 +147,8 @@ class QolsysEventInfoSecureArm(QolsysEventInfo):
         return self._value
 
     def __str__(self):
-        return f"<{type(self).__name__} request_id={self.request_id} "\
-                f"partition_id={self.partition_id} value={self.value}>"
+        return (f"<{type(self).__name__} request_id={self.request_id} "
+                f"partition_id={self.partition_id} value={self.value}>")
 
     @classmethod
     def from_json(cls, data):
@@ -181,9 +183,9 @@ class QolsysEventZoneEvent(QolsysEvent):
         return None
 
     def __str__(self):
-        return f"<{type(self).__name__} "\
-                f"zone={self.zone} "\
-                f"version={self._version}>"
+        return (f"<{type(self).__name__} "
+                f"zone={self.zone} "
+                f"version={self._version}>")
 
     @classmethod
     def from_json(cls, data):
@@ -199,7 +201,6 @@ class QolsysEventZoneEvent(QolsysEvent):
             raise UnknownQolsysEventException
 
         return klass.from_json(data)
-
 
 
 class QolsysEventZoneEventActive(QolsysEventZoneEvent):
@@ -222,7 +223,7 @@ class QolsysEventZoneEventActive(QolsysEventZoneEvent):
         zone_event_type = data.get('zone_event_type')
         if zone_event_type != 'ZONE_ACTIVE':
             raise UnableToParseEventException(
-                    f"Cannot parse zone event '{zone_event_type}'")
+                f"Cannot parse zone event '{zone_event_type}'")
 
         return QolsysEventZoneEventActive(
             request_id=data.get('requestID'),
@@ -249,7 +250,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
         zone_event_type = data.get('zone_event_type')
         if zone_event_type != 'ZONE_UPDATE':
             raise UnableToParseEventException(
-                    f"Cannot parse zone event '{zone_event_type}'")
+                f"Cannot parse zone event '{zone_event_type}'")
 
         zone = data.get('zone')
         try:
@@ -269,7 +270,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
 class QolsysEventArming(QolsysEvent):
 
     def __init__(self, partition_id: int, arming_type: str, version: int,
-                 delay: int=None, *args, **kwargs) -> None:
+                 delay: int = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._partition_id = partition_id
@@ -290,11 +291,11 @@ class QolsysEventArming(QolsysEvent):
         return self._delay
 
     def __str__(self):
-        return f"<{type(self).__name__} "\
-                f"partition_id={self.partition_id} "\
-                f"arming_type={self.arming_type} "\
-                f"delay{self.delay} "\
-                f"version={self._version}>"
+        return (f"<{type(self).__name__} "
+                f"partition_id={self.partition_id} "
+                f"arming_type={self.arming_type} "
+                f"delay{self.delay} "
+                f"version={self._version}>")
 
     @classmethod
     def from_json(cls, data):
@@ -335,10 +336,10 @@ class QolsysEventAlarm(QolsysEvent):
         return self._delay
 
     def __str__(self):
-        return f"<{type(self).__name__} "\
-                f"partition_id={self.partition_id} "\
-                f"alarm_type={self.alarm_type} "\
-                f"version={self._version}>"
+        return (f"<{type(self).__name__} "
+                f"partition_id={self.partition_id} "
+                f"alarm_type={self.alarm_type} "
+                f"version={self._version}>")
 
     @classmethod
     def from_json(cls, data):

@@ -18,8 +18,8 @@ class QolsysControl(object):
 
     __SUBCLASSES_CACHE = {}
 
-    def __init__(self, raw: dict, partition_id: int, code: str=None,
-                 session_token: str=None):
+    def __init__(self, raw: dict, partition_id: int, code: str = None,
+                 session_token: str = None):
         self._raw = raw
         self._partition_id = partition_id
         self._code = code
@@ -62,9 +62,9 @@ class QolsysControl(object):
         return None
 
     def __str__(self):
-        return f"<{type(self).__name__} partition_id={self.partition_id} "\
-                f"code={'<redacted>' if self._code else self._code} "\
-                f"session_token={self.session_token}>"
+        return (f"<{type(self).__name__} partition_id={self.partition_id} "
+                f"code={'<redacted>' if self._code else self._code} "
+                f"session_token={self.session_token}>")
 
     @classmethod
     def from_json(cls, data):
@@ -76,7 +76,7 @@ class QolsysControl(object):
                               cache=QolsysControl.__SUBCLASSES_CACHE)
         if not klass:
             raise UnknownQolsysControlException(
-                "Unable to find a QolsysControl class for "\
+                "Unable to find a QolsysControl class for "
                 f"action '{action_type}'")
 
         from_json = getattr(klass, 'from_json', None)
@@ -90,6 +90,7 @@ class QolsysControl(object):
             session_token=data.get('session_token'),
             raw=data,
         )
+
 
 class _QolsysControlCheckCode(QolsysControl):
     def __init__(self, *args, **kwargs):
@@ -124,14 +125,15 @@ class _QolsysControlCheckCode(QolsysControl):
             # an exception, as we want to try and use that provided code
             # to disarm the alarm
             if self._valid_code and self._code != self._valid_code:
-                raise InvalidArmUserCodeException
+                raise InvalidUserCodeException(
+                    'Code received in the control command invalid')
 
         if self._PANEL_CODE_REQUIRED:
             LOGGER.debug(f"Panel code is required for {self}")
             if self._panel_code is None:
                 LOGGER.debug('Panel code is not provided in config')
                 if self._code:
-                    LOGGER.info('Using code sent from home assistant since '\
+                    LOGGER.info('Using code sent from home assistant since '
                                 'no panel code configured')
                     self._panel_code = self._code
                 else:
@@ -140,7 +142,7 @@ class _QolsysControlCheckCode(QolsysControl):
 
 
 class QolsysControlDisarm(_QolsysControlCheckCode):
-    
+
     _CODE_REQUIRED_ATTR = 'code_disarm_required'
     _PANEL_CODE_REQUIRED = True
 
@@ -158,7 +160,7 @@ class QolsysControlArm(_QolsysControlCheckCode):
 
 
 class QolsysControlArmAway(QolsysControlArm):
-    def __init__(self, delay: int=None, *args, **kwargs):
+    def __init__(self, delay: int = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._delay = delay
@@ -208,7 +210,7 @@ class QolsysControlTrigger(_QolsysControlCheckCode):
     _CODE_REQUIRED_ATTR = 'code_trigger_required'
     _PANEL_CODE_REQUIRED = False
 
-    def __init__(self, alarm_type: str=None, *args, **kwargs):
+    def __init__(self, alarm_type: str = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._alarm_type = alarm_type
@@ -237,4 +239,3 @@ class QolsysControlTriggerAuxiliary(QolsysControlTrigger):
     def __init__(self, *args, **kwargs):
         super().__init__(alarm_type=QolsysActionTrigger.ALARM_TYPE_AUXILIARY,
                          *args, **kwargs)
-
