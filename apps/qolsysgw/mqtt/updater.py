@@ -1,11 +1,11 @@
 import json
 import logging
-import re
 import posixpath
 
 from mqtt.exceptions import UnknownDeviceClassException
 from mqtt.exceptions import UnknownMqttWrapperException
 from mqtt.utils import get_mac_from_host
+from mqtt.utils import normalize_name_to_id
 
 from qolsys.config import QolsysGatewayConfig
 from qolsys.partition import QolsysPartition
@@ -13,6 +13,7 @@ from qolsys.sensors import QolsysSensor
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
+from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorSmokeDetector
@@ -101,7 +102,7 @@ class MqttWrapper(object):
 
     @property
     def entity_id(self):
-        return re.compile(r'\W').sub('_', self.name).lower()
+        return normalize_name_to_id(self.name)
 
     @property
     def config_topic(self):
@@ -380,6 +381,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorSmokeDetector: 'smoke',
         QolsysSensorCODetector: 'gas',
         QolsysSensorWater: 'moisture',
+        QolsysSensorFreeze: 'cold',
     }
 
     def __init__(self, sensor: QolsysSensor, *args, **kwargs):

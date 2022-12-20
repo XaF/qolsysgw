@@ -26,3 +26,7 @@ def get_mac_from_host(ip_or_host):
     mac = m[0]
     LOGGER.debug(f"Found mac address '{mac}' for '{ip_or_host}'")
     return mac
+
+
+def normalize_name_to_id(name):
+    return re.compile(r'\W').sub('_', name).lower()

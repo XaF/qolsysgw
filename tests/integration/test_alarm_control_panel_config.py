@@ -15,7 +15,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
 
         config = await gw.find_last_mqtt_publish(
             filters={'topic': 'homeassistant/alarm_control_panel/'
-                              'qolsys_panel/partition1/config'},
+                              'qolsys_panel/partition0/config'},
             raise_if_not_found=True,
         )
 
