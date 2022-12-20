@@ -3,9 +3,10 @@ import ssl
 import os.path
 import logging
 import json
-import time
 
 from testenv import FIXTURES_DIR
+
+from testutils.utils import MessageStorage
 
 
 LOGGER = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 
 class PanelServer(object):
 
-    MESSAGES = []
+    MESSAGES = MessageStorage(name='message')
 
     def __init__(self):
         self.stop()
@@ -95,34 +96,5 @@ class PanelServer(object):
             # self._writer = None
             self._client_connected = False
 
-    async def wait_for_next_message(self, timeout=30, filters=None,
-                                    raise_on_timeout=False):
-        start = time.time()
-        messageslen = len(self.MESSAGES)
-        message = None
-        _SENTINEL = object()
-
-        if not filters:
-            filters = {}
-
-        while message is None:
-            while len(self.MESSAGES) == messageslen and time.time() - start < timeout:
-                await asyncio.sleep(.1)
-
-            if len(self.MESSAGES) > messageslen:
-                while message is None and messageslen < len(self.MESSAGES):
-                    message = self.MESSAGES[messageslen]
-
-                    for k, v in filters.items():
-                        if message.get(k, _SENTINEL) != v:
-                            message = None
-                            break
-
-                    messageslen += 1
-            else:
-                break
-
-        if message is None and raise_on_timeout:
-            raise AttributeError('No message found before timeout')
-
-        return message
+    async def wait_for_next_message(self, *args, **kwargs):
+        return await self.MESSAGES.wait_for_next(*args, **kwargs)

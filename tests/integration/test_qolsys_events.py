@@ -414,18 +414,17 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         }
         await panel.writeline(event)
 
-        state, pos = await gw.wait_for_next_mqtt_publish(
+        state = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/binary_sensor/'
                               'my_door/state'},
-            returnpos=True,
         )
 
         attributes = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/binary_sensor/'
                               'my_door/attributes'},
-            startpos=pos,
+            continued=True,
         )
 
         self.assertIsNotNone(state)
@@ -515,9 +514,9 @@ class TestQolsysEvents(TestQolsysGatewayBase):
                 'status': 'Closed',
                 'state': '0',
                 'zone_id': 110,
-                'zone_physical_type': 1,
+                'zone_physical_type': 2,
                 'zone_alarm_type': 3,
-                'zone_type': 1,
+                'zone_type': 2,
                 'partition_id': 0,
             },
             'version': 1,
@@ -525,52 +524,112 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         }
         await panel.writeline(event)
 
-        state, pos = await gw.wait_for_next_mqtt_publish(
+        config = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': 'homeassistant/binary_sensor/'
+                              'my_motion/config'},
+        )
+
+        availability = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': 'homeassistant/binary_sensor/'
+                              'my_motion/availability'},
+            continued=True,
+        )
+
+        state = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/binary_sensor/'
                               'my_motion/state'},
-            returnpos=True,
+            continued=True,
         )
 
         attributes = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/binary_sensor/'
                               'my_motion/attributes'},
-            startpos=pos,
+            continued=True,
         )
 
-        self.assertIsNotNone(state)
-        self.assertIsNotNone(attributes)
+        with self.subTest(msg='Check MQTT config of new sensor'):
+            self.assertIsNotNone(config)
+            self.maxDiff = None
+            self.assertDictEqual(
+                {
+                    'name': 'My Motion',
+                    'device_class': 'motion',
+                    'state_topic': 'homeassistant/binary_sensor/'
+                                   'my_motion/state',
+                    'payload_on': 'Open',
+                    'payload_off': 'Closed',
+                    'availability_mode': 'all',
+                    'availability': [
+                        {
+                            'topic': 'homeassistant/alarm_control_panel/'
+                                     'qolsys_panel/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': 'homeassistant/binary_sensor/'
+                                     'my_motion/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': 'appdaemon/birth_and_will',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                    ],
+                    'json_attributes_topic': 'homeassistant/binary_sensor/'
+                                             'my_motion/attributes',
+                    'unique_id': 'qolsys_panel_p0z110',
+                    'device': mock.ANY,
+                },
+                json.loads(config['payload']),
+            )
 
-        self.assertEqual('Closed', state['payload'])
-        self.assertDictEqual(
-            {
-                'group': 'awayinstantmotion',
-                'state': '0',
-                'zone_physical_type': 1,
-                'zone_alarm_type': 3,
-                'zone_type': 1,
-            },
-            json.loads(attributes['payload']),
-        )
+        with self.subTest(msg='Check MQTT availability of new sensor'):
+            self.assertIsNotNone(availability)
+            self.assertEqual('online', availability['payload'])
+
+        with self.subTest(msg='Check MQTT state of new sensor'):
+            self.assertIsNotNone(state)
+            self.assertEqual('Closed', state['payload'])
+
+        with self.subTest(msg='Check MQTT attributes of new sensor'):
+            self.assertIsNotNone(attributes)
+            self.assertDictEqual(
+                {
+                    'group': 'awayinstantmotion',
+                    'state': '0',
+                    'zone_physical_type': 2,
+                    'zone_alarm_type': 3,
+                    'zone_type': 2,
+                },
+                json.loads(attributes['payload']),
+            )
 
         state = gw._state
 
-        partition0 = state.partition(0)
-        self.assertEqual(2, len(partition0.sensors))
+        with self.subTest(msg='Partition 0 has the new sensor'):
+            partition0 = state.partition(0)
+            self.assertEqual(2, len(partition0.sensors))
 
-        sensor110 = partition0.zone(110)
-        self.assertEqual(QolsysSensorMotion, sensor110.__class__)
-        self.assertEqual('001-0010', sensor110.id)
-        self.assertEqual('My Motion', sensor110.name)
-        self.assertEqual('awayinstantmotion', sensor110.group)
-        self.assertEqual('Closed', sensor110.status)
-        self.assertEqual('0', sensor110.state)
-        self.assertEqual(110, sensor110.zone_id)
-        self.assertEqual(1, sensor110.zone_type)
-        self.assertEqual(1, sensor110.zone_physical_type)
-        self.assertEqual(3, sensor110.zone_alarm_type)
-        self.assertEqual(0, sensor110.partition_id)
+        with self.subTest(msg='Sensor 110 is properly configured'):
+            sensor110 = partition0.zone(110)
+            self.assertEqual(QolsysSensorMotion, sensor110.__class__)
+            self.assertEqual('001-0010', sensor110.id)
+            self.assertEqual('My Motion', sensor110.name)
+            self.assertEqual('awayinstantmotion', sensor110.group)
+            self.assertEqual('Closed', sensor110.status)
+            self.assertEqual('0', sensor110.state)
+            self.assertEqual(110, sensor110.zone_id)
+            self.assertEqual(2, sensor110.zone_physical_type)
+            self.assertEqual(3, sensor110.zone_alarm_type)
+            self.assertEqual(2, sensor110.zone_type)
+            self.assertEqual(0, sensor110.partition_id)
 
         self.assertTrue(panel.is_client_connected)
 
@@ -728,18 +787,17 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         }
         await panel.writeline(event)
 
-        published_state, pos = await gw.wait_for_next_mqtt_publish(
+        published_state = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
                               'qolsys_panel/partition1/state'},
-            returnpos=True,
         )
 
         published_attrs = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
                               'qolsys_panel/partition1/attributes'},
-            startpos=pos,
+            continued=True,
         )
 
         self.assertIsNotNone(published_state)
