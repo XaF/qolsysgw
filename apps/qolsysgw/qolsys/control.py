@@ -22,8 +22,11 @@ class QolsysControl(object):
                  session_token: str = None):
         self._raw = raw
         self._partition_id = partition_id
-        self._code = code
         self._session_token = session_token
+
+        self._code = code
+        if self._code is not None:
+            self._code = str(self._code)
 
         self._requires_config = False
 

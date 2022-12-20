@@ -83,11 +83,6 @@ parameter is not provided, it will simply use the default value configured
 in the panel. If the `delay` is set to `0`, the panel will immediately
 be armed, without an arming period.
 
-  "token": "<token>",
-  "token": "<token>",
-  "token": "<token>",
-  "token": "<token>",
-  "token": "<token>",
 ```json
 {
   "action": "ARMING",

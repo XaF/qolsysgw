@@ -105,6 +105,12 @@ class QolsysGatewayConfig(object):
                     panel_unique_id=self.get('panel_unique_id') or 'qolsys',
                     discovery_topic=self.get('discovery_topic'))
 
+        # Make sure that user codes are stored as strings
+        for k in ('panel_user_code', 'ha_user_code'):
+            v = self.get(k)
+            if v and not isinstance(v, str):
+                self._override_config[k] = str(v)
+
     def get(self, name):
         value = self._override_config.get(name, self._SENTINEL)
         if value is self._SENTINEL:

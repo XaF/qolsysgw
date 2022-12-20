@@ -66,7 +66,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
                 'command_template_code': False,
             },
 
-            panel_user_code='1337',
+            panel_user_code=1337,
         )
 
     async def test_config_code_required_remote_check_num(self):
@@ -79,7 +79,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
                 'command_template_code': True,
             },
 
-            panel_user_code='1337',
+            panel_user_code=1337,
             code_disarm_required=True,
             code_arm_required=True,
             code_trigger_required=True,
@@ -113,7 +113,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
                 'command_template_code': False,
             },
 
-            panel_user_code='1337',
+            panel_user_code=1337,
             code_disarm_required=True,
             code_arm_required=True,
             code_trigger_required=True,
@@ -130,7 +130,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
                 'command_template_code': False,
             },
 
-            panel_user_code='1337',
+            panel_user_code=1337,
             code_disarm_required=True,
             code_arm_required=True,
             code_trigger_required=True,
@@ -148,7 +148,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
                 'command_template_code': True,
             },
 
-            panel_user_code='1337',
+            panel_user_code=1337,
             code_disarm_required=True,
             code_arm_required=True,
             code_trigger_required=True,
