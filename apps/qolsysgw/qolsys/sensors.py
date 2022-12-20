@@ -267,3 +267,12 @@ class QolsysSensorFreeze(QolsysSensor):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Freeze', data, common)
+
+
+class QolsysSensorHeat(QolsysSensor):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def from_json(cls, data, common=None):
+        return cls.from_json_subclass('Heat', data, common)
