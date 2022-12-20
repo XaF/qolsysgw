@@ -305,7 +305,7 @@ class QolsysEventArming(QolsysEvent):
         return (f"<{type(self).__name__} "
                 f"partition_id={self.partition_id} "
                 f"arming_type={self.arming_type} "
-                f"delay{self.delay} "
+                f"delay={self.delay} "
                 f"version={self._version}>")
 
     @classmethod
@@ -367,5 +367,47 @@ class QolsysEventAlarm(QolsysEvent):
         )
 
 
-# class QolsysEventError(QolsysEvent):
-#    pass
+class QolsysEventError(QolsysEvent):
+
+    def __init__(self, partition_id: int, error_type: str, description: str,
+                 version: int, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self._partition_id = partition_id
+        self._error_type = error_type
+        self._description = description
+        self._version = version
+
+    @property
+    def partition_id(self):
+        return self._partition_id
+
+    @property
+    def error_type(self):
+        return self._error_type
+
+    @property
+    def description(self):
+        return self._description
+
+    def __str__(self):
+        return (f"<{type(self).__name__} "
+                f"partition_id={self.partition_id} "
+                f"error_type={self.error_type} "
+                f"description={self.description} "
+                f"version={self._version}>")
+
+    @classmethod
+    def from_json(cls, data):
+        event_type = data.get('event')
+        if event_type != 'ERROR':
+            raise UnableToParseEventException(f"Cannot parse event '{event_type}'")
+
+        return QolsysEventError(
+            request_id=data.get('requestID'),
+            version=data.get('version'),
+            partition_id=data.get('partition_id'),
+            error_type=data.get('error_type'),
+            description=data.get('description'),
+            raw_event=data,
+        )
