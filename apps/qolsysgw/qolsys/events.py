@@ -234,9 +234,12 @@ class QolsysEventZoneEventActive(QolsysEventZoneEvent):
         )
 
 
-class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
+class _QolsysEventZoneEventFullZone(QolsysEventZoneEvent):
 
     def __init__(self, zone: QolsysSensor, *args, **kwargs) -> None:
+        if self.__class__ == _QolsysEventZoneEventFullZone:
+            raise RuntimeError('Should not instantiate this class directly')
+
         super().__init__(*args, **kwargs)
 
         self._zone = zone
@@ -248,7 +251,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
     @classmethod
     def from_json(cls, data):
         zone_event_type = data.get('zone_event_type')
-        if zone_event_type != 'ZONE_UPDATE':
+        if zone_event_type != cls._ZONE_EVENT_TYPE:
             raise UnableToParseEventException(
                 f"Cannot parse zone event '{zone_event_type}'")
 
@@ -256,7 +259,7 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
         try:
             sensor = QolsysSensor.from_json(zone)
 
-            return QolsysEventZoneEventUpdate(
+            return cls(
                 request_id=data.get('requestID'),
                 version=data.get('version'),
                 zone=sensor,
@@ -265,6 +268,14 @@ class QolsysEventZoneEventUpdate(QolsysEventZoneEvent):
         except UnknownQolsysSensorException:
             LOGGER.warning(f"sensor of unknown type: {zone}")
             raise
+
+
+class QolsysEventZoneEventUpdate(_QolsysEventZoneEventFullZone):
+    _ZONE_EVENT_TYPE = 'ZONE_UPDATE'
+
+
+class QolsysEventZoneEventAdd(_QolsysEventZoneEventFullZone):
+    _ZONE_EVENT_TYPE = 'ZONE_ADD'
 
 
 class QolsysEventArming(QolsysEvent):

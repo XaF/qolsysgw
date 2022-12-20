@@ -54,6 +54,14 @@ class QolsysState(QolsysObservable):
             self._partitions[current_zone.partition_id].remove_zone(sensor.zone_id)
             self._partitions[sensor.partition_id].add_sensor(sensor)
 
+    def zone_add(self, sensor):
+        partition = self._partitions.get(sensor.partition_id)
+        if partition is None:
+            raise Exception(f'Partition not found for zone add: {sensor},'
+                            'we might not be sync-ed anymore')  # TODO: make it a better exception
+
+        self._partitions[sensor.partition_id].add_sensor(sensor)
+
     def zone_open(self, zone_id):
         for partition in self.partitions:
             zone = partition.zone(zone_id)

@@ -1,5 +1,4 @@
 import json
-import pytest
 
 from unittest import mock
 
@@ -496,7 +495,6 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    @pytest.mark.skip(reason='ZONE_EVENT ZONE_ADD not yet supported')
     async def test_event_zone_event_zone_add(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
