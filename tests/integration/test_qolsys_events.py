@@ -837,3 +837,61 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         await self._test_event_alarm(
             alarm_type='AUXILIARY',
         )
+
+    async def test_event_error_usercode(self):
+        panel, gw, _, _ = await self._ready_panel_and_gw(
+            partition_ids=[0],
+            zone_ids=[100],
+            partition_status={
+                0: 'ARM_STAY',
+            },
+        )
+
+        event = {
+            'event': 'ERROR',
+            'error_type': 'usercode',
+            'partition_id': 0,
+            'description': 'Please Enable Six Digit User Code or '
+                           'KeyPad is already Locked',
+            'nonce': 'qolsys',
+            'version': 1,
+            'requestID': '<request_id>',
+        }
+        await panel.writeline(event)
+
+        uncaught = await gw.wait_for_next_log(
+            timeout=self._TIMEOUT,
+            filters={'level': 'INFO'},
+            match='^UNCAUGHT event <QolsysEventError '
+                  'partition_id=0 error_type=usercode',
+        )
+
+        self.assertIsNotNone(uncaught)
+
+    async def test_event_error_disarm_failed(self):
+        panel, gw, _, _ = await self._ready_panel_and_gw(
+            partition_ids=[0],
+            zone_ids=[100],
+            partition_status={
+                0: 'ARM_STAY',
+            },
+        )
+
+        event = {
+            'event': 'ERROR',
+            'error_type': 'DISARM_FAILED',
+            'partition_id': 0,
+            'description': 'Invalid usercode',
+            'version': 1,
+            'requestID': '<request_id>',
+        }
+        await panel.writeline(event)
+
+        uncaught = await gw.wait_for_next_log(
+            timeout=self._TIMEOUT,
+            filters={'level': 'INFO'},
+            match='^UNCAUGHT event <QolsysEventError '
+                  'partition_id=0 error_type=DISARM_FAILED',
+        )
+
+        self.assertIsNotNone(uncaught)

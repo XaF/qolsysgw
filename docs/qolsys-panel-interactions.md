@@ -397,3 +397,32 @@ The `alarm_type` can be one of `POLICE`, `FIRE` or `AUXILIARY`. It can also be
 empty, which is the case when the alarm is triggered by a sensor being `Open`
 while the alarm is armed.
 
+
+### ERROR
+
+The `ERROR` event type happens when an error happens following a command
+sent to the panel through the Control4 interface. This means that any
+operation done directly on the panel (like typing a disarm code physically)
+will not lead to any of those messages.
+
+```json
+{
+  "event": "ERROR",
+  "partition_id": 0,
+  "error_type": "DISARM_FAILED",
+  "description": "Invalid usercode",
+  "version": 1,
+  "requestID": "<request_id>"
+}
+```
+
+The `error_type` corresponds to the type of the error. At the moment, we have
+only observed the following ones:
+- `usercode` which happened when trying to arm/disarm the alarm while the
+  keypad was locked (using partitions), or if the 6-digit usercodes are not
+  enabled on a panel version that requires it
+- `DISARM_FAILED` which happened when trying to arm/disarm the alarm with
+  an invalid usercode
+
+The `description` gives a human-readable version of the `error_type`, which
+contains a bit more information than the `error_type` itself.

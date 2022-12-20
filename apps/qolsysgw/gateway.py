@@ -227,6 +227,9 @@ class QolsysGateway(Mqtt):
 
             partition.triggered(alarm_type=event.alarm_type)
 
+        else:
+            LOGGER.info(f'UNCAUGHT event {event}; ignored')
+
     async def mqtt_control_callback(self, control: QolsysControl):
         if control.session_token != self._session_token and (
                 self._cfg.user_control_token is None or
