@@ -1,5 +1,4 @@
 import json
-import pytest
 
 import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase

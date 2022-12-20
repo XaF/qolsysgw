@@ -8,3 +8,7 @@ class UnknownMqttWrapperException(MqttException):
 
 class UnknownDeviceClassException(MqttException):
     pass
+
+
+class MqttPluginUnavailableException(MqttException):
+    pass
