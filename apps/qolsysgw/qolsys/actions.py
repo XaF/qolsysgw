@@ -62,22 +62,27 @@ class QolsysActionArm(QolsysAction):
             self._data['usercode'] = str(panel_code)
 
 
+class QolsysActionArmWithDelay(QolsysActionArm):
+    def __init__(self, delay: int = None, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        if delay is not None and delay >= 0:
+            self._data['delay'] = delay
+
+
 class QolsysActionDisarm(QolsysActionArm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_DISARM,
                          *args, **kwargs)
 
 
-class QolsysActionArmAway(QolsysActionArm):
-    def __init__(self, delay: int = None, *args, **kwargs) -> None:
+class QolsysActionArmAway(QolsysActionArmWithDelay):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_ARM_AWAY,
                          *args, **kwargs)
 
-        if delay is not None and delay >= 0:
-            self._data['delay'] = delay
 
-
-class QolsysActionArmStay(QolsysActionArm):
+class QolsysActionArmStay(QolsysActionArmWithDelay):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_ARM_STAY,
                          *args, **kwargs)

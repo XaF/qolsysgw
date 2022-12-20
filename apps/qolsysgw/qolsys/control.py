@@ -186,11 +186,24 @@ class QolsysControlArmVacation(QolsysControlArmAway):
 
 
 class QolsysControlArmHome(QolsysControlArm):
+    def __init__(self, delay: int = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._delay = delay
+        self._requires_config = self._requires_config or delay is None
+
+    def configure(self, cfg, state):
+        super().configure(cfg, state)
+
+        if self._delay is None:
+            self._delay = cfg.arm_stay_exit_delay
+
     @property
     def action(self):
         return QolsysActionArmStay(
             partition_id=self._partition_id,
             panel_code=self._panel_code,
+            delay=self._delay,
         )
 
 
