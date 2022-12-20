@@ -1,9 +1,10 @@
 # Qolsys Gateway - `qolsysgw`
 
-![hacs validation](https://github.com/XaF/qolsysgw/actions/workflows/hacs-validation.yaml/badge.svg)
+![build](https://github.com/XaF/qolsysgw/actions/workflows/build.yaml/badge.svg) ![hacs validation](https://github.com/XaF/qolsysgw/actions/workflows/hacs-validation.yaml/badge.svg)
 
 Qolsys Gateway (`qolsysgw`) is an [AppDaemon][appdaemon]
-automation that serves as a gateway between a [Qolsys IQ Panel 2+][qolsys-panel]
+automation that serves as a gateway between a Qolsys IQ Panel
+([2][qolsys-iq-panel-2], [2+][qolsys-panel-2-plus] or [4](qolsys-panel-4))
 and [Home Assistant][hass]. Qolsys Gateway works by establishing a connection
 to your Qolsys Panel and uses the [MQTT integration of Home Assistant][hass-mqtt].
 It takes advantages of the [MQTT discovery][hass-mqtt-discovery]
@@ -26,7 +27,7 @@ from Home Assistant, manually or through automations.
       - [Manually](#manually)
 - [Configuration](#configuration)
    - [Configuring the MQTT integration in Home Assistant](#configuring-the-mqtt-integration-in-home-assistant)
-   - [Configuring your Qolsys IQ Panel 2+](#configuring-your-qolsys-iq-panel-2)
+   - [Configuring your Qolsys IQ Panel](#configuring-your-qolsys-iq-panel)
    - [Configuring Qolsys Gateway](#configuring-qolsys-gateway)
       - [Required configuration](#required-configuration)
       - [Optional configuration related to the Qolsys Panel itself](#optional-configuration-related-to-the-qolsys-panel-itself)
@@ -79,8 +80,8 @@ workflows:
 
 ## Requirements
 
-- A Qolsys IQ Panel 2 or 2+ (software version 2.5.3 or greater), or 4 (reported
-  to work on software version 4.1 or greater),
+- A Qolsys IQ Panel 2 or 2+ (software version 2.5.3 or greater), or 4
+  (software version 4.1 or greater),
   for which you have the **dealer code** (defaults to `2222`). In some cases,
   the _installer code_ (defaults to `1111`) might be sufficient, but in my
   experience, it was not, as the required menus were not visible.
@@ -240,9 +241,9 @@ MQTT integration yet, you can do so with the following steps:
    and the integration will be setup upon success.
 
 
-### Configuring your Qolsys IQ Panel 2+
+### Configuring your Qolsys IQ Panel
 
-If you already have the Control4 token for your Qolsys IQ Panel 2+, you can
+If you already have the Control4 token for your Qolsys IQ Panel, you can
 skip that step. If you do not understand what that sentence is about, you
 definitely need to go through that step.
 
@@ -711,6 +712,8 @@ List of links used in that page, sorted alphabetically by tag
 [hass-mqtt]: https://www.home-assistant.io/integrations/mqtt/
 [hass]: https://www.home-assistant.io/
 [mqtt-docker]: https://hub.docker.com/_/eclipse-mosquitto
-[qolsys-panel]: https://qolsys.com/iq-panel-2-plus/
+[qolsys-panel-2]: https://qolsys.com/iq-panel-2/
+[qolsys-panel-2-plus]: https://qolsys.com/iq-panel-2-plus/
+[qolsys-panel-4]: https://qolsys.com/iq-panel-4/
 [roopesh]: https://github.com/roopesh
 
