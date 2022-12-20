@@ -19,6 +19,7 @@ class QolsysGatewayConfig(object):
         'panel_unique_id': 'qolsys_panel',
         'panel_device_name': 'Qolsys Panel',
         'arm_away_exit_delay': None,
+        'arm_stay_exit_delay': None,
 
         'mqtt_namespace': 'mqtt',
         'mqtt_retain': True,

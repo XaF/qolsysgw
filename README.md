@@ -392,7 +392,7 @@ With:
   <code>null</code> will let the panel use its default value. Setting
   to any other positive value will set that delay. This will not change
   the default behavior of the panel when handled manually, simply what
-  will happen when arming away from Home Assistant through Qolsys Gateway. 
+  will happen when arming away from Home Assistant through Qolsys Gateway.
   <em>Note that if "Auto Stay" is enabled (may be the default in some cases),
   an exit delay is configured, and no door is opened or closed
   during the delay, the panel will be set to "Arm Stay" instead.</em>
@@ -402,6 +402,23 @@ With:
   qolsys_panel:
     # ...
     arm_away_exit_delay: 0 # arming instantly when triggered from Home Assistant, since related to automations
+    # ...
+  ```
+  </details>
+
+- <details><summary><strong>arm_stay_exit_delay:</strong> the delay to set
+  when arming stay through Qolsys Gateway. Setting the value to
+  <code>0</code> will instantly arm the alarm system. Setting to
+  <code>null</code> will let the panel use its default value. Setting
+  to any other positive value will set that delay. This will not change
+  the default behavior of the panel when handled manually, simply what
+  will happen when arming stay from Home Assistant through Qolsys Gateway.
+  Defaults to <code>null</code>.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    arm_stay_exit_delay: 10 # arming in 10 seconds when triggered from Home Assistant
     # ...
   ```
   </details>

@@ -233,14 +233,13 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             arming_type='ARM_STAY',
         )
 
-    @pytest.mark.skip(reason='Not implemented yet')
     async def test_control_arm_home_with_exit_delay(self):
         await self._test_control_arming(
             control_action='ARM_HOME',
             partition_status='DISARM',
             arming_type='ARM_STAY',
-            arm_stay_exit_delay=30,
-            expect_delay=30,
+            arm_stay_exit_delay=42,
+            expect_delay=42,
         )
 
     async def test_control_arm_home_secure_arm_with_code(self):
