@@ -124,3 +124,16 @@ jobs:
 
           exit 0
 
+  auto-merge:
+    name: "Auto-merge Dependabot pull requests"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+
+      - name: Check and auto-merge on minor changes
+        uses: ahmadnassri/action-dependabot-auto-merge@v2
+        with:
+          target: minor
+          github-token: ${{ secrets.AUTOMERGE_TOKEN }}
