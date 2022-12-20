@@ -1,11 +1,10 @@
 import asyncio
 import logging
-import time
-import re
 
 from unittest import mock
 from copy import deepcopy
 
+from testutils.utils import MessageStorage
 from appdaemon.utils import sync_wrapper
 
 
@@ -31,10 +30,12 @@ class ADBase(object):
 
 class ADAPI(object):
 
-    CAPTURED_LOGS = []
+    CAPTURED_LOGS = MessageStorage(name='log', match_check_key='message')
     PLUGIN_CONFIG = {
-        'will_topic': 'appdaemon/birth_and_will',
         'birth_topic': 'appdaemon/birth_and_will',
+        'will_topic': 'appdaemon/birth_and_will',
+        'birth_payload': 'online',
+        'will_payload': 'offline',
     }
 
     def log(self, msg, *args, **kwargs):
@@ -60,51 +61,14 @@ class ADAPI(object):
     async def get_plugin_config(self, **kwargs):
         return deepcopy(self.PLUGIN_CONFIG)
 
-    async def wait_for_next_log(self, timeout=30, filters=None, match=None,
-                                raise_on_timeout=False, startpos=None,
-                                returnpos=False):
-        start = time.time()
-        logslen = startpos or len(self.CAPTURED_LOGS)
-        log = None
-        _SENTINEL = object()
-
-        if not filters:
-            filters = {}
-
-        while log is None:
-            while len(self.CAPTURED_LOGS) == logslen and \
-                    time.time() - start < timeout:
-                await asyncio.sleep(.1)
-
-            if len(self.CAPTURED_LOGS) > logslen:
-                while log is None and logslen < len(self.CAPTURED_LOGS):
-                    log = self.CAPTURED_LOGS[logslen]
-
-                    for k, v in filters.items():
-                        if log.get(k, _SENTINEL) != v:
-                            log = None
-                            break
-
-                    if log and match and not re.search(match, log['message']):
-                        log = None
-
-                    logslen += 1
-            else:
-                break
-
-        if log is None and raise_on_timeout:
-            raise AttributeError('No log found before timeout')
-
-        if returnpos:
-            return log, logslen
-        else:
-            return log
+    async def wait_for_next_log(self, *args, **kwargs):
+        return await self.CAPTURED_LOGS.wait_for_next(*args, **kwargs)
 
 
 class Mqtt(ADBase, ADAPI):
 
     SUBSCRIBED_TO = []
-    PUBLISHED = []
+    PUBLISHED = MessageStorage(name='publish')
     LISTEN_EVENT = []
 
     mqtt_publish_func = mock.Mock(name='mqtt_publish')
@@ -167,59 +131,8 @@ class Mqtt(ADBase, ADAPI):
     async def is_client_connected(self, **kwargs):
         raise RuntimeError('Not defined yet')
 
-    async def find_last_mqtt_publish(self, filters=None,
-                                     raise_if_not_found=False):
-        _SENTINEL = object()
+    async def find_last_mqtt_publish(self, *args, **kwargs):
+        return await self.PUBLISHED.find_last(*args, **kwargs)
 
-        for publish in reversed(self.PUBLISHED):
-            found = True
-
-            for k, v in filters.items():
-                if publish.get(k, _SENTINEL) != v:
-                    found = False
-                    break
-
-            if found:
-                return publish
-
-        if raise_if_not_found:
-            raise AttributeError('No publish found')
-
-        return None
-
-    async def wait_for_next_mqtt_publish(self, timeout=30, filters=None,
-                                         raise_on_timeout=False, startpos=None,
-                                         returnpos=False):
-        start = time.time()
-        publishedlen = startpos or len(self.PUBLISHED)
-        publish = None
-        _SENTINEL = object()
-
-        if not filters:
-            filters = {}
-
-        while publish is None:
-            while len(self.PUBLISHED) == publishedlen and \
-                    time.time() - start < timeout:
-                await asyncio.sleep(.1)
-
-            if len(self.PUBLISHED) > publishedlen:
-                while publish is None and publishedlen < len(self.PUBLISHED):
-                    publish = self.PUBLISHED[publishedlen]
-
-                    for k, v in filters.items():
-                        if publish.get(k, _SENTINEL) != v:
-                            publish = None
-                            break
-
-                    publishedlen += 1
-            else:
-                break
-
-        if publish is None and raise_on_timeout:
-            raise AttributeError('No publish found before timeout')
-
-        if returnpos:
-            return publish, publishedlen
-        else:
-            return publish
+    async def wait_for_next_mqtt_publish(self, *args, **kwargs):
+        return await self.PUBLISHED.wait_for_next(*args, **kwargs)

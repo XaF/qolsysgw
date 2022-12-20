@@ -18,6 +18,7 @@ from qolsys.events import QolsysEventArming
 from qolsys.events import QolsysEventInfoSecureArm
 from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
+from qolsys.events import QolsysEventZoneEventAdd
 from qolsys.events import QolsysEventZoneEventUpdate
 from qolsys.exceptions import InvalidUserCodeException
 from qolsys.exceptions import MissingUserCodeException
@@ -199,6 +200,11 @@ class QolsysGateway(Mqtt):
             LOGGER.debug(f'UPDATE zone={event.zone}')
 
             self._state.zone_update(event.zone)
+
+        elif isinstance(event, QolsysEventZoneEventAdd):
+            LOGGER.debug(f'ADD zone={event.zone}')
+
+            self._state.zone_add(event.zone)
 
         elif isinstance(event, QolsysEventArming):
             LOGGER.debug(f'ARMING partition_id={event.partition_id} '
