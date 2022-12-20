@@ -8,6 +8,7 @@ from testbase import TestQolsysGatewayBase
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
+from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
@@ -18,6 +19,173 @@ from qolsys.sensors import QolsysSensorWater
 
 class TestQolsysEvents(TestQolsysGatewayBase):
 
+    async def _check_partition_mqtt_messages(self, gw, partition_flat_name,
+                                             partition_state, expected_state):
+        state = partition_state
+
+        mqtt_prefix = ('homeassistant/alarm_control_panel/'
+                       f'qolsys_panel/{partition_flat_name}')
+
+        with self.subTest(msg=f'MQTT config of partition {state.id} is correct'):
+            mqtt_config = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/config'},
+                raise_if_not_found=True,
+            )
+
+            self.assertIsNotNone(mqtt_config)
+            self.maxDiff = None
+            self.assertDictEqual(
+                {
+                    'name': state.name,
+                    'state_topic': f'{mqtt_prefix}/state',
+                    'command_topic': 'homeassistant/alarm_control_panel/'
+                                     'qolsys_panel/set',
+                    'command_template': mock.ANY,
+                    'code': 'REMOTE_CODE',
+                    'code_disarm_required': True,
+                    'code_arm_required': False,
+                    'code_trigger_required': False,
+                    'availability_mode': 'all',
+                    'availability': [
+                        {
+                            'topic': 'homeassistant/alarm_control_panel/'
+                                     'qolsys_panel/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': f'{mqtt_prefix}/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': 'appdaemon/birth_and_will',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                    ],
+                    'json_attributes_topic': f'{mqtt_prefix}/attributes',
+                    'unique_id': f'qolsys_panel_p{state.id}',
+                    'device': mock.ANY,
+                },
+                json.loads(mqtt_config['payload']),
+            )
+
+        with self.subTest(msg=f'MQTT availability of partition {state.id} is correct'):
+            mqtt_availability = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/availability'},
+                raise_if_not_found=True,
+            )
+
+            self.assertIsNotNone(mqtt_availability)
+            self.assertEqual('online', mqtt_availability['payload'])
+
+        with self.subTest(msg=f'MQTT state of partition {state.id} is correct'):
+            mqtt_state = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/state'},
+                raise_if_not_found=True,
+            )
+
+            self.assertIsNotNone(mqtt_state)
+            self.assertEqual(expected_state, mqtt_state['payload'])
+
+        with self.subTest(msg=f'MQTT attributes of partition {state.id} are correct'):
+            mqtt_attributes = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/attributes'},
+                raise_if_not_found=True,
+            )
+
+            self.assertIsNotNone(mqtt_attributes)
+            self.maxDiff = None
+            self.assertDictEqual(
+                {
+                    'alarm_type': state.alarm_type,
+                    'secure_arm': state.secure_arm,
+                },
+                json.loads(mqtt_attributes['payload']),
+            )
+
+    async def _check_sensor_mqtt_messages(self, gw, sensor_flat_name,
+                                          sensor_state, expected_device_class):
+        state = sensor_state
+
+        mqtt_prefix = f'homeassistant/binary_sensor/{sensor_flat_name}'
+
+        with self.subTest(msg=f'MQTT config of sensor {state.zone_id} is correct'):
+            mqtt_config = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/config'},
+            )
+
+            self.assertIsNotNone(mqtt_config)
+
+            self.maxDiff = None
+            self.assertDictEqual(
+                {
+                    'name': state.name,
+                    'device_class': expected_device_class,
+                    'state_topic': f'{mqtt_prefix}/state',
+                    'payload_on': 'Open',
+                    'payload_off': 'Closed',
+                    'availability_mode': 'all',
+                    'availability': [
+                        {
+                            'topic': 'homeassistant/alarm_control_panel/'
+                                     'qolsys_panel/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': f'{mqtt_prefix}/availability',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                        {
+                            'topic': 'appdaemon/birth_and_will',
+                            'payload_available': 'online',
+                            'payload_not_available': 'offline',
+                        },
+                    ],
+                    'json_attributes_topic': f'{mqtt_prefix}/attributes',
+                    'unique_id': (f'qolsys_panel_p{state.partition_id}'
+                                  f'z{state.zone_id}'),
+                    'device': mock.ANY,
+                },
+                json.loads(mqtt_config['payload']),
+            )
+
+        with self.subTest(msg=f'MQTT availability of sensor {state.zone_id} is correct'):
+            mqtt_availability = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/availability'},
+            )
+
+            self.assertIsNotNone(mqtt_availability)
+            self.assertEqual('online', mqtt_availability['payload'])
+
+        with self.subTest(msg=f'MQTT state of sensor {state.zone_id} is correct'):
+            mqtt_state = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/state'},
+            )
+
+            self.assertIsNotNone(mqtt_state)
+            self.assertEqual(state.status, mqtt_state['payload'])
+
+        with self.subTest(msg=f'MQTT attributes of sensor {state.zone_id} is correct'):
+            mqtt_attributes = await gw.find_last_mqtt_publish(
+                filters={'topic': f'{mqtt_prefix}/attributes'},
+            )
+
+            self.assertIsNotNone(mqtt_attributes)
+            self.assertDictEqual(
+                {
+                    'group': state.group,
+                    'state': state.state,
+                    'zone_physical_type': state.zone_physical_type,
+                    'zone_alarm_type': state.zone_alarm_type,
+                    'zone_type': state.zone_type,
+                },
+                json.loads(mqtt_attributes['payload']),
+            )
+
     async def test_event_info_summary_initializes_all_entities(self):
         panel, gw, entity_ids, topics = await self._ready_panel_and_gw()
 
@@ -26,7 +194,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         for topic in topics:
             mqtt_publish_calls.append(mock.call(
                 (f'homeassistant/alarm_control_panel/'
-                 f'qolsys_panel/partition1/{topic}'),
+                 f'qolsys_panel/partition0/{topic}'),
                 mock.ANY,
                 namespace=mock.ANY,
                 retain=mock.ANY,
@@ -58,19 +226,33 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             partition0 = state.partition(0)
             self.assertEqual(10, len(partition0.sensors))
             self.assertEqual(0, partition0.id)
-            self.assertEqual('partition1', partition0.name)
+            self.assertEqual('partition0', partition0.name)
             self.assertEqual('DISARM', partition0.status)
             self.assertEqual(False, partition0.secure_arm)
             self.assertIsNone(partition0.alarm_type)
 
+            await self._check_partition_mqtt_messages(
+                gw=gw,
+                partition_flat_name='partition0',
+                partition_state=partition0,
+                expected_state='disarmed',
+            )
+
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(1, len(partition1.sensors))
+            self.assertEqual(2, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
-            self.assertEqual('partition2', partition1.name)
+            self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
             self.assertEqual(False, partition1.secure_arm)
             self.assertIsNone(partition1.alarm_type)
+
+            await self._check_partition_mqtt_messages(
+                gw=gw,
+                partition_flat_name='partition1',
+                partition_state=partition1,
+                expected_state='disarmed',
+            )
 
         # Check the sensors information
         with self.subTest(msg='Sensor 100 is properly configured'):
@@ -87,6 +269,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(1, sensor100.zone_type)
             self.assertEqual(0, sensor100.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_door',
+                sensor_state=sensor100,
+                expected_device_class='door',
+            )
+
         with self.subTest(msg='Sensor 101 is properly configured'):
             sensor101 = partition0.zone(101)
             self.assertEqual(QolsysSensorDoorWindow, sensor101.__class__)
@@ -100,6 +289,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(3, sensor101.zone_alarm_type)
             self.assertEqual(1, sensor101.zone_type)
             self.assertEqual(0, sensor101.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_window',
+                sensor_state=sensor101,
+                expected_device_class='door',
+            )
 
         with self.subTest(msg='Sensor 110 is properly configured'):
             sensor110 = partition0.zone(110)
@@ -115,6 +311,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(2, sensor110.zone_type)
             self.assertEqual(0, sensor110.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_motion',
+                sensor_state=sensor110,
+                expected_device_class='motion',
+            )
+
         with self.subTest(msg='Sensor 111 is properly configured'):
             sensor111 = partition0.zone(111)
             self.assertEqual(QolsysSensorPanelMotion, sensor111.__class__)
@@ -128,6 +331,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(3, sensor111.zone_alarm_type)
             self.assertEqual(119, sensor111.zone_type)
             self.assertEqual(0, sensor111.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='panel_motion',
+                sensor_state=sensor111,
+                expected_device_class='motion',
+            )
 
         with self.subTest(msg='Sensor 120 is properly configured'):
             sensor120 = partition0.zone(120)
@@ -143,6 +353,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(116, sensor120.zone_type)
             self.assertEqual(0, sensor120.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_glass_break',
+                sensor_state=sensor120,
+                expected_device_class='vibration',
+            )
+
         with self.subTest(msg='Sensor 121 is properly configured'):
             sensor121 = partition0.zone(121)
             self.assertEqual(QolsysSensorPanelGlassBreak, sensor121.__class__)
@@ -156,6 +373,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(0, sensor121.zone_alarm_type)
             self.assertEqual(116, sensor121.zone_type)
             self.assertEqual(0, sensor121.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='panel_glass_break',
+                sensor_state=sensor121,
+                expected_device_class='vibration',
+            )
 
         with self.subTest(msg='Sensor 130 is properly configured'):
             sensor130 = partition0.zone(130)
@@ -171,6 +395,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(115, sensor130.zone_type)
             self.assertEqual(0, sensor130.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_phone',
+                sensor_state=sensor130,
+                expected_device_class='presence',
+            )
+
         with self.subTest(msg='Sensor 140 is properly configured'):
             sensor140 = partition0.zone(140)
             self.assertEqual(QolsysSensorSmokeDetector, sensor140.__class__)
@@ -184,6 +415,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(9, sensor140.zone_alarm_type)
             self.assertEqual(5, sensor140.zone_type)
             self.assertEqual(0, sensor140.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_smoke_detector',
+                sensor_state=sensor140,
+                expected_device_class='smoke',
+            )
 
         with self.subTest(msg='Sensor 141 is properly configured'):
             sensor141 = partition0.zone(141)
@@ -199,6 +437,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(1, sensor141.zone_type)
             self.assertEqual(0, sensor141.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_co_detector',
+                sensor_state=sensor141,
+                expected_device_class='gas',
+            )
+
         with self.subTest(msg='Sensor 150 is properly configured'):
             sensor150 = partition0.zone(150)
             self.assertEqual(QolsysSensorWater, sensor150.__class__)
@@ -213,6 +458,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(15, sensor150.zone_type)
             self.assertEqual(0, sensor150.partition_id)
 
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_water_detector',
+                sensor_state=sensor150,
+                expected_device_class='moisture',
+            )
+
         with self.subTest(msg='Sensor 200 is properly configured'):
             sensor200 = partition1.zone(200)
             self.assertEqual(QolsysSensorDoorWindow, sensor200.__class__)
@@ -225,7 +477,35 @@ class TestQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(1, sensor200.zone_physical_type)
             self.assertEqual(3, sensor200.zone_alarm_type)
             self.assertEqual(1, sensor200.zone_type)
-            self.assertEqual(0, sensor200.partition_id)
+            self.assertEqual(1, sensor200.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_2nd_door',
+                sensor_state=sensor200,
+                expected_device_class='door',
+            )
+
+        with self.subTest(msg='Sensor 210 is properly configured'):
+            sensor210 = partition1.zone(210)
+            self.assertEqual(QolsysSensorFreeze, sensor210.__class__)
+            self.assertEqual('002-0010', sensor210.id)
+            self.assertEqual('My Freeze Sensor', sensor210.name)
+            self.assertEqual('freeze', sensor210.group)
+            self.assertEqual('Closed', sensor210.status)
+            self.assertEqual('0', sensor210.state)
+            self.assertEqual(210, sensor210.zone_id)
+            self.assertEqual(6, sensor210.zone_physical_type)
+            self.assertEqual(0, sensor210.zone_alarm_type)
+            self.assertEqual(17, sensor210.zone_type)
+            self.assertEqual(1, sensor210.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_freeze_sensor',
+                sensor_state=sensor210,
+                expected_device_class='cold',
+            )
 
     async def _test_event_info_secure_arm(self, from_secure_arm,
                                           to_secure_arm):
@@ -249,7 +529,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         attributes = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
-                              'qolsys_panel/partition1/attributes'},
+                              'qolsys_panel/partition0/attributes'},
         )
 
         if from_secure_arm != to_secure_arm:
@@ -652,7 +932,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         published_state = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
-                              'qolsys_panel/partition1/state'},
+                              'qolsys_panel/partition0/state'},
         )
 
         if from_status != to_status:
@@ -788,13 +1068,13 @@ class TestQolsysEvents(TestQolsysGatewayBase):
         published_state = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
-                              'qolsys_panel/partition1/state'},
+                              'qolsys_panel/partition0/state'},
         )
 
         published_attrs = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
             filters={'topic': 'homeassistant/alarm_control_panel/'
-                              'qolsys_panel/partition1/attributes'},
+                              'qolsys_panel/partition0/attributes'},
             continued=True,
         )
 

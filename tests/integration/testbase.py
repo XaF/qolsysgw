@@ -74,7 +74,7 @@ class TestQolsysGatewayBase(unittest.IsolatedAsyncioTestCase):
             'partition_list': [
                 {
                     'partition_id': 0,
-                    'name': 'partition1',
+                    'name': 'partition0',
                     'status': partition_status.get(0, 'DISARM'),
                     'secure_arm': secure_arm,
                     'zone_list': [
@@ -212,7 +212,7 @@ class TestQolsysGatewayBase(unittest.IsolatedAsyncioTestCase):
                 },
                 {
                     'partition_id': 1,
-                    'name': 'partition2',
+                    'name': 'partition1',
                     'status': partition_status.get(1, 'DISARM'),
                     'secure_arm': secure_arm,
                     'zone_list': [
@@ -227,8 +227,21 @@ class TestQolsysGatewayBase(unittest.IsolatedAsyncioTestCase):
                             'zone_physical_type': 1,
                             'zone_alarm_type': 3,
                             'zone_type': 1,
-                            'partition_id': 0,
+                            'partition_id': 1,
                         },
+                        {
+                            'id': '002-0010',
+                            'type': 'Freeze',
+                            'name': 'My Freeze Sensor',
+                            'group': 'freeze',
+                            'status': 'Closed',
+                            'state': '0',
+                            'zone_id': 210,
+                            'zone_physical_type': 6,
+                            'zone_alarm_type': 0,
+                            'zone_type': 17,
+                            'partition_id': 1,
+                        }
                     ],
                 },
             ],
