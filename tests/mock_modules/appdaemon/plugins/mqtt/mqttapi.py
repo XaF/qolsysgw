@@ -32,7 +32,10 @@ class ADBase(object):
 class ADAPI(object):
 
     CAPTURED_LOGS = []
-    PLUGIN_CONFIG = {}
+    PLUGIN_CONFIG = {
+        'will_topic': 'appdaemon/birth_and_will',
+        'birth_topic': 'appdaemon/birth_and_will',
+    }
 
     def log(self, msg, *args, **kwargs):
         log = dict(kwargs.items())

@@ -4,8 +4,9 @@ import uuid
 
 from appdaemon.plugins.mqtt.mqttapi import Mqtt
 
-from mqtt.listener import MqttQolsysEventListener
+from mqtt.exceptions import MqttPluginUnavailableException
 from mqtt.listener import MqttQolsysControlListener
+from mqtt.listener import MqttQolsysEventListener
 from mqtt.updater import MqttUpdater
 from mqtt.updater import MqttWrapperFactory
 
@@ -18,8 +19,8 @@ from qolsys.events import QolsysEventInfoSecureArm
 from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
 from qolsys.events import QolsysEventZoneEventUpdate
-from qolsys.exceptions import MissingUserCodeException
 from qolsys.exceptions import InvalidUserCodeException
+from qolsys.exceptions import MissingUserCodeException
 from qolsys.socket import QolsysSocket
 from qolsys.state import QolsysState
 
@@ -70,7 +71,13 @@ class QolsysGateway(Mqtt):
         self._is_terminated = False
 
         cfg = self._cfg = QolsysGatewayConfig(self.args)
+
         mqtt_plugin_cfg = await self.get_plugin_config(namespace=cfg.mqtt_namespace)
+        if mqtt_plugin_cfg is None:
+            raise MqttPluginUnavailableException(
+                'Unable to load the MQTT Plugin from AppDaemon, have you '
+                'configured the MQTT plugin properly in appdaemon.yaml?')
+
         self._session_token = str(uuid.uuid4())
 
         self._factory = MqttWrapperFactory(
