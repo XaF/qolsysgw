@@ -3,7 +3,6 @@ description: If you have a sensor type that is not yet supported and would like 
 title: "Add support for `<sensor type>` sensor type"
 labels:
   - enhancement
-assignees:
 body:
   - type: checkboxes
     id: initial_checks
