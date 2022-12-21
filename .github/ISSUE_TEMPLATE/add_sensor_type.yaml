@@ -1,0 +1,133 @@
+name: Request the addition of a new sensor type (form)
+description: If you have a sensor type that is not yet supported and would like to request it to be
+title: "Add support for `<sensor type>` sensor type"
+labels:
+  - enhancement
+assignees:
+body:
+  - type: checkboxes
+    id: initial_checks
+    attributes:
+      label: Before submitting this form
+      description: Making sure that you've done your due dilligence before submitting a new issue
+      options:
+        - label: I have checked that this sensor type was not suggested for addition before; I know that it could be in open or closed issues, and if there was another issue mentioning this sensor type I could simply comment in it instead
+          required: true
+        - label: I have updated the `<sensor type>` mention in the title of the issue, but left the issue title as it was otherwise
+          required: true
+        - label: I understand that if I want to suggest the addition of more than a single sensor type, I need to file that form for each separate type
+          required: true
+
+  - type: input
+    id: sensor_type
+    attributes:
+      label: Sensor type
+      description: What is the type of the sensor
+      placeholder: ex. Door_Window
+    validations:
+      required: true
+
+  - type: input
+    id: device_class
+    attributes:
+      label: Home Assistant device class
+      description: One of the values available at https://www.home-assistant.io/integrations/binary_sensor/#device-class
+      placeholder: ex. door
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: status_update
+    attributes:
+      label: Does the panel send sensor status updates?
+      description: Whether or not you've been able to witness messages sent from the panel to update the status of the sensor (open/closed)
+      options:
+        - label: Yes, I can see the Open/Close messages (I have been able to capture `ZONE_ACTIVE` messages)
+          required: false
+        - label: No, it seems to only tell us the sensor exists, but never update its state
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        To add a sensor, we need data, and I unfortunately do not have data on all the possible sensors.
+        By adding the `log_level` configuration parameter to `DEBUG` in your apps.yaml file, you will be able to grab that data for me, and provide it under here. Your apps.yaml configuration for `qolsysgw` should then look like something like this:
+
+        ```yaml
+        qolsys_panel:
+          module: gateway
+          class: QolsysGateway
+          log_level: DEBUG
+          <rest_of_config>
+        ```
+
+        All the data you provide below should be in beautified JSON for readability purposes. If unsure, you can use [this tool to beautify your JSON](https://codebeautify.org/jsonviewer).
+
+  - type: textarea
+    id: event_info_summary
+    attributes:
+      label: Sensor data from an `INFO` message
+      description: Add the data for the sensor from the content of an INFO message. If you have more than one distinct example, please provide a few of them.
+      placeholder: |
+        {
+          "id": "xxx-yyyy",
+          "type": "Door_Window",
+          "name": "Door NNN",
+          "group": "entryexitdelay",
+          "status": "Closed",
+          "state": "0",
+          "zone_id": 42,
+          "zone_physical_type": 1,
+          "zone_alarm_type": 3,
+          "zone_type": 1,
+          "partition_id": 0
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: event_zone_event_zone_update
+    attributes:
+      label: Sensor data from a `ZONE_EVENT`'s `ZONE_UPDATE` message
+      description: Add the data for the sensor from the content of a ZONE_EVENT of ZONE_UPDATE type message; these are regular healthchecks for the sensors and should be similar to what we see in the INFO message above. If you have more than one distinct example, please provide a few of them.
+      placeholder: |
+        {
+          "event": "ZONE_EVENT",
+          "zone_event_type": "ZONE_UPDATE",
+          "zone": {
+            "id": "xxx-yyyy",
+            "type": "Motion",
+            "name": "Motion MMM",
+            "group": "awayinstantmotion",
+            "status": "Closed",
+            "state": "0",
+            "zone_id": 1337,
+            "zone_physical_type": 2,
+            "zone_alarm_type": 3,
+            "zone_type": 2,
+            "partition_id": 0
+          },
+          "version": 1,
+          "requestID": "<request_id>"
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: event_zone_event_zone_active
+    attributes:
+      label: Sensor data from a `ZONE_EVENT`'s `ZONE_ACTIVE` message
+      description: Add the data for the sensor from the content of a ZONE_EVENT of ZONE_ACTIVE type message; these are happening when the sensor status change and should be of a lesser size than the other message types above; note that if you see those messages: good news, it means this sensor gets status updates from the panel! If you have more than one distinct example, please provide a few of them.
+      placeholder: |
+        {
+          "event": "ZONE_EVENT",
+          "zone_event_type": "ZONE_ACTIVE",
+          "version": 1,
+          "zone": {
+            "status": "Open",
+            "zone_id": 42
+          },
+          "requestID": "<request_id>"
+        }
+    validations:
+      required: true
