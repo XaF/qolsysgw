@@ -29,10 +29,12 @@ body:
     id: event_action
     attributes:
       label: Is it an event or an action?
-      description: Whether this interaction is something that `qolsysgw` will use to interact with the Qolsys Panel (action) or that the Qolsys Panel will use to inform of any change or status (event)
+      description: |
+        Whether this interaction is something that `qolsysgw` will use to interact with the Qolsys Panel (action) or
+        that the Qolsys Panel will use to inform of any change or status (event)
       options:
-        - Event (I can see `"event": "<type>"` in the JSON)
-        - Action (I can see `"action": "<type>"` in the JSON)
+        - 'Event (I can see `"event": "<type>"` in the JSON)'
+        - 'Action (I can see `"action": "<type>"` in the JSON)'
     validations:
       required: true
 
@@ -40,7 +42,8 @@ body:
     id: interaction_type
     attributes:
       label: Interaction type
-      description: The value provided for the `"event"` or `"action"` field in the JSON, e.g. for `"event": "INFO"` you would write `INFO`.
+      description: |
+        The value provided for the `"event"` or `"action"` field in the JSON, e.g. for `"event": "INFO"` you would write `INFO`.
       placeholder: ex. INFO
     validations:
       required: true
@@ -49,7 +52,9 @@ body:
     id: interaction_subtype
     attributes:
       label: Interaction subtype
-      description: The value provided for the `"<type>_type"` field in the JSON, where `<type>` is the interaction type, e.g. for `"info_type": "SUMMARY"` you would write `SUMMARY`.
+      description: |
+        The value provided for the `"<type>_type"` field in the JSON, where `<type>` is the interaction type,
+        e.g. for `"info_type": "SUMMARY"` you would write `SUMMARY`.
       placeholder: ex. SUMMARY
     validations:
       required: true

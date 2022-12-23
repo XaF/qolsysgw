@@ -1,6 +1,5 @@
 name: Report a bug
 description: If the gateway is not behaving as expected
-title: ""
 labels:
   - bug
 body:
