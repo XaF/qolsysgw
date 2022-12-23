@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "core.config_entries",
+  "data": {
+    "entries": [
+      {
+        "entry_id": "286d021cb835e1abd62ea8537fcb99d1",
+        "version": 1,
+        "domain": "mqtt",
+        "title": "mosquitto",
+        "data": {
+          "broker": "mosquitto",
+          "port": 1883,
+          "discovery": true,
+          "discovery_prefix": "homeassistant"
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": null
+      }
+    ]
+  }
+}

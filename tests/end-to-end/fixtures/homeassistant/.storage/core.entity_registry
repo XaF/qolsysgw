@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "minor_version": 8,
+  "key": "core.entity_registry",
+  "data": {
+    "entities": [
+      {
+        "area_id": null,
+        "capabilities": null,
+        "config_entry_id": null,
+        "device_class": null,
+        "device_id": null,
+        "disabled_by": null,
+        "entity_category": null,
+        "entity_id": "person.qolsysgw_tests",
+        "hidden_by": null,
+        "icon": null,
+        "id": "8196beda9aaaa0a61004a2fd46ab071c",
+        "has_entity_name": false,
+        "name": null,
+        "options": {},
+        "original_device_class": null,
+        "original_icon": null,
+        "original_name": "qolsysgw-tests",
+        "platform": "person",
+        "supported_features": 0,
+        "unique_id": "qolsysgw_tests",
+        "unit_of_measurement": null
+      }
+    ]
+  }
+}

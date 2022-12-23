@@ -67,14 +67,14 @@ class ADAPI(object):
 
 class Mqtt(ADBase, ADAPI):
 
-    SUBSCRIBED_TO = []
-    PUBLISHED = MessageStorage(name='publish')
-    LISTEN_EVENT = []
-
-    mqtt_publish_func = mock.Mock(name='mqtt_publish')
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.SUBSCRIBED_TO = []
+        self.PUBLISHED = MessageStorage(name='publish')
+        self.LISTEN_EVENT = []
+
+        self.mqtt_publish_func = mock.Mock(name='mqtt_publish')
 
     @sync_wrapper
     async def listen_event(self, callback, event=None, **kwargs):

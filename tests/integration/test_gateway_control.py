@@ -4,9 +4,9 @@ import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase
 
 
-class TestQolsysGatewayControl(TestQolsysGatewayBase):
+class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
 
-    async def test_control_with_wrong_session_token(self):
+    async def test_integration_control_with_wrong_session_token(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],
@@ -96,7 +96,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             elif panel_user_code:
                 self.assertEqual(panel_user_code, action['usercode'])
 
-    async def test_control_disarm(self):
+    async def test_integration_control_disarm(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -104,7 +104,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             send_code=True,
         )
 
-    async def test_control_disarm_without_code(self):
+    async def test_integration_control_disarm_without_code(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -113,7 +113,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
                          'a configured panel code',
         )
 
-    async def test_control_disarm_with_panel_code(self):
+    async def test_integration_control_disarm_with_panel_code(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -121,7 +121,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             panel_user_code='1337',
         )
 
-    async def test_control_disarm_with_panel_code_and_user_control_token(self):
+    async def test_integration_control_disarm_with_panel_code_and_user_control_token(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -130,7 +130,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             user_control_token='My$ecr3tT0k3n!',
         )
 
-    async def test_control_disarm_if_code_disarm_required_and_ha_check_code(self):
+    async def test_integration_control_disarm_if_code_disarm_required_and_ha_check_code(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -140,7 +140,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             ha_check_user_code=True,
         )
 
-    async def test_control_disarm_with_wrong_code_if_code_disarm_required(self):
+    async def test_integration_control_disarm_with_wrong_code_if_code_disarm_required(self):
         await self._test_control_arming(
             control_action='DISARM',
             partition_status='ARM_AWAY',
@@ -152,14 +152,14 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             expect_error='^Code received in the control command invalid',
         )
 
-    async def test_control_arm_away(self):
+    async def test_integration_control_arm_away(self):
         await self._test_control_arming(
             control_action='ARM_AWAY',
             partition_status='DISARM',
             arming_type='ARM_AWAY',
         )
 
-    async def test_control_arm_away_with_exit_delay(self):
+    async def test_integration_control_arm_away_with_exit_delay(self):
         await self._test_control_arming(
             control_action='ARM_AWAY',
             partition_status='DISARM',
@@ -168,7 +168,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             expect_delay=30,
         )
 
-    async def test_control_arm_away_secure_arm_with_code(self):
+    async def test_integration_control_arm_away_secure_arm_with_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_AWAY',
@@ -177,7 +177,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             send_code=True,
         )
 
-    async def test_control_arm_away_secure_arm_with_panel_code(self):
+    async def test_integration_control_arm_away_secure_arm_with_panel_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_AWAY',
@@ -186,7 +186,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             panel_user_code='1337',
         )
 
-    async def test_control_arm_away_with_panel_code_if_code_arm_required_and_ha_check_code(self):
+    async def test_integration_control_arm_away_with_panel_code_if_code_arm_required_and_ha_check_code(self):
         await self._test_control_arming(
             control_action='ARM_AWAY',
             partition_status='DISARM',
@@ -196,7 +196,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             ha_check_user_code=True,
         )
 
-    async def test_control_arm_away_with_panel_code_and_wrong_code_if_code_arm_required(self):
+    async def test_integration_control_arm_away_with_panel_code_and_wrong_code_if_code_arm_required(self):
         await self._test_control_arming(
             control_action='ARM_AWAY',
             partition_status='DISARM',
@@ -208,7 +208,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             expect_error='^Code received in the control command invalid',
         )
 
-    async def test_control_arm_away_secure_arm_without_code(self):
+    async def test_integration_control_arm_away_secure_arm_without_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_AWAY',
@@ -218,21 +218,21 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
                          'a configured panel code',
         )
 
-    async def test_control_arm_vacation(self):
+    async def test_integration_control_arm_vacation(self):
         await self._test_control_arming(
             control_action='ARM_VACATION',
             partition_status='DISARM',
             arming_type='ARM_AWAY',
         )
 
-    async def test_control_arm_home(self):
+    async def test_integration_control_arm_home(self):
         await self._test_control_arming(
             control_action='ARM_HOME',
             partition_status='DISARM',
             arming_type='ARM_STAY',
         )
 
-    async def test_control_arm_home_with_exit_delay(self):
+    async def test_integration_control_arm_home_with_exit_delay(self):
         await self._test_control_arming(
             control_action='ARM_HOME',
             partition_status='DISARM',
@@ -241,7 +241,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             expect_delay=42,
         )
 
-    async def test_control_arm_home_secure_arm_with_code(self):
+    async def test_integration_control_arm_home_secure_arm_with_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_HOME',
@@ -250,7 +250,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             send_code=True,
         )
 
-    async def test_control_arm_home_secure_arm_with_panel_code(self):
+    async def test_integration_control_arm_home_secure_arm_with_panel_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_HOME',
@@ -259,7 +259,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             panel_user_code='1337',
         )
 
-    async def test_control_arm_home_secure_arm_without_code(self):
+    async def test_integration_control_arm_home_secure_arm_without_code(self):
         await self._test_control_arming(
             secure_arm=True,
             control_action='ARM_HOME',
@@ -269,7 +269,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
                          'a configured panel code',
         )
 
-    async def test_control_arm_night(self):
+    async def test_integration_control_arm_night(self):
         await self._test_control_arming(
             control_action='ARM_NIGHT',
             partition_status='DISARM',
@@ -320,13 +320,13 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             self.assertEqual(0, action['partition_id'])
             self.assertEqual(gw.args['panel_token'], action['token'])
 
-    async def test_control_trigger_default(self):
+    async def test_integration_control_trigger_default(self):
         await self._test_control_trigger(
             control_action='TRIGGER',
             alarm_type='POLICE',
         )
 
-    async def test_control_trigger_if_code_trigger_required_and_ha_check_code(self):
+    async def test_integration_control_trigger_if_code_trigger_required_and_ha_check_code(self):
         await self._test_control_trigger(
             control_action='TRIGGER',
             alarm_type='POLICE',
@@ -335,7 +335,7 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             panel_user_code='1337',
         )
 
-    async def test_control_trigger_with_wrong_code_if_code_trigger_required(self):
+    async def test_integration_control_trigger_with_wrong_code_if_code_trigger_required(self):
         await self._test_control_trigger(
             control_action='TRIGGER',
             alarm_type='POLICE',
@@ -346,19 +346,19 @@ class TestQolsysGatewayControl(TestQolsysGatewayBase):
             expect_error='^Code received in the control command invalid'
         )
 
-    async def test_control_trigger_police(self):
+    async def test_integration_control_trigger_police(self):
         await self._test_control_trigger(
             control_action='TRIGGER_POLICE',
             alarm_type='POLICE',
         )
 
-    async def test_control_trigger_fire(self):
+    async def test_integration_control_trigger_fire(self):
         await self._test_control_trigger(
             control_action='TRIGGER_FIRE',
             alarm_type='FIRE',
         )
 
-    async def test_control_trigger_auxiliary(self):
+    async def test_integration_control_trigger_auxiliary(self):
         await self._test_control_trigger(
             control_action='TRIGGER_AUXILIARY',
             alarm_type='AUXILIARY',

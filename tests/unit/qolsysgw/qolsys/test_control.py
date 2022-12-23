@@ -13,21 +13,21 @@ from qolsys.control import QolsysControlTrigger
 
 
 # TODO: add unit tests
-class TestQolsysControlDisarm(unittest.IsolatedAsyncioTestCase):
+class TestUnitQolsysControlDisarm(unittest.IsolatedAsyncioTestCase):
     pass
 
 
 # TODO: add unit tests
-class TestQolsysControlArmAway(unittest.IsolatedAsyncioTestCase):
+class TestUnitQolsysControlArmAway(unittest.IsolatedAsyncioTestCase):
     pass
 
 
 # TODO: add unit tests
-class TestQolsysControlArmHome(unittest.IsolatedAsyncioTestCase):
+class TestUnitQolsysControlArmHome(unittest.IsolatedAsyncioTestCase):
     pass
 
 
 # TODO: add unit tests
-class TestQolsysControlTrigger(unittest.IsolatedAsyncioTestCase):
+class TestUnitQolsysControlTrigger(unittest.IsolatedAsyncioTestCase):
     pass
 

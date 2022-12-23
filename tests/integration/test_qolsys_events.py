@@ -18,7 +18,7 @@ from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorWater
 
 
-class TestQolsysEvents(TestQolsysGatewayBase):
+class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _check_partition_mqtt_messages(self, gw, partition_flat_name,
                                              partition_state, expected_state):
@@ -187,7 +187,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
                 json.loads(mqtt_attributes['payload']),
             )
 
-    async def test_event_info_summary_initializes_all_entities(self):
+    async def test_integration_event_info_summary_initializes_all_entities(self):
         panel, gw, entity_ids, topics = await self._ready_panel_and_gw()
 
         mqtt_publish_calls = []
@@ -530,8 +530,8 @@ class TestQolsysEvents(TestQolsysGatewayBase):
                 expected_device_class='heat',
             )
 
-    async def _test_event_info_secure_arm(self, from_secure_arm,
-                                          to_secure_arm):
+    async def _test_integration_event_info_secure_arm(self, from_secure_arm,
+                                                      to_secure_arm):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             secure_arm=from_secure_arm,
             partition_ids=[0],
@@ -569,31 +569,31 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_info_secure_arm_true_if_false(self):
-        await self._test_event_info_secure_arm(
+    async def test_integration_event_info_secure_arm_true_if_false(self):
+        await self._test_integration_event_info_secure_arm(
             from_secure_arm=False,
             to_secure_arm=True,
         )
 
-    async def test_event_info_secure_arm_true_if_true(self):
-        await self._test_event_info_secure_arm(
+    async def test_integration_event_info_secure_arm_true_if_true(self):
+        await self._test_integration_event_info_secure_arm(
             from_secure_arm=True,
             to_secure_arm=True,
         )
 
-    async def test_event_info_secure_arm_false_if_true(self):
-        await self._test_event_info_secure_arm(
+    async def test_integration_event_info_secure_arm_false_if_true(self):
+        await self._test_integration_event_info_secure_arm(
             from_secure_arm=True,
             to_secure_arm=False,
         )
 
-    async def test_event_info_secure_arm_false_if_false(self):
-        await self._test_event_info_secure_arm(
+    async def test_integration_event_info_secure_arm_false_if_false(self):
+        await self._test_integration_event_info_secure_arm(
             from_secure_arm=False,
             to_secure_arm=False,
         )
 
-    async def _test_event_zone_event_zone_active(self, from_status, to_status):
+    async def _test_integration_event_zone_event_zone_active(self, from_status, to_status):
         if from_status == 'Closed':
             zone_id = 100
             entity_id = 'my_door'
@@ -637,31 +637,31 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_zone_event_zone_active_open_if_closed(self):
-        await self._test_event_zone_event_zone_active(
+    async def test_integration_event_zone_event_zone_active_open_if_closed(self):
+        await self._test_integration_event_zone_event_zone_active(
             from_status='Closed',
             to_status='Open',
         )
 
-    async def test_event_zone_event_zone_active_open_if_open(self):
-        await self._test_event_zone_event_zone_active(
+    async def test_integration_event_zone_event_zone_active_open_if_open(self):
+        await self._test_integration_event_zone_event_zone_active(
             from_status='Open',
             to_status='Open',
         )
 
-    async def test_event_zone_event_zone_active_closed_if_open(self):
-        await self._test_event_zone_event_zone_active(
+    async def test_integration_event_zone_event_zone_active_closed_if_open(self):
+        await self._test_integration_event_zone_event_zone_active(
             from_status='Open',
             to_status='Closed',
         )
 
-    async def test_event_zone_event_zone_active_closed_if_closed(self):
-        await self._test_event_zone_event_zone_active(
+    async def test_integration_event_zone_event_zone_active_closed_if_closed(self):
+        await self._test_integration_event_zone_event_zone_active(
             from_status='Closed',
             to_status='Closed',
         )
 
-    async def test_event_zone_event_zone_active_unknown_zone(self):
+    async def test_integration_event_zone_event_zone_active_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[101],
@@ -689,7 +689,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_zone_event_zone_update_existing_zone(self):
+    async def test_integration_event_zone_event_zone_update_existing_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0, 1],
             zone_ids=[100, 200],
@@ -761,7 +761,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_zone_event_zone_update_unknown_zone(self):
+    async def test_integration_event_zone_event_zone_update_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[101],
@@ -798,7 +798,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_zone_event_zone_add(self):
+    async def test_integration_event_zone_event_zone_add(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],
@@ -934,7 +934,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def _test_event_arming(self, from_status, to_status, ha_status=None):
+    async def _test_integration_event_arming(self, from_status, to_status, ha_status=None):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],
@@ -969,114 +969,114 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_arming_disarm_if_disarm(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_disarm_if_disarm(self):
+        await self._test_integration_event_arming(
             from_status='DISARM',
             to_status='DISARM',
         )
 
-    async def test_event_arming_disarm_if_arm_stay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_disarm_if_arm_stay(self):
+        await self._test_integration_event_arming(
             from_status='ARM_STAY',
             to_status='DISARM',
             ha_status='disarmed',
         )
 
-    async def test_event_arming_disarm_if_arm_away(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_disarm_if_arm_away(self):
+        await self._test_integration_event_arming(
             from_status='ARM_AWAY',
             to_status='DISARM',
             ha_status='disarmed',
         )
 
-    async def test_event_arming_disarm_if_entry_delay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_disarm_if_entry_delay(self):
+        await self._test_integration_event_arming(
             from_status='ARM_AWAY',
             to_status='DISARM',
             ha_status='disarmed',
         )
 
-    async def test_event_arming_arm_stay_if_arm_stay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_stay_if_arm_stay(self):
+        await self._test_integration_event_arming(
             from_status='ARM_STAY',
             to_status='ARM_STAY',
         )
 
-    async def test_event_arming_arm_stay_if_exit_delay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_stay_if_exit_delay(self):
+        await self._test_integration_event_arming(
             from_status='EXIT_DELAY',
             to_status='ARM_STAY',
             ha_status='armed_home',
         )
 
-    async def test_event_arming_arm_stay_if_disarm(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_stay_if_disarm(self):
+        await self._test_integration_event_arming(
             from_status='DISARM',
             to_status='ARM_STAY',
             ha_status='armed_home',
         )
 
-    async def test_event_arming_arm_away_if_arm_away(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_away_if_arm_away(self):
+        await self._test_integration_event_arming(
             from_status='ARM_AWAY',
             to_status='ARM_AWAY',
         )
 
-    async def test_event_arming_arm_away_if_exit_delay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_away_if_exit_delay(self):
+        await self._test_integration_event_arming(
             from_status='EXIT_DELAY',
             to_status='ARM_AWAY',
             ha_status='armed_away',
         )
 
-    async def test_event_arming_arm_away_if_disarm(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_away_if_disarm(self):
+        await self._test_integration_event_arming(
             from_status='DISARM',
             to_status='ARM_AWAY',
             ha_status='armed_away',
         )
 
-    async def test_event_arming_entry_delay_if_entry_delay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_entry_delay_if_entry_delay(self):
+        await self._test_integration_event_arming(
             from_status='ENTRY_DELAY',
             to_status='ENTRY_DELAY',
         )
 
-    async def test_event_arming_entry_delay_if_arm_away(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_entry_delay_if_arm_away(self):
+        await self._test_integration_event_arming(
             from_status='ARM_AWAY',
             to_status='ENTRY_DELAY',
             ha_status='pending',
         )
 
-    async def test_event_arming_entry_delay_if_arm_stay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_entry_delay_if_arm_stay(self):
+        await self._test_integration_event_arming(
             from_status='ARM_STAY',
             to_status='ENTRY_DELAY',
             ha_status='pending',
         )
 
-    async def test_event_arming_exit_delay_if_exit_delay(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_exit_delay_if_exit_delay(self):
+        await self._test_integration_event_arming(
             from_status='EXIT_DELAY',
             to_status='EXIT_DELAY',
         )
 
-    async def test_event_arming_exit_delay_if_disarm(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_exit_delay_if_disarm(self):
+        await self._test_integration_event_arming(
             from_status='DISARM',
             to_status='EXIT_DELAY',
             ha_status='arming',
         )
 
-    async def test_event_arming_arm_away_exit_delay_if_disarm(self):
-        await self._test_event_arming(
+    async def test_integration_event_arming_arm_away_exit_delay_if_disarm(self):
+        await self._test_integration_event_arming(
             from_status='DISARM',
             to_status='ARM-AWAY-EXIT-DELAY',
             ha_status='arming',
         )
 
-    async def _test_event_alarm(self, alarm_type=''):
+    async def _test_integration_event_alarm(self, alarm_type=''):
         panel, gw, _, _ = await self._ready_panel_and_gw()
 
         event = {
@@ -1121,27 +1121,27 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
-    async def test_event_alarm_default(self):
-        await self._test_event_alarm(
+    async def test_integration_event_alarm_default(self):
+        await self._test_integration_event_alarm(
             alarm_type='',
         )
 
-    async def test_event_alarm_police(self):
-        await self._test_event_alarm(
+    async def test_integration_event_alarm_police(self):
+        await self._test_integration_event_alarm(
             alarm_type='POLICE',
         )
 
-    async def test_event_alarm_fire(self):
-        await self._test_event_alarm(
+    async def test_integration_event_alarm_fire(self):
+        await self._test_integration_event_alarm(
             alarm_type='FIRE',
         )
 
-    async def test_event_alarm_auxiliary(self):
-        await self._test_event_alarm(
+    async def test_integration_event_alarm_auxiliary(self):
+        await self._test_integration_event_alarm(
             alarm_type='AUXILIARY',
         )
 
-    async def test_event_error_usercode(self):
+    async def test_integration_event_error_usercode(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],
@@ -1171,7 +1171,7 @@ class TestQolsysEvents(TestQolsysGatewayBase):
 
         self.assertIsNotNone(uncaught)
 
-    async def test_event_error_disarm_failed(self):
+    async def test_integration_event_error_disarm_failed(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],

@@ -8,10 +8,37 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  tests:
-    name: Run tests
+  prepare-env:
+    name: Prepare environment
     runs-on: "ubuntu-latest"
+    outputs:
+      requires_tests: ${{ github.event_name == 'schedule' || steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true' || steps.changed-files.outputs.any_modified == 'true' }}
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+        if: github.event_name != 'schedule'
+
+      - name: Get the changed files that would require tests
+        id: changed-files
+        uses: "tj-actions/changed-files@v35"
+        if: github.event_name != 'schedule'
+        with:
+          files: |
+            apps/**
+            tests/**
+            .github/workflows/build.yaml
+
+  unit-integration-tests:
+    name: Unit & integration tests
+    runs-on: "ubuntu-latest"
+    needs:
+      - prepare-env
+    if: needs.prepare-env.outputs.requires_tests == 'true'
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
@@ -51,11 +78,11 @@ jobs:
           flake8 tests/
         continue-on-error: true
 
-      - name: Run tests
+      - name: Run unit & integration tests
         id: tests
         run: |
           set -eo pipefail
-          pytest --cache-clear --cov=gateway --cov=qolsys --cov=mqtt --cov-report term-missing --junitxml=pytest.xml | tee pytest-coverage.txt
+          pytest --cache-clear --cov=gateway --cov=qolsys --cov=mqtt --cov-report term-missing --junitxml=pytest.xml tests/unit/ tests/integration/ | tee pytest-coverage.txt
         continue-on-error: true
 
       - name: Identify bot comments to hide
@@ -69,7 +96,7 @@ jobs:
               issue_number: context.issue.number,
             })
             const botComments = comments.filter(comment => {
-              return comment.user.type === 'Bot' && comment.body.startsWith('<!-- Pytest Coverage Comment: tests -->')
+              return comment.user.type === 'Bot' && comment.body.startsWith('<!-- Pytest Coverage Comment: unit-integration-tests -->')
             }).map((comment) => comment.node_id)
 
             if (botComments.length > 0) {
@@ -110,24 +137,78 @@ jobs:
           TESTS=$([ '${{ steps.tests.outcome }}' == 'success' ] && echo true || echo false)
 
           if ! $LINT_CODE; then
-            echo "Lint of code failed (ignoring)" >&2
+            echo "Lint of code failed" >&2
           fi
 
           if ! $LINT_TESTS; then
-            echo "Lint of tests failed (ignoring)" >&2
+            echo "Lint of tests failed" >&2
           fi
 
           if ! $TESTS; then
             echo "Tests failed" >&2
+          fi
+
+          # Exit on error if any failed
+          if ! $LINT_CODE || ! $LINT_TESTS || ! $TESTS; then
             exit 1
           fi
 
           exit 0
 
+
+  end-to-end-tests:
+    name: End-to-end tests
+    runs-on: "ubuntu-latest"
+    needs:
+      - unit-integration-tests
+    if: needs.unit-integration-tests.result == 'success'
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+
+      - name: Print docker versions
+        run: |
+          docker version
+          docker compose version
+
+      - name: Prepare environment
+        run: |
+          # Get the python version from the AppDaemon's Dockerfile
+          # which was used to build the latest AppDaemon's docker
+          # container
+          PYTHON_VERSION=$(\
+            curl -s https://raw.githubusercontent.com/AppDaemon/appdaemon/dev/Dockerfile | \
+            grep -oP "(?<=python:)[0-9\.]*")
+          echo "PYTHON_VERSION=${PYTHON_VERSION}" | tee -a "$GITHUB_ENV"
+
+          PYTHON_MAJOR=${PYTHON_VERSION%%.*}
+          echo "PYTHON_MAJOR=${PYTHON_MAJOR}" | tee -a "$GITHUB_ENV"
+
+      - name: Install python
+        uses: "actions/setup-python@v4"
+        with:
+          python-version: '${{ env.PYTHON_VERSION }}'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-clarity pytest-subtests
+          pip install -r tests/end-to-end/requirements.txt
+
+      - name: Run end-to-end tests
+        id: tests
+        run: |
+          set -eo pipefail
+          pytest --cache-clear tests/end-to-end/
+
+
   auto-merge:
     name: "Auto-merge Dependabot pull requests"
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    needs:
+      - unit-integration-tests
+      - end-to-end-tests
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' && needs.unit-integration-tests.result != 'failure' && needs.end-to-end-tests.result != 'failure'
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"

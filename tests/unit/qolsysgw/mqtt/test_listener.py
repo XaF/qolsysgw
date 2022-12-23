@@ -2,16 +2,16 @@ import unittest
 
 from unittest import mock
 
-from .testenv import FIXTURES_DIR  # noqa: F401
+import testenv  # noqa: F401
 
 from mqtt.listener import MqttQolsysControlListener
 from mqtt.listener import MqttQolsysEventListener
 
 
 # test MqttQolsysEventListener
-class TestMqttQolsysEventListener(unittest.IsolatedAsyncioTestCase):
+class TestUnitMqttQolsysEventListener(unittest.IsolatedAsyncioTestCase):
 
-    async def test_event_callback_on_success(self):
+    async def test_unit_event_callback_on_success(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object
@@ -37,7 +37,7 @@ class TestMqttQolsysEventListener(unittest.IsolatedAsyncioTestCase):
         # assert event_callback was called
         event_callback.assert_called_once_with(qolsys_event)
 
-    async def test_event_callback_on_empty_data(self):
+    async def test_unit_event_callback_on_empty_data(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object
@@ -58,7 +58,7 @@ class TestMqttQolsysEventListener(unittest.IsolatedAsyncioTestCase):
         # assert event_callback was not called
         event_callback.assert_not_called()
 
-    async def test_event_callback_on_unhandled_failure(self):
+    async def test_unit_event_callback_on_unhandled_failure(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object
@@ -87,9 +87,9 @@ class TestMqttQolsysEventListener(unittest.IsolatedAsyncioTestCase):
 
 
 # test MqttQolsysControlListener
-class TestMqttQolsysControlListener(unittest.IsolatedAsyncioTestCase):
+class TestUnitMqttQolsysControlListener(unittest.IsolatedAsyncioTestCase):
 
-    async def test_event_callback_on_success(self):
+    async def test_unit_event_callback_on_success(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object
@@ -115,7 +115,7 @@ class TestMqttQolsysControlListener(unittest.IsolatedAsyncioTestCase):
         # assert event_callback was called
         event_callback.assert_called_once_with(qolsys_control)
 
-    async def test_event_callback_on_empty_data(self):
+    async def test_unit_event_callback_on_empty_data(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object
@@ -136,7 +136,7 @@ class TestMqttQolsysControlListener(unittest.IsolatedAsyncioTestCase):
         # assert event_callback was not called
         event_callback.assert_not_called()
 
-    async def test_event_callback_on_unhandled_failure(self):
+    async def test_unit_event_callback_on_unhandled_failure(self):
         # mock event_callback
         event_callback = mock.AsyncMock()
         # mock Mqtt object

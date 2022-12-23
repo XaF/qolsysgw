@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "core.restore_state",
+  "data": [
+    {
+      "state": {
+        "entity_id": "person.qolsysgw_tests",
+        "state": "unknown",
+        "attributes": {
+          "editable": true,
+          "id": "qolsysgw_tests",
+          "user_id": "6e127e2e39354ae89b9aaf1508217a08",
+          "friendly_name": "qolsysgw-tests"
+        },
+        "last_changed": "2022-12-23T22:08:47.491485+00:00",
+        "last_updated": "2022-12-23T22:08:47.491485+00:00",
+        "context": {
+          "id": "01GN0GG5W3PDKD83BKB3KKQMYC",
+          "parent_id": null,
+          "user_id": null
+        }
+      },
+      "extra_data": null,
+      "last_seen": "2022-12-23T22:15:05.412920+00:00"
+    }
+  ]
+}

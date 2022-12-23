@@ -1,0 +1,62 @@
+version: '3'
+services:
+  # HomeAssistant
+  homeassistant:
+    image: homeassistant/home-assistant
+{% if IN_WSL %}
+    networks:
+      - qolsysgw
+    ports:
+      - "{{ HA_PORT }}:8123"
+{% else %}
+    network_mode: host
+    extra_hosts:
+      - "mosquitto:host-gateway"
+{% endif %}
+    volumes:
+      - {{ WORKSPACE }}/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  # MQTT
+  mosquitto:
+    image: eclipse-mosquitto
+{% if IN_WSL %}
+    networks:
+      - qolsysgw
+{% else %}
+    network_mode: host
+{% endif %}
+    volumes:
+      - {{ WORKSPACE }}/mosquitto:/mosquitto/config
+    restart: unless-stopped
+
+  # AppDaemon
+  appdaemon:
+    image: acockburn/appdaemon
+{% if IN_WSL %}
+    networks:
+      - qolsysgw
+{% else %}
+    network_mode: host
+{% endif %}
+    extra_hosts:
+{% if IN_WSL %}
+      - "host.docker.internal:host-gateway"
+{% else %}
+      - "homeassistant:host-gateway"
+      - "mosquitto:host-gateway"
+{% endif %}
+    volumes:
+      - {{ WORKSPACE }}/appdaemon:/conf
+      - {{ ROOT_DIR }}/apps/qolsysgw:/conf/apps/qolsysgw:ro
+    depends_on:
+      - homeassistant
+      - mosquitto
+    restart: unless-stopped
+
+{% if IN_WSL %}
+networks:
+  qolsysgw:
+    name: qolsysgw-network
+{% endif %}
