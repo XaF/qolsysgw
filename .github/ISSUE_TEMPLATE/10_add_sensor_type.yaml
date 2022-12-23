@@ -1,4 +1,4 @@
-name: Request the addition of a new sensor type (form)
+name: Request the addition of a new sensor type
 description: If you have a sensor type that is not yet supported and would like to request it to be
 title: "Add support for `<sensor type>` sensor type"
 labels:
@@ -69,7 +69,7 @@ body:
           module: gateway
           class: QolsysGateway
           log_level: DEBUG
-          <rest_of_config>
+          ...
         ```
 
         All the data you provide below should be in beautified JSON for readability purposes. If unsure, you can
@@ -83,6 +83,7 @@ body:
         Add the data for the sensor from the content of an INFO message. If you have more than one distinct example,
         please provide a few of them.
       placeholder: |
+        ```json
         {
           "id": "xxx-yyyy",
           "type": "Door_Window",
@@ -96,6 +97,7 @@ body:
           "zone_type": 1,
           "partition_id": 0
         }
+        ```
     validations:
       required: true
 
@@ -108,6 +110,7 @@ body:
         healthchecks for the sensors and should be similar to what we see in the INFO message above. If you have more
         than one distinct example, please provide a few of them.
       placeholder: |
+        ```json
         {
           "event": "ZONE_EVENT",
           "zone_event_type": "ZONE_UPDATE",
@@ -127,6 +130,7 @@ body:
           "version": 1,
           "requestID": "<request_id>"
         }
+        ```
     validations:
       required: true
 
@@ -140,6 +144,7 @@ body:
         messages: good news, it means this sensor gets status updates from the panel! If you have more than one distinct
         example, please provide a few of them.
       placeholder: |
+        ```json
         {
           "event": "ZONE_EVENT",
           "zone_event_type": "ZONE_ACTIVE",
@@ -150,5 +155,15 @@ body:
           },
           "requestID": "<request_id>"
         }
+        ```
     validations:
       required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: |
+        Anything else relevant.
+    validations:
+      required: false

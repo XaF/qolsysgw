@@ -1,0 +1,69 @@
+name: Report a bug
+description: If the gateway is not behaving as expected
+title: ""
+labels:
+  - bug
+body:
+  - type: checkboxes
+    id: initial_checks
+    attributes:
+      label: Before submitting this form
+      description: Making sure that you've done your due dilligence before submitting a new issue
+      options:
+        - label: |
+            I have checked that there hasn't been a similar issue submitted in the past
+          required: true
+        - label: |
+            I have updated the issue title to something relevant and clear to understand the bug I'm facing
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the bug
+      description: |
+        A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: |
+        A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: debug_log
+    attributes:
+      label: DEBUG logs
+      description: |
+        To understand what happened for the bug, we need `DEBUG` logs that show clearly the issue or what lead to it.
+        By adding the `log_level` configuration parameter to `DEBUG` in your apps.yaml file, you will be able to grab
+        that data, and provide it under here. Your apps.yaml configuration for `qolsysgw` should then look
+        like something like this:
+
+        ```yaml
+        qolsys_panel:
+          module: gateway
+          class: QolsysGateway
+          log_level: DEBUG
+          ...
+        ```
+
+        You then will be able to find the `qolsysgw` logs by looking at the AppDaemon logs.
+
+        If relevant to your bug, please also add logs of Home Assistant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: |
+        Anything else relevant to the problem.
+    validations:
+      required: false

@@ -1,0 +1,138 @@
+name: Request the support of a Qolsys IQ Panel interaction (event or action)
+description: If there is a Qolsys IQ Panel interaction that is not yet supported, and you would like the support to be added
+title: "Add support for `<interaction>` <event or action>"
+labels:
+  - enhancement
+body:
+  - type: checkboxes
+    id: initial_checks
+    attributes:
+      label: Before submitting this form
+      description: Making sure that you've done your due dilligence before submitting a new issue
+      options:
+        - label: |
+            I have checked that this interaction was not suggested for addition before; I know that it could
+            be in open or closed issues, and if there was another issue mentioning this interaction I could
+            simply comment in it instead
+          required: true
+        - label: |
+            I have updated the `<event or action>` mention in the title of the issue to either `event` or `action`,
+            the `<interaction>` mention to the corresponding type/subtype (e.g. `INFO/SUMMARY` or `ZONE_EVENT/ZONE_UPDATE`),
+            but left the issue title as it was otherwise
+          required: true
+        - label: |
+            I understand that if I want to suggest the addition of more than a single interaction, I need
+            to file that form for each separate type
+          required: true
+
+  - type: dropdown
+    id: event_action
+    attributes:
+      label: Is it an event or an action?
+      description: Whether this interaction is something that `qolsysgw` will use to interact with the Qolsys Panel (action) or that the Qolsys Panel will use to inform of any change or status (event)
+      options:
+        - Event (I can see `"event": "<type>"` in the JSON)
+        - Action (I can see `"action": "<type>"` in the JSON)
+    validations:
+      required: true
+
+  - type: input
+    id: interaction_type
+    attributes:
+      label: Interaction type
+      description: The value provided for the `"event"` or `"action"` field in the JSON, e.g. for `"event": "INFO"` you would write `INFO`.
+      placeholder: ex. INFO
+    validations:
+      required: true
+
+  - type: input
+    id: interaction_subtype
+    attributes:
+      label: Interaction subtype
+      description: The value provided for the `"<type>_type"` field in the JSON, where `<type>` is the interaction type, e.g. for `"info_type": "SUMMARY"` you would write `SUMMARY`.
+      placeholder: ex. SUMMARY
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of what that interaction does/mean
+      description: |
+        Provide your understanding of what the interaction does or what it means.
+      placeholder: |
+        ex. The INFO/SUMMARY event returns the current state of the panel, its partitions and corresponding sensors.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        To add an interaction, we need data, and I unfortunately do not have data on all the possible sensors.
+        By adding the `log_level` configuration parameter to `DEBUG` in your apps.yaml file, you will be able to grab
+        that data for me, and provide it under here. Your apps.yaml configuration for `qolsysgw` should then look
+        like something like this:
+
+        ```yaml
+        qolsys_panel:
+          module: gateway
+          class: QolsysGateway
+          log_level: DEBUG
+          ...
+        ```
+
+        All the data you provide below should be in beautified JSON for readability purposes. If unsure, you can
+        use [this tool to beautify your JSON](https://codebeautify.org/jsonviewer).
+
+  - type: textarea
+    id: interaction_example
+    attributes:
+      label: Examples of the data of the interaction
+      description: |
+        Add the data you have for the sensor interaction, as well as the detail of what those mean if necessary / adding to the context.
+      placeholder: |
+        INFO/SUMMARY message returned by the panel:
+
+        ```json
+        {
+          "event": "INFO",
+          "info_type": "SUMMARY",
+          "partition_list": [
+            {
+              "partition_id": 0,
+              "name": "partition1",
+              "status": "DISARM",
+              "secure_arm": false,
+              "zone_list": [
+                {
+                  "id": "xxx-yyyy",
+                  "type": "Door_Window",
+                  "name": "Door NNN",
+                  "group": "entryexitdelay",
+                  "status": "Closed",
+                  "state": "0",
+                  "zone_id": 42,
+                  "zone_physical_type": 1,
+                  "zone_alarm_type": 3,
+                  "zone_type": 1,
+                  "partition_id": 0
+                },
+                ...
+              ]
+            }
+          ],
+          "nonce": "qolsys",
+          "requestID": "<request_id>"
+        }
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: |
+        Anything else relevant.
+    validations:
+      required: false
