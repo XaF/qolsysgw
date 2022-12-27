@@ -1,0 +1,7 @@
+qolsys_panel:
+  module: gateway
+  class: QolsysGateway
+  log_level: DEBUG
+  panel_host: {% if IN_WSL %}host.docker.internal{% else %}localhost{% endif %}
+  panel_port: {{ PANEL_PORT }}
+  panel_token: ThisIsMyToken

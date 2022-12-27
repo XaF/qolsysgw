@@ -1,13 +1,23 @@
 import asyncio
 import re
+import socket
 import time
+
+from contextlib import closing
+
+
+def get_free_port():
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('localhost', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
 
 
 class MessageStorage(object):
-    MESSAGES = []
-    SAVED_MESSAGES_POS = 0
 
     def __init__(self, name='message', match_check_key=None):
+        self.MESSAGES = []
+        self.SAVED_MESSAGES_POS = 0
         self._name = name
         self._match_check_key = match_check_key
 

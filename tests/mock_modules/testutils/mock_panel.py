@@ -1,30 +1,29 @@
 import asyncio
-import ssl
-import os.path
-import logging
 import json
-
-from testenv import FIXTURES_DIR
+import logging
+import os.path
+import ssl
+import time
 
 from testutils.utils import MessageStorage
 
 
 LOGGER = logging.getLogger(__name__)
+CERTS_DIR = os.path.join(os.path.dirname(__file__), 'certs')
 
 
 class PanelServer(object):
 
-    MESSAGES = MessageStorage(name='message')
-
     def __init__(self):
+        self.MESSAGES = MessageStorage(name='message')
         self.stop()
 
-    async def start(self):
+    async def start(self, port=0):
         ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ssl_ctx.check_hostname = False
         ssl_ctx.load_cert_chain(
-            os.path.join(FIXTURES_DIR, 'mock-panel-server.crt'),
-            os.path.join(FIXTURES_DIR, 'mock-panel-server.key'),
+            os.path.join(CERTS_DIR, 'mock-panel-server.crt'),
+            os.path.join(CERTS_DIR, 'mock-panel-server.key'),
         )
 
         self._keep_listening = True
@@ -32,12 +31,14 @@ class PanelServer(object):
         server = await asyncio.start_server(
             self._serve_client,
             'localhost',
-            0,
+            port,
             ssl=ssl_ctx,
         )
 
-        address, port = server.sockets[0].getsockname()[:2]
-        self._port = port
+        address, connected_port = server.sockets[0].getsockname()[:2]
+        self._port = connected_port
+
+        return server
 
     @property
     def port(self):
@@ -49,6 +50,18 @@ class PanelServer(object):
 
         self._writer.write(f'{line}\n'.encode())
         await self._writer.drain()
+
+    async def wait_for_client(self, timeout=None, raise_if_timeout=False):
+        start = time.time()
+
+        while not self._client_connected and (
+                not timeout or time.time() - start < timeout):
+            await asyncio.sleep(.1)
+
+        if raise_if_timeout and not self._client_connected:
+            raise RuntimeError('Timeout before client connection')
+
+        return self._client_connected
 
     def stop(self):
         self._keep_listening = False

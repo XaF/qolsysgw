@@ -1,0 +1,24 @@
+appdaemon:
+  time_zone: "America/Toronto"
+
+  # All three of those might be already filled for you, or you set the
+  # values here, or use the secrets.yaml file to setup the values
+  latitude: !secret latitude
+  longitude: !secret longitude
+  elevation: !secret elevation
+
+  plugins:
+    # If using the add-on in Home Assistant, that plugin will already be
+    # enabled; when using the docker container, you will have to add it here
+    HASS:
+      type: hass
+      ha_url: "http://homeassistant:8123"
+      token: !secret ha_token # The token you get from home assistant
+
+    # And we need to add the MQTT plugin
+    MQTT:
+      type: mqtt
+      namespace: mqtt # We will need that same value in the apps.yaml configuration
+      client_host: mosquitto # The IP address or hostname of the MQTT broker
+      client_port: 1883 # The port of the MQTT broker, generally 1883
+

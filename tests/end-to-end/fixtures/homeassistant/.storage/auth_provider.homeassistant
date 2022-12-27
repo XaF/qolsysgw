@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "auth_provider.homeassistant",
+  "data": {
+    "users": [
+      {
+        "username": "qolsysgw-tests",
+        "password": "JDJiJDEyJGtydmgyOFJXL0kvQkE0NkliYm1uamVDdUcxRTZDdU9Ja0ZaeGlBcU52eU9WWjh0WnI3LzVp"
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase
 
 
-class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
+class TestIntegrationAlarmControlPanelConfig(TestQolsysGatewayBase):
 
     async def _test_config(self, payload_expect, **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -45,7 +45,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
         command_template = json.loads(payload['command_template'])
         self.assertDictEqual(expected_command_template, command_template)
 
-    async def test_config_default(self):
+    async def test_integration_config_default(self):
         await self._test_config(
             payload_expect={
                 'code': 'REMOTE_CODE',
@@ -56,7 +56,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             },
         )
 
-    async def test_config_with_panel_code(self):
+    async def test_integration_config_with_panel_code(self):
         await self._test_config(
             payload_expect={
                 'code': None,
@@ -69,7 +69,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             panel_user_code=1337,
         )
 
-    async def test_config_code_required_remote_check_num(self):
+    async def test_integration_config_code_required_remote_check_num(self):
         await self._test_config(
             payload_expect={
                 'code': 'REMOTE_CODE',
@@ -86,7 +86,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             ha_check_user_code=False,
         )
 
-    async def test_config_code_required_remote_check_alnum(self):
+    async def test_integration_config_code_required_remote_check_alnum(self):
         await self._test_config(
             payload_expect={
                 'code': 'REMOTE_CODE_TEXT',
@@ -103,7 +103,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             ha_check_user_code=False,
         )
 
-    async def test_config_code_required_ha_check_user_code(self):
+    async def test_integration_config_code_required_ha_check_user_code(self):
         await self._test_config(
             payload_expect={
                 'code': '1337',
@@ -120,7 +120,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             ha_check_user_code=True,
         )
 
-    async def test_config_code_required_ha_user_code_with_ha_check(self):
+    async def test_integration_config_code_required_ha_user_code_with_ha_check(self):
         await self._test_config(
             payload_expect={
                 'code': 'topsecret',
@@ -138,7 +138,7 @@ class TestAlarmControlPanelConfig(TestQolsysGatewayBase):
             ha_user_code='topsecret',
         )
 
-    async def test_config_code_required_ha_user_code_with_remote_check(self):
+    async def test_integration_config_code_required_ha_user_code_with_remote_check(self):
         await self._test_config(
             payload_expect={
                 'code': 'REMOTE_CODE_TEXT',

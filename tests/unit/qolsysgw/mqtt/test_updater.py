@@ -2,7 +2,7 @@ import unittest
 
 from unittest import mock
 
-from .testenv import FIXTURES_DIR  # noqa: F401
+import testenv  # noqa: F401
 
 from mqtt.updater import MqttUpdater
 from mqtt.updater import MqttWrapperFactory
@@ -19,9 +19,9 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TestMqttUpdater(unittest.TestCase):
+class TestUnitMqttUpdater(unittest.TestCase):
 
-    def test_init_register_for_state_updates(self):
+    def test_unit_init_register_for_state_updates(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -29,7 +29,7 @@ class TestMqttUpdater(unittest.TestCase):
 
         state.register.assert_called_once_with(updater, updater._state_update)
 
-    def test_state_update_register_for_partition_updates(self):
+    def test_unit_state_update_register_for_partition_updates(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -44,7 +44,7 @@ class TestMqttUpdater(unittest.TestCase):
         partition1.register.assert_called_once_with(updater, updater._partition_update)
         partition2.register.assert_called_once_with(updater, updater._partition_update)
 
-    def test_state_update_configures_partitions(self):
+    def test_unit_state_update_configures_partitions(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -74,7 +74,7 @@ class TestMqttUpdater(unittest.TestCase):
         wrapped[partition1].configure.assert_called_once_with()
         wrapped[partition2].configure.assert_called_once_with()
 
-    def test_state_update_register_for_sensor_updates(self):
+    def test_unit_state_update_register_for_sensor_updates(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -95,7 +95,7 @@ class TestMqttUpdater(unittest.TestCase):
         for sensor in [sensor1, sensor2, sensor3]:
             sensor.register.assert_called_once_with(updater, updater._sensor_update)
 
-    def test_state_update_configures_sensors(self):
+    def test_unit_state_update_configures_sensors(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -138,7 +138,7 @@ class TestMqttUpdater(unittest.TestCase):
         wrapped[sensor2].configure.assert_called_once_with(partition=partition1)
         wrapped[sensor3].configure.assert_called_once_with(partition=partition2)
 
-    def test_partition_update_add_sensor_configures_sensor(self):
+    def test_unit_partition_update_add_sensor_configures_sensor(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -161,7 +161,7 @@ class TestMqttUpdater(unittest.TestCase):
         new_sensor.register.assert_called_once_with(updater, callback=updater._sensor_update)
         wrapped[new_sensor].configure.assert_called_once_with(partition=partition)
 
-    def test_partition_update_update_status_updates_partition_state(self):
+    def test_unit_partition_update_update_status_updates_partition_state(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -180,7 +180,7 @@ class TestMqttUpdater(unittest.TestCase):
 
         wrapped[partition].update_state.assert_called_once_with()
 
-    def test_partition_update_update_secure_arm_configures_partition(self):
+    def test_unit_partition_update_update_secure_arm_configures_partition(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -199,7 +199,7 @@ class TestMqttUpdater(unittest.TestCase):
 
         wrapped[partition].configure.assert_called_once_with()
 
-    def test_partition_update_update_alarm_type_updates_attributes(self):
+    def test_unit_partition_update_update_alarm_type_updates_attributes(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -218,7 +218,7 @@ class TestMqttUpdater(unittest.TestCase):
 
         wrapped[partition].update_attributes.assert_called_once_with()
 
-    def test_sensor_update_update_status_updates_sensor_state(self):
+    def test_unit_sensor_update_update_status_updates_sensor_state(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -237,7 +237,7 @@ class TestMqttUpdater(unittest.TestCase):
 
         wrapped[sensor].update_state.assert_called_once_with()
 
-    def test_sensor_update_update_attributes_updates_attributes(self):
+    def test_unit_sensor_update_update_attributes_updates_attributes(self):
         state = mock.create_autospec(QolsysState)
         factory = mock.create_autospec(MqttWrapperFactory)
 
@@ -257,7 +257,7 @@ class TestMqttUpdater(unittest.TestCase):
         wrapped[sensor].update_attributes.assert_called_once_with()
 
 
-class TestMqttWrapperQolsys(unittest.TestCase):
+class TestUnitMqttWrapperQolsys(unittest.TestCase):
 
     def setUp(self):
         # Configuration objects
@@ -329,7 +329,7 @@ class TestMqttWrapperQolsys(unittest.TestCase):
             'sensor': wrapped_sensor,
         }
 
-    def test_partition_configure_payload(self):
+    def test_unit_partition_configure_payload(self):
         self.maxDiff = None
 
         actual = self.wrapped_partition.configure_payload()
@@ -381,7 +381,7 @@ class TestMqttWrapperQolsys(unittest.TestCase):
 
         self.assertDictEqual(expected, actual)
 
-    def test_sensor_ha_device_class(self):
+    def test_unit_sensor_ha_device_class(self):
         for cls, device_class in MqttWrapperQolsysSensor.QOLSYS_TO_HA_DEVICE_CLASS.items():
             class SubCls(cls):
                 def __init__(self):
@@ -399,7 +399,7 @@ class TestMqttWrapperQolsys(unittest.TestCase):
 
             self.assertEqual(expected, actual, f'for sensor class {cls.__name__}')
 
-    def test_sensor_configure_payload(self):
+    def test_unit_sensor_configure_payload(self):
         self.maxDiff = None
 
         actual = self.wrapped_sensor.configure_payload(

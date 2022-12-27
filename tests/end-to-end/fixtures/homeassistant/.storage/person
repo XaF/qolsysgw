@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "minor_version": 1,
+  "key": "person",
+  "data": {
+    "items": [
+      {
+        "name": "qolsysgw-tests",
+        "user_id": "6e127e2e39354ae89b9aaf1508217a08",
+        "device_trackers": [],
+        "id": "qolsysgw_tests"
+      }
+    ]
+  }
+}
