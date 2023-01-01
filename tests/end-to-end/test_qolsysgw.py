@@ -13,11 +13,12 @@ from types import SimpleNamespace
 
 import testenv  # noqa: F401
 
-from testutils.mock_panel import PanelServer
-from testutils.utils import get_free_port
+from testutils.docker import AppDaemonDockerLogReader
 from testutils.fixtures_data import get_summary
 from testutils.homeassistant import HomeAssistantRestAPI
-from testutils.docker import AppDaemonDockerLogReader
+from testutils.mock_panel import PanelServer
+from testutils.mock_types import ISODATE
+from testutils.utils import get_free_port
 
 
 def in_wsl():
@@ -162,8 +163,8 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             expected = {
                 **expected_state,
                 'context': mock.ANY,
-                'last_changed': mock.ANY,
-                'last_updated': mock.ANY,
+                'last_changed': ISODATE,
+                'last_updated': ISODATE,
             }
 
             with self.subTest(msg=f'{msg}Entity {entity_id} is correctly configured'):
@@ -199,6 +200,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'code_arm_required': False,
                     'code_format': 'number',
                     'friendly_name': 'partition0',
+                    'last_error_at': None,
+                    'last_error_type': None,
+                    'last_error_desc': None,
                     'secure_arm': False,
                     'supported_features': 63,
                 },
@@ -332,6 +336,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'code_arm_required': False,
                     'code_format': 'number',
                     'friendly_name': 'partition1',
+                    'last_error_at': None,
+                    'last_error_type': None,
+                    'last_error_desc': None,
                     'secure_arm': False,
                     'supported_features': 63,
                 },
@@ -427,6 +434,16 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         })
 
         events.append({
+            'event': 'ERROR',
+            'error_type': 'DISARM_FAILED',
+            'partition_id': 0,
+            'description': 'Invalid usercode',
+            'nonce': 'qolsys',
+            'version': 1,
+            'requestID': '<request_id>',
+        })
+
+        events.append({
             'event': 'ALARM',
             'alarm_type': 'FIRE',
             'partition_id': 1,
@@ -455,6 +472,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'code_arm_required': False,
                     'code_format': 'number',
                     'friendly_name': 'partition0',
+                    'last_error_at': ISODATE,
+                    'last_error_type': 'DISARM_FAILED',
+                    'last_error_desc': 'Invalid usercode',
                     'secure_arm': False,
                     'supported_features': 63,
                 },
@@ -588,6 +608,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'code_arm_required': True,
                     'code_format': 'number',
                     'friendly_name': 'partition1',
+                    'last_error_at': None,
+                    'last_error_type': None,
+                    'last_error_desc': None,
                     'secure_arm': True,
                     'supported_features': 63,
                 },

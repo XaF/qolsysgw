@@ -15,6 +15,7 @@ from qolsys.control import QolsysControl
 from qolsys.events import QolsysEvent
 from qolsys.events import QolsysEventAlarm
 from qolsys.events import QolsysEventArming
+from qolsys.events import QolsysEventError
 from qolsys.events import QolsysEventInfoSecureArm
 from qolsys.events import QolsysEventInfoSummary
 from qolsys.events import QolsysEventZoneEventActive
@@ -226,6 +227,17 @@ class QolsysGateway(Mqtt):
                 return
 
             partition.triggered(alarm_type=event.alarm_type)
+
+        elif isinstance(event, QolsysEventError):
+            LOGGER.debug(f'ERROR partition_id={event.partition_id}')
+
+            partition = self._state.partition(event.partition_id)
+            if partition is None:
+                LOGGER.warning(f'Partition {event.partition_id} not found')
+                return
+
+            partition.errored(error_type=event.error_type,
+                              error_description=event.description)
 
         else:
             LOGGER.info(f'UNCAUGHT event {event}; ignored')
