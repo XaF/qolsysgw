@@ -46,6 +46,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ✨ **[feature]** Add `last_error_type` and `last_error_desc` attributes to partitions (#60)
  * ✨ **[feature]** Add `disarm_failed` counter as partition attribute (#61)
  * ♻️ **[refactor]** Refactoring the Control classes (#62)
+ * ✨ **[feature]** Add support for `bypass` parameter when arming (#63)
 {%   endif %}
 {%   if parsed_version < [1, 0, 0] -%}
 ### Version 1.0.0
