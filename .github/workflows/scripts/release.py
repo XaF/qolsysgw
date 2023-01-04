@@ -35,12 +35,12 @@ class ChangeLogRegex(object):
     )
 
     COMMIT_CHANGE = re.compile(
-        r'^\s*(\*\*)?\[(?P<category>[^\]]*)\](\*\*)?\s*'
+        r'^\s*(?P<emojis>[^\x00-\x7F]+)?\s*'
+        r'(?:(\*\*)?\[(?P<category>[^\]]*)\](\*\*)?)?\s*'
         r'(?P<change>.*)$',
     )
     COMMIT_CHANGE_BUG = re.compile(r'\b(bug|fix)\b', re.IGNORECASE)
     COMMIT_CHANGE_FEATURE = re.compile(r'\b(feature|add)\b', re.IGNORECASE)
-
 
 class ChangeLogHandler(object):
 
@@ -48,6 +48,10 @@ class ChangeLogHandler(object):
     RELEASE_PATHS = [
         re.compile(r'^apps/'),
     ]
+    CATEGORY_TO_EMOJI = {
+        'feature': '✨',
+        'bugfix': '🐛',
+    }
 
     def __init__(self, github_event, github_token=None):
         self._changelog = None
@@ -102,7 +106,19 @@ class ChangeLogHandler(object):
     def categorize_change(self, change):
         formatted = ChangeLogRegex.COMMIT_CHANGE.search(change)
         if formatted:
-            return (formatted['category'], formatted['change'])
+            if formatted['emojis'] and not formatted['category']:
+                for emoji in formatted['emojis']:
+                    try:
+                        formatted['category'] = next(
+                            k
+                            for k, v in self.CATEGORY_TO_EMOJI
+                            if v == emoji
+                        )
+                        break
+                    except StopIteration:
+                        pass
+            if formatted['category']:
+                return (formatted['category'], formatted['change'])
 
         bug = ChangeLogRegex.COMMIT_CHANGE_BUG.search(change)
         if bug:
@@ -156,6 +172,19 @@ class ChangeLogHandler(object):
 
         return new_changes
 
+    def get_existing_changes(self):
+        if not hasattr(self, '_existing_changes'):
+            next_version = ChangeLogRegex.NEXT.search(self.read_file())
+            if next_version:
+                self._existing_changes = []
+                for change in ChangeLogRegex.CHANGE.finditer(next_version['release_desc']):
+                    change_text = change['change']
+                    self._existing_changes.append(self.categorize_change(change_text))
+            else:
+                self._existing_changes = None
+
+        return self._existing_changes
+
     def read_file_releases(self):
         for version in ChangeLogRegex.VERSION.finditer(self.read_file()):
             d = version.groupdict()
@@ -202,25 +231,21 @@ class ChangeLogHandler(object):
         return False
 
     def update_changelog(self):
-        existing_changes = []
-
-        next_version = ChangeLogRegex.NEXT.search(self.read_file())
-        if next_version:
-            for change in ChangeLogRegex.CHANGE.finditer(next_version['release_desc']):
-                change_text = change['change']
-                existing_changes.append(self.categorize_change(change_text))
-
+        existing_changes = self.get_existing_changes()
         changes = self.get_changes(existing_changes=existing_changes)
         if not changes:
             return
 
         new_changes = []
         for (changecat, change) in changes:
+            emoji = (f'{self.CATEGORY_TO_EMOJI[changecat]} '
+                     if changecat in self.CATEGORY_TO_EMOJI
+                     else '')
             cat = f'**[{changecat}]** ' if changecat else ''
-            new_changes.append(f' * {cat}{change}')
+            new_changes.append(f' * {emoji}{cat}{change}')
         new_changes = '\n'.join(new_changes)
 
-        if next_version:
+        if existing_changes is not None:
             new_content = ChangeLogRegex.NEXT.sub(
                 f'\g<prefix>\n{new_changes}\g<suffix>',
                 self.read_file(),
@@ -238,9 +263,17 @@ class ChangeLogHandler(object):
         with open(self.CHANGELOG_FILE, 'w') as f:
             f.write(new_content)
 
-    def release_next(self, version):
+    def release_next(self, version, suggest_emoji=True):
         if not ChangeLogRegex.NEXT_SUB.search(self.read_file()):
             raise RuntimeError('No release waiting to be released')
+
+        version = version.lower()
+        if version == 'auto':
+            existing_changes = self.get_existing_changes()
+            if any(ctype.lower() == 'feature' for ctype, cdesc in existing_changes):
+                version = 'minor'
+            else:
+                version = 'patch'
 
         version_parts = ['major', 'minor', 'patch']
         if version in version_parts:
@@ -277,7 +310,25 @@ class ChangeLogHandler(object):
         with open(self.CHANGELOG_FILE, 'w') as f:
             f.write(new_content)
 
-        print(f'Replaced NEXT by release {major}.{minor}.{patch}')
+        print(f'RELEASE_VERSION={major}.{minor}.{patch}')
+        print(f'RELEASE_MAJOR={major}')
+        print(f'RELEASE_MINOR={minor}')
+        print(f'RELEASE_PATCH={patch}')
+        print(f'RELEASE_VERSION_MAJOR={major}')
+        print(f'RELEASE_VERSION_MINOR={major}.{minor}')
+        print(f'RELEASE_VERSION_PATCH={major}.{minor}.{patch}')
+
+        if suggest_emoji:
+            existing_changes = self.get_existing_changes()
+
+            emojis = ['🔖']
+            if any(ctype.lower() == 'feature' for ctype, _ in existing_changes):
+                emojis.append('✨')
+            if any(ctype.lower() == 'bugfix' for ctype, _ in existing_changes):
+                emojis.append('🐛')
+            emoji = ''.join(emojis)
+
+            print(f'RELEASE_EMOJI={emoji}')
 
 
 if __name__ == '__main__':
@@ -308,7 +359,7 @@ if __name__ == '__main__':
     )
     command.add_argument(
         '-r', '--release-next',
-        nargs='?', const='patch',
+        nargs='?', const='auto',
         help='Release the next version',
     )
 

@@ -1,0 +1,39 @@
+name: Release next
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to bump to [auto|major|minor|patch|semver]
+        default: auto
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  bump-version:
+    name: Release next
+    runs-on: ubuntu-latest
+
+    if: github.event.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+        with:
+          token: ${{ secrets.COMMIT_TOKEN }}
+
+      - name: Update changelog with release version
+        env:
+          GITHUB_EVENT: ${{ toJSON(github.event) }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          .github/workflows/scripts/release.py --release-next "${{ github.event.inputs.version }}" | tee -a "$GITHUB_ENV"
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: "info.md"
+          commit_message: ${{ env.RELEASE_EMOJI }} Release version ${{ env.RELEASE_VERSION }}
