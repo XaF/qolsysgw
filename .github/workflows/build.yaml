@@ -40,6 +40,7 @@ jobs:
         if: github.event_name == 'push'
         env:
           GITHUB_EVENT: ${{ toJSON(github.event) }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           .github/workflows/scripts/release.py --printenv | tee -a "$GITHUB_ENV"
 
@@ -227,10 +228,13 @@ jobs:
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
+        with:
+          token: ${{ secrets.COMMIT_TOKEN }}
 
       - name: Update changelog for future release
         env:
           GITHUB_EVENT: ${{ toJSON(github.event) }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           .github/workflows/scripts/release.py --update-changelog
 
