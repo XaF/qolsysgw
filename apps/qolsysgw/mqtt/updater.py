@@ -361,6 +361,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
                 'last_error_type': self._partition.last_error_type,
                 'last_error_desc': self._partition.last_error_desc,
                 'last_error_at': self._partition.last_error_at,
+                'disarm_failed': self._partition.disarm_failed,
             }),
         )
 

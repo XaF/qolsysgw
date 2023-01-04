@@ -1,5 +1,7 @@
 import json
 
+from types import SimpleNamespace
+
 from unittest import mock
 
 import testenv  # noqa: F401
@@ -107,6 +109,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'last_error_type': state.last_error_type,
                     'last_error_desc': state.last_error_desc,
                     'last_error_at': state.last_error_at,
+                    'disarm_failed': state.disarm_failed,
                 },
                 json.loads(mqtt_attributes['payload']),
             )
@@ -1146,14 +1149,19 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             alarm_type='AUXILIARY',
         )
 
-    async def _test_integration_event_error(self, error_type, error_desc):
-        panel, gw, _, _ = await self._ready_panel_and_gw(
-            partition_ids=[0],
-            zone_ids=[100],
-            partition_status={
-                0: 'ARM_STAY',
-            },
-        )
+    async def _test_integration_event_error(self, error_type, error_desc,
+                                            extra_expect=None, init_data=None):
+        if init_data:
+            panel = init_data.panel
+            gw = init_data.gw
+        else:
+            panel, gw, _, _ = await self._ready_panel_and_gw(
+                partition_ids=[0],
+                zone_ids=[100],
+                partition_status={
+                    0: 'ARM_STAY',
+                },
+            )
 
         event = {
             'event': 'ERROR',
@@ -1179,9 +1187,16 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             'last_error_desc': error_desc,
             'last_error_at': ISODATE,
         }
+        if extra_expect:
+            expected.update(extra_expect)
         actual = json.loads(attributes['payload'])
         actual_subset = {k: v for k, v in actual.items() if k in expected}
         self.assertDictEqual(expected, actual_subset)
+
+        return SimpleNamespace(
+            panel=panel,
+            gw=gw,
+        )
 
     async def test_integration_event_error_usercode(self):
         await self._test_integration_event_error(
@@ -1191,7 +1206,53 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         )
 
     async def test_integration_event_error_disarm_failed(self):
-        await self._test_integration_event_error(
-            error_type='DISARM_FAILED',
-            error_desc='Invalid usercode',
-        )
+        with self.subTest(msg='Disarm failed error is handled properly'):
+            init_data = await self._test_integration_event_error(
+                error_type='DISARM_FAILED',
+                error_desc='Invalid usercode',
+                extra_expect={
+                    'disarm_failed': 1,
+                },
+            )
+
+        with self.subTest(msg='Other disarm failed error keeps raising the counter'):
+            await self._test_integration_event_error(
+                error_type='DISARM_FAILED',
+                error_desc='Invalid usercode',
+                extra_expect={
+                    'disarm_failed': 2,
+                },
+                init_data=init_data,
+            )
+
+        with self.subTest(msg='Disarming the panel resets the counter'):
+            panel = init_data.panel
+            gw = init_data.gw
+
+            self.assertEqual(2, gw._state.partition(0).disarm_failed)
+
+            event = {
+                'event': 'ARMING',
+                'arming_type': 'DISARM',
+                'partition_id': 0,
+                'version': 1,
+                'requestID': '<request_id>',
+            }
+            await panel.writeline(event)
+
+            attributes = await gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': 'homeassistant/alarm_control_panel/'
+                                  'qolsys_panel/partition0/attributes'},
+            )
+
+            self.assertIsNotNone(attributes)
+
+            expected = {
+                'disarm_failed': 0,
+            }
+            actual = json.loads(attributes['payload'])
+            actual_subset = {k: v for k, v in actual.items() if k in expected}
+            self.assertDictEqual(expected, actual_subset)
+
+            self.assertEqual(0, gw._state.partition(0).disarm_failed)
