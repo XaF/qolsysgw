@@ -62,12 +62,16 @@ class QolsysActionArm(QolsysAction):
             self._data['usercode'] = str(panel_code)
 
 
-class QolsysActionArmWithDelay(QolsysActionArm):
-    def __init__(self, delay: int = None, *args, **kwargs) -> None:
+class QolsysActionArmWithDelayAndBypass(QolsysActionArm):
+    def __init__(self, delay: int = None, bypass: bool = None,
+                 *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         if delay is not None and delay >= 0:
             self._data['delay'] = delay
+
+        if bypass is not None:
+            self._data['bypass'] = str(bypass).lower()
 
 
 class QolsysActionDisarm(QolsysActionArm):
@@ -76,13 +80,13 @@ class QolsysActionDisarm(QolsysActionArm):
                          *args, **kwargs)
 
 
-class QolsysActionArmAway(QolsysActionArmWithDelay):
+class QolsysActionArmAway(QolsysActionArmWithDelayAndBypass):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_ARM_AWAY,
                          *args, **kwargs)
 
 
-class QolsysActionArmStay(QolsysActionArmWithDelay):
+class QolsysActionArmStay(QolsysActionArmWithDelayAndBypass):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(arm_type=QolsysActionArm.ARMING_TYPE_ARM_STAY,
                          *args, **kwargs)

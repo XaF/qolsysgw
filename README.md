@@ -426,6 +426,63 @@ With:
   ```
   </details>
 
+- <details><summary><strong>arm_away_bypass:</strong> whether or not to
+  bypass sensors that are "open" when arming away through Qolsys Gateway.
+  Bypassed sensors are then ignored until the next time the panel will
+  be armed (this means that closing and reopening those sensors after
+  arming with the bypass will not trigger an alarm).
+  Setting the value to <code>true</code> will always bypass open sensors
+  when arming away, while setting it to <code>false</code> will always
+  disable the bypass. If you have a default behavior for this defined in
+  your panel, this parameter will override it. Leaving the parameter
+  unset will leave the panel decide what to do.
+  Defaults to <code>null</code>.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    arm_away_bypass: true # will bypass the open sensors if any
+    # ...
+  ```
+  </details>
+
+- <details><summary><strong>arm_stay_bypass:</strong> whether or not to
+  bypass sensors that are "open" when arming stay through Qolsys Gateway.
+  Bypassed sensors are then ignored until the next time the panel will
+  be armed (this means that closing and reopening those sensors after
+  arming with the bypass will not trigger an alarm).
+  Setting the value to <code>true</code> will always bypass open sensors
+  when arming stay, while setting it to <code>false</code> will always
+  disable the bypass. If you have a default behavior for this defined in
+  your panel, this parameter will override it. Leaving the parameter
+  unset will leave the panel decide what to do.
+  Defaults to <code>null</code>.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    arm_stay_bypass: false # will NOT bypass the open sensors if any
+    # ...
+  ```
+  </details>
+
+- <details><summary><strong>arm_type_custom_bypass:</strong> the type of
+  arming to use when using `ARM_CUSTOM_BYPASS` from Home Assistant. This
+  arming type will automatically enable bypassing the open sensors.
+  Setting the value to <code>arm_away</code> will lead to the panel being
+  armed in away mode with bypass enabled when `ARM_CUSTOM_BYPASS` is used.
+  Setting the value to <code>arm_stay</code> will lead to the panel being
+  armed in stay mode.
+  Defaults to <code>arm_away</code>.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    arm_type_custom_bypass: arm_stay # to arm the panel in stay mode when using the custom bypass arming type
+    # ...
+  ```
+  </details>
+
 
 #### Optional configuration related to the representation of the panel in Home Assistant
 

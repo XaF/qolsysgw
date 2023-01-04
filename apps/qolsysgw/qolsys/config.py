@@ -20,6 +20,9 @@ class QolsysGatewayConfig(object):
         'panel_device_name': 'Qolsys Panel',
         'arm_away_exit_delay': None,
         'arm_stay_exit_delay': None,
+        'arm_away_bypass': None,
+        'arm_stay_bypass': None,
+        'arm_type_custom_bypass': 'arm_away',
 
         'mqtt_namespace': 'mqtt',
         'mqtt_retain': True,
@@ -95,6 +98,19 @@ class QolsysGatewayConfig(object):
                     f"{', '.join(valid_trigger)}")
 
             self._override_config['default_trigger_command'] = trig_cmd
+
+        arm_type = self.get('arm_type_custom_bypass')
+        if arm_type:
+            arm_type = arm_type.lower()
+        valid_arm_type = [
+            'arm_stay',
+            'arm_away',
+        ]
+        if arm_type not in valid_arm_type:
+            raise QolsysGwConfigError(
+                f"Invalid arm type '{arm_type}' for custom bypass; must be "
+                f"one of {', '.join(valid_arm_type)}")
+        self._override_config['arm_type_custom_bypass'] = arm_type
 
         # Apply a template to the control and event topics if the unique id
         # is part of the requested topics

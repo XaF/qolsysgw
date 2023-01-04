@@ -83,12 +83,18 @@ parameter is not provided, it will simply use the default value configured
 in the panel. If the `delay` is set to `0`, the panel will immediately
 be armed, without an arming period.
 
+We can also use a `bypass` parameter, to specify whether to bypass the
+sensors "open" when arming. If set to `"true"`, the sensors will be
+bypassed and the alarm will be armed. If set to `"false"`, any sensor
+"open" at the time of arming will prevent the system from being armed.
+
 ```json
 {
   "action": "ARMING",
   "arming_type": "ARM_AWAY",
   "partition_id": 0,
   "delay": 10,
+  "bypass": "false",
   "token": "<token>",
   "nonce": "qolsys",
   "source": "C4",
