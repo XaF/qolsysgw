@@ -1,6 +1,8 @@
 # Qolsys Gateway - `qolsysgw`
 
-![build](https://github.com/XaF/qolsysgw/actions/workflows/build.yaml/badge.svg) ![hacs validation](https://github.com/XaF/qolsysgw/actions/workflows/hacs-validation.yaml/badge.svg)
+![build](https://github.com/XaF/qolsysgw/actions/workflows/build.yaml/badge.svg)
+![hacs validation](https://github.com/XaF/qolsysgw/actions/workflows/hacs-validation.yaml/badge.svg)
+[![latest release](https://img.shields.io/github/v/release/XaF/qolsysgw?logo=github&sort=semver)](https://github.com/XaF/qolsysgw/releases)
 
 Qolsys Gateway (`qolsysgw`) is an [AppDaemon][appdaemon]
 automation that serves as a gateway between a Qolsys IQ Panel
