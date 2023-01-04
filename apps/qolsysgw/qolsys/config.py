@@ -120,5 +120,5 @@ class QolsysGatewayConfig(object):
     def __getattr__(self, name):
         value = self.get(name)
         if value is self._SENTINEL:
-            raise AttributeError
+            raise AttributeError(f'Parameter `{name}` has not been defined')
         return value
