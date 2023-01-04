@@ -87,11 +87,20 @@ class QolsysControl(object):
                 from_json.__func__ != QolsysControl.from_json.__func__:
             return from_json(data)
 
+        if hasattr(klass, '_EXTRA_PARAMS'):
+            extra_params = {
+                p: data.get(p)
+                for p in klass._EXTRA_PARAMS
+            }
+        else:
+            extra_params = {}
+
         return klass(
             partition_id=data.get('partition_id'),
             code=data.get('code'),
             session_token=data.get('session_token'),
             raw=data,
+            **extra_params,
         )
 
 
@@ -160,6 +169,10 @@ class QolsysControlDisarm(_QolsysControlCheckCode):
 class QolsysControlArm(_QolsysControlCheckCode):
     _CODE_REQUIRED_ATTR = 'code_arm_required'
     _PANEL_CODE_REQUIRED = 'secure_arm'
+    _EXTRA_PARAMS = [
+        'bypass',
+        'delay',
+    ]
 
     def __init__(self, delay: int = None, bypass: bool = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -215,7 +228,8 @@ class QolsysControlArmCustomBypass(QolsysControlArm):
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__(bypass=True, *args, **kwargs)
+        super().__init__(bypass=True, *args,
+                         **{k: v for k, v in kwargs.items() if k != 'bypass'})
 
         self._require_config = True
 
