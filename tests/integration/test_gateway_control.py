@@ -37,6 +37,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                                    expect_error=None, expect_delay=None,
                                    secure_arm=False, panel_user_code=None,
                                    user_control_token=None, expect_bypass=None,
+                                   send_delay=None, send_bypass=None,
                                    **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
@@ -59,6 +60,10 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
         }
         if send_code:
             control['code'] = '4242'
+        if send_delay is not None:
+            control['delay'] = send_delay
+        if send_bypass is not None:
+            control['bypass'] = send_bypass
 
         gw.mqtt_publish(
             'homeassistant/alarm_control_panel/qolsys_panel/set',
@@ -172,6 +177,15 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             expect_delay=30,
         )
 
+    async def test_integration_control_arm_away_with_exit_delay_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_AWAY',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            send_delay=30,
+            expect_delay=30,
+        )
+
     async def test_integration_control_arm_away_secure_arm_with_code(self):
         await self._test_control_arming(
             secure_arm=True,
@@ -240,6 +254,24 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             expect_bypass='false',
         )
 
+    async def test_integration_control_arm_away_bypass_true_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_AWAY',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            send_bypass=True,
+            expect_bypass='true',
+        )
+
+    async def test_integration_control_arm_away_bypass_false_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_AWAY',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            send_bypass=False,
+            expect_bypass='false',
+        )
+
     async def test_integration_control_arm_vacation(self):
         await self._test_control_arming(
             control_action='ARM_VACATION',
@@ -260,6 +292,15 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             partition_status='DISARM',
             arming_type='ARM_STAY',
             arm_stay_exit_delay=42,
+            expect_delay=42,
+        )
+
+    async def test_integration_control_arm_home_with_exit_delay_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_HOME',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            send_delay=42,
             expect_delay=42,
         )
 
@@ -306,6 +347,24 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             partition_status='DISARM',
             arming_type='ARM_STAY',
             arm_stay_bypass=False,
+            expect_bypass='false',
+        )
+
+    async def test_integration_control_arm_home_bypass_true_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_HOME',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            send_bypass=True,
+            expect_bypass='true',
+        )
+
+    async def test_integration_control_arm_home_bypass_false_if_sent(self):
+        await self._test_control_arming(
+            control_action='ARM_HOME',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            send_bypass=False,
             expect_bypass='false',
         )
 
