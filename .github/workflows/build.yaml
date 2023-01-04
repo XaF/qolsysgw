@@ -17,7 +17,10 @@ jobs:
     name: Prepare environment
     runs-on: "ubuntu-latest"
     outputs:
-      requires_tests: ${{ github.event_name == 'schedule' || steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true' || steps.changed-files.outputs.any_modified == 'true' }}
+      requires_tests: ${{ github.event_name == 'schedule' || steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true' || steps.changed-files.outputs.any_modified == 'true' || env.PUBLISH_RELEASE == 'true' }}
+      publish_release: ${{ env.PUBLISH_RELEASE }}
+      release_version: ${{ env.RELEASE_VERSION }}
+      release_desc: ${{ env.RELEASE_DESC }}
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
@@ -32,6 +35,14 @@ jobs:
             apps/**
             tests/**
             .github/workflows/build.yaml
+
+      - name: Check if a new release should be published
+        if: github.event_name == 'push'
+        env:
+          GITHUB_EVENT: ${{ toJSON(github.event) }}
+        run: |
+          .github/workflows/scripts/release.py --printenv | tee -a "$GITHUB_ENV"
+
 
   unit-integration-tests:
     name: Unit & integration tests
@@ -202,13 +213,73 @@ jobs:
           pytest --cache-clear tests/end-to-end/
 
 
+  update_changelog:
+    name: Update changelog
+    runs-on: "ubuntu-latest"
+
+    needs:
+      - prepare-env
+      - unit-integration-tests
+      - end-to-end-tests
+
+    if: github.event_name == 'push' && needs.prepare-env.outputs.publish_release != 'true' && needs.unit-integration-tests.result != 'failure' && needs.end-to-end-tests.result != 'failure'
+
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+
+      - name: Update changelog for future release
+        env:
+          GITHUB_EVENT: ${{ toJSON(github.event) }}
+        run: |
+          .github/workflows/scripts/release.py --update-changelog
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: "info.md"
+          commit_message: 📒 Update changelog for future release
+
+
+  push_release:
+    name: Release version
+    runs-on: ubuntu-latest
+
+    needs:
+      - prepare-env
+      - unit-integration-tests
+      - end-to-end-tests
+
+    if: github.event_name == 'push' && needs.prepare-env.outputs.publish_release == 'true' && needs.unit-integration-tests.result != 'failure' && needs.end-to-end-tests.result != 'failure'
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
+
+      - name: Release version
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.prepare-env.outputs.release_version }}
+          name: v${{ needs.prepare-env.outputs.release_version }}
+          body: ${{ needs.prepare-env.outputs.release_desc }}
+          commit: main
+          makeLatest: true
+          skipIfReleaseExists: true
+
+
   auto-merge:
     name: "Auto-merge Dependabot pull requests"
     runs-on: ubuntu-latest
+
     needs:
       - unit-integration-tests
       - end-to-end-tests
+
     if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' && needs.unit-integration-tests.result != 'failure' && needs.end-to-end-tests.result != 'failure'
+
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
