@@ -1,5 +1,7 @@
 import logging
 
+from datetime import datetime, timezone
+
 from qolsys.observable import QolsysObservable
 
 
@@ -11,6 +13,7 @@ class QolsysPartition(QolsysObservable):
     NOTIFY_ADD_SENSOR = 'add_sensor'
     NOTIFY_REMOVE_SENSOR = 'remove_sensor'
     NOTIFY_UPDATE_ALARM_TYPE = 'update_alarm_type'
+    NOTIFY_UPDATE_ATTRIBUTES = 'update_attributes'
     NOTIFY_UPDATE_SECURE_ARM = 'update_secure_arm'
     NOTIFY_UPDATE_STATUS = 'update_status'
 
@@ -24,6 +27,10 @@ class QolsysPartition(QolsysObservable):
         self._secure_arm = secure_arm
         self._sensors = {}
         self._alarm_type = None
+
+        self._last_error_type = None
+        self._last_error_desc = None
+        self._last_error_at = None
 
     @property
     def id(self):
@@ -48,6 +55,18 @@ class QolsysPartition(QolsysObservable):
     @property
     def sensors(self):
         return self._sensors.values()
+
+    @property
+    def last_error_type(self):
+        return self._last_error_type
+
+    @property
+    def last_error_desc(self):
+        return self._last_error_desc
+
+    @property
+    def last_error_at(self):
+        return self._last_error_at
 
     @status.setter
     def status(self, value):
@@ -90,6 +109,13 @@ class QolsysPartition(QolsysObservable):
     def triggered(self, alarm_type: str = None):
         self.status = 'ALARM'
         self.alarm_type = alarm_type
+
+    def errored(self, error_type: str, error_description: str):
+        self._last_error_type = error_type
+        self._last_error_desc = error_description
+        self._last_error_at = datetime.now(timezone.utc).isoformat()
+
+        self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
 
     def zone(self, zone_id, default=None):
         return self._sensors.get(zone_id, default)

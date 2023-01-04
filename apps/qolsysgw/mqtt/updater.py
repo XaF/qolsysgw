@@ -64,7 +64,8 @@ class MqttUpdater(object):
             self._factory.wrap(partition).update_state()
         elif change == QolsysPartition.NOTIFY_UPDATE_SECURE_ARM:
             self._factory.wrap(partition).configure()
-        elif change == QolsysPartition.NOTIFY_UPDATE_ALARM_TYPE:
+        elif change == QolsysPartition.NOTIFY_UPDATE_ALARM_TYPE or \
+                change == QolsysPartition.NOTIFY_UPDATE_ATTRIBUTES:
             self._factory.wrap(partition).update_attributes()
 
     def _sensor_update(self, sensor: QolsysSensor, change, prev_value=None, new_value=None):
@@ -357,6 +358,9 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             payload=json.dumps({
                 'secure_arm': self._partition.secure_arm,
                 'alarm_type': self._partition.alarm_type,
+                'last_error_type': self._partition.last_error_type,
+                'last_error_desc': self._partition.last_error_desc,
+                'last_error_at': self._partition.last_error_at,
             }),
         )
 

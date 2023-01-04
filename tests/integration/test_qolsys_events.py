@@ -5,6 +5,8 @@ from unittest import mock
 import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase
 
+from testutils.mock_types import ISODATE
+
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
@@ -102,6 +104,9 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 {
                     'alarm_type': state.alarm_type,
                     'secure_arm': state.secure_arm,
+                    'last_error_type': state.last_error_type,
+                    'last_error_desc': state.last_error_desc,
+                    'last_error_at': state.last_error_at,
                 },
                 json.loads(mqtt_attributes['payload']),
             )
@@ -558,10 +563,10 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         if from_secure_arm != to_secure_arm:
             self.assertIsNotNone(attributes)
 
-            self.assertDictEqual(
-                {'secure_arm': to_secure_arm, 'alarm_type': None},
-                json.loads(attributes['payload']),
-            )
+            expected = {'secure_arm': to_secure_arm}
+            actual = json.loads(attributes['payload'])
+            actual_subset = {k: v for k, v in actual.items() if k in expected}
+            self.assertDictEqual(expected, actual_subset)
         else:
             self.assertIsNone(attributes)
 
@@ -1141,7 +1146,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             alarm_type='AUXILIARY',
         )
 
-    async def test_integration_event_error_usercode(self):
+    async def _test_integration_event_error(self, error_type, error_desc):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
             zone_ids=[100],
@@ -1152,49 +1157,41 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         event = {
             'event': 'ERROR',
-            'error_type': 'usercode',
+            'error_type': error_type,
             'partition_id': 0,
-            'description': 'Please Enable Six Digit User Code or '
-                           'KeyPad is already Locked',
+            'description': error_desc,
             'nonce': 'qolsys',
             'version': 1,
             'requestID': '<request_id>',
         }
         await panel.writeline(event)
 
-        uncaught = await gw.wait_for_next_log(
+        attributes = await gw.wait_for_next_mqtt_publish(
             timeout=self._TIMEOUT,
-            filters={'level': 'INFO'},
-            match='^UNCAUGHT event <QolsysEventError '
-                  'partition_id=0 error_type=usercode',
+            filters={'topic': 'homeassistant/alarm_control_panel/'
+                              'qolsys_panel/partition0/attributes'},
         )
 
-        self.assertIsNotNone(uncaught)
+        self.assertIsNotNone(attributes)
+
+        expected = {
+            'last_error_type': error_type,
+            'last_error_desc': error_desc,
+            'last_error_at': ISODATE,
+        }
+        actual = json.loads(attributes['payload'])
+        actual_subset = {k: v for k, v in actual.items() if k in expected}
+        self.assertDictEqual(expected, actual_subset)
+
+    async def test_integration_event_error_usercode(self):
+        await self._test_integration_event_error(
+            error_type='usercode',
+            error_desc='Please Enable Six Digit User Code or '
+                       'KeyPad is already Locked',
+        )
 
     async def test_integration_event_error_disarm_failed(self):
-        panel, gw, _, _ = await self._ready_panel_and_gw(
-            partition_ids=[0],
-            zone_ids=[100],
-            partition_status={
-                0: 'ARM_STAY',
-            },
+        await self._test_integration_event_error(
+            error_type='DISARM_FAILED',
+            error_desc='Invalid usercode',
         )
-
-        event = {
-            'event': 'ERROR',
-            'error_type': 'DISARM_FAILED',
-            'partition_id': 0,
-            'description': 'Invalid usercode',
-            'version': 1,
-            'requestID': '<request_id>',
-        }
-        await panel.writeline(event)
-
-        uncaught = await gw.wait_for_next_log(
-            timeout=self._TIMEOUT,
-            filters={'level': 'INFO'},
-            match='^UNCAUGHT event <QolsysEventError '
-                  'partition_id=0 error_type=DISARM_FAILED',
-        )
-
-        self.assertIsNotNone(uncaught)
