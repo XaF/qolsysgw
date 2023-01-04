@@ -36,7 +36,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                                    arming_type, send_code=False,
                                    expect_error=None, expect_delay=None,
                                    secure_arm=False, panel_user_code=None,
-                                   user_control_token=None,
+                                   user_control_token=None, expect_bypass=None,
                                    **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
@@ -88,8 +88,12 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             if expect_delay is not None:
                 self.assertEqual(expect_delay, action.get('delay'))
             else:
-                _SENTINEL = object()
-                self.assertEqual(_SENTINEL, action.get('delay', _SENTINEL))
+                assert 'delay' not in action
+
+            if expect_bypass is not None:
+                self.assertEqual(expect_bypass, action.get('bypass'))
+            else:
+                assert 'bypass' not in action
 
             if send_code:
                 self.assertEqual('4242', action['usercode'])
@@ -159,7 +163,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             arming_type='ARM_AWAY',
         )
 
-    async def test_integration_control_arm_away_with_exit_delay(self):
+    async def test_integration_control_arm_away_with_exit_delay_if_configured(self):
         await self._test_control_arming(
             control_action='ARM_AWAY',
             partition_status='DISARM',
@@ -218,6 +222,24 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                          'a configured panel code',
         )
 
+    async def test_integration_control_arm_away_bypass_true_if_configured(self):
+        await self._test_control_arming(
+            control_action='ARM_AWAY',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            arm_away_bypass=True,
+            expect_bypass='true',
+        )
+
+    async def test_integration_control_arm_away_bypass_false_if_configured(self):
+        await self._test_control_arming(
+            control_action='ARM_AWAY',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            arm_away_bypass=False,
+            expect_bypass='false',
+        )
+
     async def test_integration_control_arm_vacation(self):
         await self._test_control_arming(
             control_action='ARM_VACATION',
@@ -232,7 +254,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             arming_type='ARM_STAY',
         )
 
-    async def test_integration_control_arm_home_with_exit_delay(self):
+    async def test_integration_control_arm_home_with_exit_delay_if_configured(self):
         await self._test_control_arming(
             control_action='ARM_HOME',
             partition_status='DISARM',
@@ -269,11 +291,46 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                          'a configured panel code',
         )
 
+    async def test_integration_control_arm_home_bypass_true_if_configured(self):
+        await self._test_control_arming(
+            control_action='ARM_HOME',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            arm_stay_bypass=True,
+            expect_bypass='true',
+        )
+
+    async def test_integration_control_arm_home_bypass_false_if_configured(self):
+        await self._test_control_arming(
+            control_action='ARM_HOME',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            arm_stay_bypass=False,
+            expect_bypass='false',
+        )
+
     async def test_integration_control_arm_night(self):
         await self._test_control_arming(
             control_action='ARM_NIGHT',
             partition_status='DISARM',
             arming_type='ARM_STAY',
+        )
+
+    async def test_integration_control_arm_custom_bypass_arms_away_with_bypass(self):
+        await self._test_control_arming(
+            control_action='ARM_CUSTOM_BYPASS',
+            partition_status='DISARM',
+            arming_type='ARM_AWAY',
+            expect_bypass='true',
+        )
+
+    async def test_integration_control_arm_custom_bypass_arms_stay_with_bypass(self):
+        await self._test_control_arming(
+            control_action='ARM_CUSTOM_BYPASS',
+            partition_status='DISARM',
+            arming_type='ARM_STAY',
+            arm_type_custom_bypass='arm_stay',
+            expect_bypass='true',
         )
 
     async def _test_control_trigger(self, control_action, alarm_type,

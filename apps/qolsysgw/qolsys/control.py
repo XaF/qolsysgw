@@ -161,11 +161,15 @@ class QolsysControlArm(_QolsysControlCheckCode):
     _CODE_REQUIRED_ATTR = 'code_arm_required'
     _PANEL_CODE_REQUIRED = 'secure_arm'
 
-    def __init__(self, delay: int = None, *args, **kwargs):
+    def __init__(self, delay: int = None, bypass: bool = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._delay = delay
-        self._requires_config = self._requires_config or delay is None
+        self._bypass = bypass
+
+        self._requires_config = (self._requires_config or
+                                 delay is None or
+                                 bypass is None)
 
     def configure(self, cfg, state):
         super().configure(cfg, state)
@@ -173,12 +177,16 @@ class QolsysControlArm(_QolsysControlCheckCode):
         if self._delay is None:
             self._delay = getattr(cfg, f'{self._ATTR_PREFIX}_exit_delay')
 
+        if self._bypass is None:
+            self._bypass = getattr(cfg, f'{self._ATTR_PREFIX}_bypass')
+
     @property
     def action(self):
         return self._ACTION_CLASS(
             partition_id=self._partition_id,
             panel_code=self._panel_code,
             delay=self._delay,
+            bypass=self._bypass,
         )
 
 
@@ -200,9 +208,22 @@ class QolsysControlArmNight(QolsysControlArmHome):
     pass
 
 
-# I do not think we can support this through the C4 interface with the panel
-# class QolsysControlArmCustomBypass(QolsysControlArm):
-    # pass
+class QolsysControlArmCustomBypass(QolsysControlArm):
+    _ACTION_CLASSES = {
+        'arm_stay': QolsysActionArmStay,
+        'arm_away': QolsysActionArmAway,
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(bypass=True, *args, **kwargs)
+
+        self._require_config = True
+
+    def configure(self, cfg, state):
+        self._ATTR_PREFIX = cfg.arm_type_custom_bypass.lower()
+        self._ACTION_CLASS = self._ACTION_CLASSES[self._ATTR_PREFIX]
+
+        super().configure(cfg, state)
 
 
 # This depends on https://github.com/home-assistant/core/pull/60525, which
