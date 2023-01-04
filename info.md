@@ -47,6 +47,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ✨ **[feature]** Add `disarm_failed` counter as partition attribute (#61)
  * ♻️ **[refactor]** deduplicate code in the ARM control classes (#62)
  * ✨ **[feature]** Add support for `bypass` parameter when arming (#63)
+ * 🐛 **[bugfix]** Control commands weren't reading the `delay` and `bypass` parameters (#66)
 {%   endif %}
 {%   if parsed_version < [1, 0, 0] -%}
 ### Version 1.0.0
