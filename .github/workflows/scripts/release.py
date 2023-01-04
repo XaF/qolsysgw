@@ -39,8 +39,13 @@ class ChangeLogRegex(object):
         r'(?:(\*\*)?\[(?P<category>[^\]]*)\](\*\*)?)?\s*'
         r'(?P<change>.*)$',
     )
-    COMMIT_CHANGE_BUG = re.compile(r'\b(bug|fix)\b', re.IGNORECASE)
-    COMMIT_CHANGE_FEATURE = re.compile(r'\b(feature|add)\b', re.IGNORECASE)
+    COMMIT_CHANGE_MATCHING = [
+        ('bugfix', re.compile(r'\b(bug|fix)\b', re.IGNORECASE)),
+        ('feature', re.compile(r'\b(feature|add)\b', re.IGNORECASE)),
+        ('refactor', re.compile(r'\b(refactor(ed|ing)?)\b', re.IGNORECASE)),
+        ('cleanup', re.compile(r'\b(clean(ed|ing)?)\b', re.IGNORECASE)),
+    ]
+
 
 class ChangeLogHandler(object):
 
@@ -49,8 +54,10 @@ class ChangeLogHandler(object):
         re.compile(r'^apps/'),
     ]
     CATEGORY_TO_EMOJI = {
-        'feature': '✨',
-        'bugfix': '🐛',
+        'feature': '\u2728',
+        'bugfix': '\U0001f41b',
+        'refactor': '\u267b\ufe0f',
+        'cleanup': '\U0001f5d1\ufe0f',
     }
 
     def __init__(self, github_event, github_token=None):
@@ -106,27 +113,24 @@ class ChangeLogHandler(object):
     def categorize_change(self, change):
         formatted = ChangeLogRegex.COMMIT_CHANGE.search(change)
         if formatted:
-            if formatted['emojis'] and not formatted['category']:
-                for emoji in formatted['emojis']:
-                    try:
-                        formatted['category'] = next(
-                            k
-                            for k, v in self.CATEGORY_TO_EMOJI
-                            if v == emoji
-                        )
-                        break
-                    except StopIteration:
-                        pass
-            if formatted['category']:
-                return (formatted['category'], formatted['change'])
+            cat = formatted['category']
+            if formatted['emojis'] and not cat:
+                try:
+                    cat = next(
+                        k
+                        for k, v in self.CATEGORY_TO_EMOJI.items()
+                        if v in formatted['emojis']
+                    )
+                except StopIteration:
+                    pass
 
-        bug = ChangeLogRegex.COMMIT_CHANGE_BUG.search(change)
-        if bug:
-            return ('bugfix', change)
+            if cat:
+                return (cat, formatted['change'])
 
-        feature = ChangeLogRegex.COMMIT_CHANGE_FEATURE.search(change)
-        if feature:
-            return ('feature', change)
+        for cat, regex in ChangeLogRegex.COMMIT_CHANGE_MATCHING:
+            m = regex.search(change)
+            if m:
+                return ('bugfix', change)
 
         return (None, change)
 
