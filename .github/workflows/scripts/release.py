@@ -325,11 +325,11 @@ class ChangeLogHandler(object):
         if suggest_emoji:
             existing_changes = self.get_existing_changes()
 
-            emojis = ['🔖']
-            if any(ctype.lower() == 'feature' for ctype, _ in existing_changes):
-                emojis.append('✨')
-            if any(ctype.lower() == 'bugfix' for ctype, _ in existing_changes):
-                emojis.append('🐛')
+            emojis = ['\U0001f516']
+            for cat, emoji in self.CATEGORY_TO_EMOJI.items():
+                if any(ctype.lower() == cat.lower()
+                       for ctype, _ in existing_changes):
+                    emojis.append(emoji)
             emoji = ''.join(emojis)
 
             print(f'RELEASE_EMOJI={emoji}')
