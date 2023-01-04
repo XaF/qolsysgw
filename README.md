@@ -6,7 +6,7 @@
 
 Qolsys Gateway (`qolsysgw`) is an [AppDaemon][appdaemon]
 automation that serves as a gateway between a Qolsys IQ Panel
-([2][qolsys-panel-2], [2+][qolsys-panel-2-plus] or [4](qolsys-panel-4))
+([2][qolsys-panel-2], [2+][qolsys-panel-2-plus] or [4][qolsys-panel-4])
 and [Home Assistant][hass]. Qolsys Gateway works by establishing a connection
 to your Qolsys Panel and uses the [MQTT integration of Home Assistant][hass-mqtt].
 It takes advantages of the [MQTT discovery][hass-mqtt-discovery]
@@ -718,4 +718,3 @@ List of links used in that page, sorted alphabetically by tag
 [qolsys-panel-2-plus]: https://qolsys.com/iq-panel-2-plus/
 [qolsys-panel-4]: https://qolsys.com/iq-panel-4/
 [roopesh]: https://github.com/roopesh
-
