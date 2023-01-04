@@ -31,6 +31,7 @@ class QolsysPartition(QolsysObservable):
         self._last_error_type = None
         self._last_error_desc = None
         self._last_error_at = None
+        self._disarm_failed = 0
 
     @property
     def id(self):
@@ -68,6 +69,10 @@ class QolsysPartition(QolsysObservable):
     def last_error_at(self):
         return self._last_error_at
 
+    @property
+    def disarm_failed(self):
+        return self._disarm_failed
+
     @status.setter
     def status(self, value):
         new_value = value.upper()
@@ -79,6 +84,10 @@ class QolsysPartition(QolsysObservable):
 
             self.notify(change=self.NOTIFY_UPDATE_STATUS,
                         prev_value=prev_value, new_value=new_value)
+
+        # If the panel is disarmed, we can reset the failed disarm attempts
+        if new_value.upper() == 'DISARM':
+            self.disarm_failed = 0
 
         self.alarm_type = None
 
@@ -106,6 +115,16 @@ class QolsysPartition(QolsysObservable):
             self.notify(change=self.NOTIFY_UPDATE_ALARM_TYPE,
                         prev_value=prev_value, new_value=value)
 
+    @disarm_failed.setter
+    def disarm_failed(self, value):
+        new_value = int(value)
+
+        if self._disarm_failed != new_value:
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) disarm failed updated to '{value}'")
+            self._disarm_failed = new_value
+
+            self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
+
     def triggered(self, alarm_type: str = None):
         self.status = 'ALARM'
         self.alarm_type = alarm_type
@@ -114,6 +133,10 @@ class QolsysPartition(QolsysObservable):
         self._last_error_type = error_type
         self._last_error_desc = error_description
         self._last_error_at = datetime.now(timezone.utc).isoformat()
+
+        # If this is a failed disarm attempt, let's increase the counter
+        if error_type.upper() == 'DISARM_FAILED':
+            self._disarm_failed += 1
 
         self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
 
