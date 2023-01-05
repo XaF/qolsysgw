@@ -467,10 +467,10 @@ With:
   </details>
 
 - <details><summary><strong>arm_type_custom_bypass:</strong> the type of
-  arming to use when using `ARM_CUSTOM_BYPASS` from Home Assistant. This
+  arming to use when using <code>ARM_CUSTOM_BYPASS</code> from Home Assistant. This
   arming type will automatically enable bypassing the open sensors.
   Setting the value to <code>arm_away</code> will lead to the panel being
-  armed in away mode with bypass enabled when `ARM_CUSTOM_BYPASS` is used.
+  armed in away mode with bypass enabled when <code>ARM_CUSTOM_BYPASS</code> is used.
   Setting the value to <code>arm_stay</code> will lead to the panel being
   armed in stay mode.
   Defaults to <code>arm_away</code>.</summary>
