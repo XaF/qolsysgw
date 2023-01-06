@@ -18,6 +18,7 @@ from testutils.fixtures_data import get_summary
 from testutils.homeassistant import HomeAssistantRestAPI
 from testutils.mock_panel import PanelServer
 from testutils.mock_types import ISODATE
+from testutils.mock_types import ISODATE_S
 from testutils.utils import get_free_port
 
 
@@ -193,6 +194,16 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         # Check that the states of the entities in Home Assistant are as
         # we expect them to be at this point
         expected_states = [
+            {
+                'attributes': {
+                    'device_class': 'timestamp',
+                    'friendly_name': 'Qolsys Panel Last Error',
+                    'type': None,
+                    'desc': None,
+                },
+                'entity_id': 'sensor.qolsys_panel_last_error',
+                'state': 'unknown',
+            },
             {
                 'attributes': {
                     'alarm_type': None,
@@ -397,6 +408,10 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 'version': 1,
                 'requestID': '<request_id>',
             },
+            {
+                # Just an unknown event to test if the last error gets updated
+                'event': 'UNKNOWN',
+            },
         ]
 
         closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
@@ -467,6 +482,17 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         # Check that the states of the entities in Home Assistant are as
         # we expect them to be at this point
         expected_states = [
+            {
+                'attributes': {
+                    'device_class': 'timestamp',
+                    'friendly_name': 'Qolsys Panel Last Error',
+                    'type': 'UnknownQolsysEventException',
+                    'desc': "Event type 'UNKNOWN' unsupported "
+                            "for event {'event': 'UNKNOWN'}",
+                },
+                'entity_id': 'sensor.qolsys_panel_last_error',
+                'state': ISODATE_S,
+            },
             {
                 'attributes': {
                     'alarm_type': None,

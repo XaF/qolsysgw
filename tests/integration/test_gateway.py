@@ -1,7 +1,9 @@
 import asyncio
+import json
 
 import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase
+from testutils.mock_types import ISODATE
 
 from gateway import QolsysGateway
 from mqtt.exceptions import MqttPluginUnavailableException
@@ -49,6 +51,36 @@ class TestIntegrationQolsysGateway(TestQolsysGatewayBase):
 
         self.assertTrue(panel.is_client_connected)
 
+    async def test_integration_gateway_publish_error_on_unknown_json_data(self):
+        panel, gw = await self._init_panel_and_gw_and_wait()
+
+        data = {'not': 'expected'}
+        await panel.writeline(data)
+
+        topic_prefix = 'homeassistant/sensor/qolsys_panel_last_error'
+
+        state = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': f'{topic_prefix}/state'},
+            raise_on_timeout=True,
+        )
+
+        attributes = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': f'{topic_prefix}/attributes'},
+            raise_on_timeout=True,
+            continued=True,
+        )
+
+        self.assertEqual(ISODATE, state['payload'])
+        self.assertDictEqual(
+            {
+                'type': 'UnknownQolsysEventException',
+                'desc': f'Event type not found for event {data}',
+            },
+            json.loads(attributes['payload']),
+        )
+
     async def test_integration_gateway_stays_connected_on_unknown_event_type(self):
         panel, gw = await self._init_panel_and_gw_and_wait()
 
@@ -56,3 +88,33 @@ class TestIntegrationQolsysGateway(TestQolsysGatewayBase):
         await asyncio.sleep(self._TIMEOUT)
 
         self.assertTrue(panel.is_client_connected)
+
+    async def test_integration_gateway_publish_error_on_unknown_event_type(self):
+        panel, gw = await self._init_panel_and_gw_and_wait()
+
+        data = {'event': 'unknown'}
+        await panel.writeline(data)
+
+        topic_prefix = 'homeassistant/sensor/qolsys_panel_last_error'
+
+        state = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': f'{topic_prefix}/state'},
+            raise_on_timeout=True,
+        )
+
+        attributes = await gw.wait_for_next_mqtt_publish(
+            timeout=self._TIMEOUT,
+            filters={'topic': f'{topic_prefix}/attributes'},
+            raise_on_timeout=True,
+            continued=True,
+        )
+
+        self.assertEqual(ISODATE, state['payload'])
+        self.assertDictEqual(
+            {
+                'type': 'UnknownQolsysEventException',
+                'desc': f"Event type '{data['event']}' unsupported for event {data}",
+            },
+            json.loads(attributes['payload']),
+        )

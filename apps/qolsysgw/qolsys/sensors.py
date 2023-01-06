@@ -156,12 +156,16 @@ class QolsysSensor(QolsysObservable):
 
         sensor_type = data.get('type')
         if not sensor_type:
-            raise UnknownQolsysSensorException
+            raise UnknownQolsysSensorException(
+                f'Sensor type not found for sensor {data}'
+            )
 
         klass = find_subclass(cls, sensor_type, cache=cls.__SUBCLASSES_CACHE,
                               preserve_capitals=True)
         if not klass:
-            raise UnknownQolsysSensorException
+            raise UnknownQolsysSensorException(
+                f"Sensor type '{sensor_type}' unsupported for sensor {data}"
+            )
 
         return klass.from_json(data, common=cls.from_json_common_data(data))
 

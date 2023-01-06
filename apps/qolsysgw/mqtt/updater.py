@@ -50,6 +50,12 @@ class MqttUpdater(object):
                 for sensor in partition.sensors:
                     sensor.register(self, callback=self._sensor_update)
                     self._factory.wrap(sensor).configure(partition=partition)
+        elif change == QolsysState.NOTIFY_UPDATE_ERROR:
+            # An error has happened on qolsysgw, so we want to update the
+            # state sensor
+            wrapped_state = self._factory.wrap(state)
+            wrapped_state.update_state()
+            wrapped_state.update_attributes()
 
     def _partition_update(self, partition: QolsysPartition, change, prev_value=None, new_value=None):
         self._logger.debug(f"Received update from partition "
@@ -149,12 +155,14 @@ class MqttWrapper(object):
                 'payload_available': self.payload_available,
                 'payload_not_available': self.payload_unavailable,
             },
-            {
+        ]
+
+        if self.availability_topic != self.device_availability_topic:
+            availability.append({
                 'topic': self.availability_topic,
                 'payload_available': self.payload_available,
                 'payload_not_available': self.payload_unavailable,
-            },
-        ]
+            })
 
         # If we the birth and will topic of the MQTT plugin are the same,
         # we can take advantage of this to consider that the panel is offline
@@ -214,32 +222,80 @@ class MqttWrapperQolsysState(MqttWrapper):
         return self._cfg.panel_unique_id or 'qolsys'
 
     @property
+    def entity_id(self):
+        return f'{self.name}_last_error'
+
+    @property
     def availability_topic(self):
         return self.device_availability_topic
 
     @property
-    def entity_id(self):
-        raise AttributeError(f"Property {{entity_id}} is not "
-                             f"available for {type(self).__name__}")
+    def topic_path(self):
+        return posixpath.join(
+            'sensor',
+            self.entity_id,
+        )
 
-    @property
-    def config_topic(self):
-        raise AttributeError(f"Property {{config_topic}} is not "
-                             f"available for {type(self).__name__}")
+    def configure_payload(self, **kwargs):
+        panel_name = self._cfg.panel_device_name or self.name
 
-    @property
-    def state_topic(self):
-        raise AttributeError(f"Property {{state_topic}} is not "
-                             f"available for {type(self).__name__}")
+        payload = {
+            'name': f'{panel_name} Last Error',
+            'device_class': 'timestamp',
+            'state_topic': self.state_topic,
+            'availability_mode': 'all',
+            'availability': self.configure_availability,
+            'json_attributes_topic': self.attributes_topic,
+        }
 
-    def configure(self):
-        raise AttributeError(f"Method {{configure}} is not available "
-                             f"for {type(self).__name__}")
+        if self._cfg.panel_unique_id:
+            payload['unique_id'] = f"{self._cfg.panel_unique_id}_last_error"
+            payload['device'] = {
+                'name': self._cfg.panel_device_name,
+                'identifiers': [
+                    self._cfg.panel_unique_id,
+                ],
+                'manufacturer': 'Qolsys',
+                'model': 'IQ Panel 2+',
+            }
 
-    @property
-    def configure_availability(self):
-        raise AttributeError(f"Property {{configure_availability}} is not "
-                             f"available for {type(self).__name__}")
+            # If we are able to resolve the mac address, this will allow to
+            # link the device to other related elements in home assistant
+            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
+            if mac:
+                payload['device']['connections'] = [
+                    ['mac', mac],
+                ]
+
+        return payload
+
+    def update_attributes(self):
+        if self._state.last_exception:
+            exc_type = type(self._state.last_exception).__name__
+            exc_desc = str(self._state.last_exception)
+        else:
+            exc_type = None
+            exc_desc = None
+
+        self._mqtt_publish(
+            namespace=self._cfg.mqtt_namespace,
+            topic=self.attributes_topic,
+            retain=self._mqtt_retain,
+            payload=json.dumps({
+                'type': exc_type,
+                'desc': exc_desc,
+            }),
+        )
+
+    def update_state(self):
+        self._mqtt_publish(
+            namespace=self._cfg.mqtt_namespace,
+            topic=self.state_topic,
+            retain=self._mqtt_retain,
+            payload=(self._state.last_exception.at
+                     if self._state.last_exception
+                     else None),
+        )
 
 
 class MqttWrapperQolsysPartition(MqttWrapper):
@@ -505,6 +561,8 @@ class MqttWrapperFactory(object):
                 break
 
         if not klass:
-            raise UnknownMqttWrapperException
+            raise UnknownMqttWrapperException(
+                f'Unable to wrap object type {type(obj).__name__}'
+            )
 
         return klass(obj, *self._args, **self._kwargs)
