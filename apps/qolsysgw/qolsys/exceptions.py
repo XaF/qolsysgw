@@ -1,5 +1,20 @@
+from datetime import datetime, timezone
+
+
 class QolsysException(Exception):
-    pass
+    STATE = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._at = datetime.now(timezone.utc).isoformat()
+
+        if self.STATE:
+            self.STATE.last_exception = self
+
+    @property
+    def at(self):
+        return self._at
 
 
 class QolsysGwConfigIncomplete(QolsysException):

@@ -40,11 +40,15 @@ class QolsysEvent(object):
 
         event_type = data.get('event')
         if not event_type:
-            raise UnknownQolsysEventException
+            raise UnknownQolsysEventException(
+                f'Event type not found for event {data}'
+            )
 
         klass = find_subclass(cls, event_type, cache=cls.__SUBCLASSES_CACHE)
         if not klass:
-            raise UnknownQolsysEventException
+            raise UnknownQolsysEventException(
+                f"Event type '{event_type}' unsupported for event {data}"
+            )
 
         return klass.from_json(data)
 
@@ -62,7 +66,10 @@ class QolsysEventInfo(QolsysEvent):
         info_type = data.get('info_type')
         klass = find_subclass(cls, info_type, cache=cls.__INFOCLASSES_CACHE)
         if not klass:
-            raise UnknownQolsysEventException
+            raise UnknownQolsysEventException(
+                f"Event INFO subtype '{info_type}' unsupported "
+                f"for event {data}"
+            )
 
         return klass.from_json(data)
 
@@ -198,7 +205,10 @@ class QolsysEventZoneEvent(QolsysEvent):
             zone_event_type = zone_event_type[5:]
         klass = find_subclass(cls, zone_event_type, cache=cls.__ZONEEVENTCLASSES_CACHE)
         if not klass:
-            raise UnknownQolsysEventException
+            raise UnknownQolsysEventException(
+                f"Event ZONE_EVENT subtype '{zone_event_type}' unsupported "
+                f"for event {data}"
+            )
 
         return klass.from_json(data)
 

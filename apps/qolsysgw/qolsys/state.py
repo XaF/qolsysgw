@@ -1,6 +1,9 @@
 import logging
 
+from mqtt.exceptions import MqttException
+
 from qolsys.events import QolsysEventInfoSummary
+from qolsys.exceptions import QolsysException
 from qolsys.observable import QolsysObservable
 
 
@@ -9,13 +12,32 @@ LOGGER = logging.getLogger(__name__)
 
 class QolsysState(QolsysObservable):
     NOTIFY_UPDATE_PARTITIONS = 'update_partitions'
+    NOTIFY_UPDATE_ERROR = 'update_error'
 
     def __init__(self, event: QolsysEventInfoSummary = None):
         super().__init__()
 
+        self._last_exception = None
+
         self._partitions = {}
         if event:
             self.update(event)
+
+        QolsysException.STATE = self
+        MqttException.STATE = self
+
+    @property
+    def last_exception(self):
+        return self._last_exception
+
+    @last_exception.setter
+    def last_exception(self, value):
+        prev_value = self._last_exception
+        self._last_exception = value
+
+        self.notify(change=self.NOTIFY_UPDATE_ERROR,
+                    prev_value=prev_value,
+                    new_value=value)
 
     @property
     def partitions(self):

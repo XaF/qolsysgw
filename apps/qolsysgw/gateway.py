@@ -155,7 +155,7 @@ class QolsysGateway(Mqtt):
 
     async def qolsys_connected_callback(self):
         LOGGER.debug('Qolsys callback for connection event')
-        self._factory.wrap(self._state).set_available()
+        self._factory.wrap(self._state).configure()
 
     async def qolsys_disconnected_callback(self):
         if self._is_terminated:
