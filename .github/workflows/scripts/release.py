@@ -40,6 +40,7 @@ class ChangeLogRegex(object):
         r'(?P<change>.*)$',
     )
     COMMIT_CHANGE_MATCHING = [
+        ('breaking', re.compile(r'\b(breaking change)\b', re.IGNORECASE)),
         ('bugfix', re.compile(r'\b(bug|fix)\b', re.IGNORECASE)),
         ('feature', re.compile(r'\b(feature|add)\b', re.IGNORECASE)),
         ('refactor', re.compile(r'\b(refactor(ed|ing)?)\b', re.IGNORECASE)),
@@ -58,6 +59,7 @@ class ChangeLogHandler(object):
         'bugfix': '\U0001f41b',
         'refactor': '\u267b\ufe0f',
         'cleanup': '\U0001f5d1\ufe0f',
+        'breaking': '\U0001f4a5',
     }
 
     def __init__(self, github_event, github_token=None):
@@ -274,7 +276,9 @@ class ChangeLogHandler(object):
         version = version.lower()
         if version == 'auto':
             existing_changes = self.get_existing_changes()
-            if any(ctype.lower() == 'feature' for ctype, cdesc in existing_changes):
+            if any(ctype.lower() == 'breaking' for ctype, _ in existing_changes):
+                version = 'major'
+            elif any(ctype.lower() == 'feature' for ctype, _ in existing_changes):
                 version = 'minor'
             else:
                 version = 'patch'
