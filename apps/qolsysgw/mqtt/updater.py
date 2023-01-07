@@ -136,7 +136,7 @@ class MqttWrapper(object):
     def device_availability_topic(self):
         return posixpath.join(self._cfg.discovery_topic,
                               'alarm_control_panel',
-                              self._cfg.panel_unique_id or 'qolsys',
+                              self._cfg.panel_unique_id,
                               'availability')
 
     @property
@@ -219,7 +219,7 @@ class MqttWrapperQolsysState(MqttWrapper):
 
     @property
     def name(self):
-        return self._cfg.panel_unique_id or 'qolsys'
+        return self._cfg.panel_unique_id
 
     @property
     def entity_id(self):
@@ -237,7 +237,7 @@ class MqttWrapperQolsysState(MqttWrapper):
         )
 
     def configure_payload(self, **kwargs):
-        panel_name = self._cfg.panel_device_name or self.name
+        panel_name = self._cfg.panel_device_name
 
         payload = {
             'name': f'{panel_name} Last Error',
@@ -248,24 +248,23 @@ class MqttWrapperQolsysState(MqttWrapper):
             'json_attributes_topic': self.attributes_topic,
         }
 
-        if self._cfg.panel_unique_id:
-            payload['unique_id'] = f"{self._cfg.panel_unique_id}_last_error"
-            payload['device'] = {
-                'name': self._cfg.panel_device_name,
-                'identifiers': [
-                    self._cfg.panel_unique_id,
-                ],
-                'manufacturer': 'Qolsys',
-                'model': 'IQ Panel 2+',
-            }
+        payload['unique_id'] = f"{self._cfg.panel_unique_id}_last_error"
+        payload['device'] = {
+            'name': self._cfg.panel_device_name,
+            'identifiers': [
+                self._cfg.panel_unique_id,
+            ],
+            'manufacturer': 'Qolsys',
+            'model': 'IQ Panel 2+',
+        }
 
-            # If we are able to resolve the mac address, this will allow to
-            # link the device to other related elements in home assistant
-            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
-            if mac:
-                payload['device']['connections'] = [
-                    ['mac', mac],
-                ]
+        # If we are able to resolve the mac address, this will allow to
+        # link the device to other related elements in home assistant
+        mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
+        if mac:
+            payload['device']['connections'] = [
+                ['mac', mac],
+            ]
 
         return payload
 
@@ -335,7 +334,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
     def topic_path(self):
         return posixpath.join(
             'alarm_control_panel',
-            self._cfg.panel_unique_id or 'qolsys',
+            self._cfg.panel_unique_id,
             self.entity_id,
         )
 
@@ -369,28 +368,27 @@ class MqttWrapperQolsysPartition(MqttWrapper):
             'json_attributes_topic': self.attributes_topic,
         }
 
-        # If we have a unique ID for the panel, we can setup a unique ID for
+        # As we have a unique ID for the panel, we can setup a unique ID for
         # the partition, and create a device to link all of our partitions
         # together; this will also allow to interact with the partition in
         # the UI, change it's name, assign it to areas, etc.
-        if self._cfg.panel_unique_id:
-            payload['unique_id'] = f"{self._cfg.panel_unique_id}_p{self._partition.id}"
-            payload['device'] = {
-                'name': self._cfg.panel_device_name or self.name,
-                'identifiers': [
-                    self._cfg.panel_unique_id,
-                ],
-                'manufacturer': 'Qolsys',
-                'model': 'IQ Panel 2+',
-            }
+        payload['unique_id'] = f"{self._cfg.panel_unique_id}_p{self._partition.id}"
+        payload['device'] = {
+            'name': self._cfg.panel_device_name,
+            'identifiers': [
+                self._cfg.panel_unique_id,
+            ],
+            'manufacturer': 'Qolsys',
+            'model': 'IQ Panel 2+',
+        }
 
-            # If we are able to resolve the mac address, this will allow to
-            # link the device to other related elements in home assistant
-            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
-            if mac:
-                payload['device']['connections'] = [
-                    ['mac', mac],
-                ]
+        # If we are able to resolve the mac address, this will allow to
+        # link the device to other related elements in home assistant
+        mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
+        if mac:
+            payload['device']['connections'] = [
+                ['mac', mac],
+            ]
 
         if self._cfg.default_trigger_command:
             payload['payload_trigger'] = self._cfg.default_trigger_command
@@ -492,30 +490,29 @@ class MqttWrapperQolsysSensor(MqttWrapper):
             'json_attributes_topic': self.attributes_topic,
         }
 
-        # If we have a unique ID for the panel, we can setup a unique ID for
+        # As we have a unique ID for the panel, we can setup a unique ID for
         # the partition, and create a device to link all of our partitions
         # together; this will also allow to interact with the partition in
         # the UI, change it's name, assign it to areas, etc.
-        if self._cfg.panel_unique_id:
-            payload['unique_id'] = f"{self._cfg.panel_unique_id}_"\
-                                   f"p{self._sensor.partition_id}"\
-                                   f"z{self._sensor.zone_id}"
-            payload['device'] = {
-                'name': self._cfg.panel_device_name or partition.name,
-                'identifiers': [
-                    self._cfg.panel_unique_id,
-                ],
-                'manufacturer': 'Qolsys',
-                'model': 'IQ Panel 2+',
-            }
+        payload['unique_id'] = f"{self._cfg.panel_unique_id}_"\
+                               f"p{self._sensor.partition_id}"\
+                               f"z{self._sensor.zone_id}"
+        payload['device'] = {
+            'name': self._cfg.panel_device_name,
+            'identifiers': [
+                self._cfg.panel_unique_id,
+            ],
+            'manufacturer': 'Qolsys',
+            'model': 'IQ Panel 2+',
+        }
 
-            # If we are able to resolve the mac address, this will allow to
-            # link the device to other related elements in home assistant
-            mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
-            if mac:
-                payload['device']['connections'] = [
-                    ['mac', mac],
-                ]
+        # If we are able to resolve the mac address, this will allow to
+        # link the device to other related elements in home assistant
+        mac = self._cfg.panel_mac or get_mac_from_host(self._cfg.panel_host)
+        if mac:
+            payload['device']['connections'] = [
+                ['mac', mac],
+            ]
 
         return payload
 

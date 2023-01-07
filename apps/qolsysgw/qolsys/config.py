@@ -51,7 +51,7 @@ class QolsysGatewayConfig(object):
 
     def load(self, args):
         for k, v in args.items():
-            if k in self._DEFAULT_CONFIG:
+            if v is not None and k in self._DEFAULT_CONFIG:
                 self._override_config[k] = v
 
     def check(self):
@@ -118,7 +118,7 @@ class QolsysGatewayConfig(object):
             v = self.get(k)
             if v:
                 self._override_config[k] = v.format(
-                    panel_unique_id=self.get('panel_unique_id') or 'qolsys',
+                    panel_unique_id=self.get('panel_unique_id'),
                     discovery_topic=self.get('discovery_topic'))
 
         # Make sure that user codes are stored as strings
