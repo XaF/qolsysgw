@@ -231,6 +231,7 @@ jobs:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
         with:
+          ref: main
           token: ${{ secrets.COMMIT_TOKEN }}
 
       - name: Update changelog for future release
