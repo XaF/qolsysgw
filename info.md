@@ -51,6 +51,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ✨ **[feature]** Add `qolsysgw` error sensor (#68)
  * 🐛 [bugfix] config parameters shouldn't be overriden by 'None' values (#69)
  * ♻️ **[refactor]** centralize the generation of the device payload (#70)
+ * ♻️ **[refactor]** move mac address resolution to avoid duplication (#71)
 {%   endif %}
 {%   if parsed_version < [1, 0, 0] -%}
 ### Version 1.0.0
