@@ -50,6 +50,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * 🐛 **[bugfix]** Control commands weren't reading the `delay` and `bypass` parameters (#66)
  * ✨ **[feature]** Add `qolsysgw` error sensor (#68)
  * 🐛 [bugfix] config parameters shouldn't be overriden by 'None' values (#69)
+ * ♻️ **[refactor]** centralize the generation of the device payload (#70)
 {%   endif %}
 {%   if parsed_version < [1, 0, 0] -%}
 ### Version 1.0.0
