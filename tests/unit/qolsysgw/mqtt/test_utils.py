@@ -1,36 +1,21 @@
-import os
-import subprocess
 import unittest
 
-from unittest import mock
-
-from testenv import FIXTURES_DIR
-
-from mqtt.utils import get_mac_from_host
+from mqtt.utils import normalize_name_to_id
 
 
-class TestUnitGetMacFromHost(unittest.TestCase):
+class TestUnitNormalizeNameToId(unittest.TestCase):
 
-    def test_unit_returns_none_on_subprocess_error(self):
-        with mock.patch('subprocess.run', side_effect=subprocess.SubprocessError):
-            self.assertIsNone(get_mac_from_host('random_host'))
+    def test_unit_returns_same_value_if_already_normalized(self):
+        self.assertEqual('normalized_value',
+                         normalize_name_to_id('normalized_value'))
 
-    def test_unit_returns_none_on_mac_address_not_found(self):
-        fixture = os.path.join(FIXTURES_DIR, 'subprocess_run_arp_unknown_host.txt')
-        with open(fixture, 'rb') as f:
-            output = f.read()
+    def test_unit_returns_lowercase(self):
+        self.assertEqual('normalized_value',
+                         normalize_name_to_id('NoRmAlIzEd VaLuE'))
 
-        with mock.patch('subprocess.run', return_value=mock.Mock(stdout=output)):
-            self.assertIsNone(get_mac_from_host('random_host'))
-
-    def test_unit_returns_mac_address_on_success(self):
-        fixture = os.path.join(FIXTURES_DIR, 'subprocess_run_arp_known_host.txt')
-        with open(fixture, 'rb') as f:
-            output = f.read()
-
-        with mock.patch('subprocess.run', return_value=mock.Mock(stdout=output)):
-            self.assertEqual(get_mac_from_host('random_host'),
-                             '01:12:76:ef:11:02')
+    def test_unit_returns_value_with_special_chars_replaced(self):
+        self.assertEqual('n0r_v_aliz3d',
+                         normalize_name_to_id('n0r|v|aliz3d'))
 
 
 if __name__ == '__main__':
