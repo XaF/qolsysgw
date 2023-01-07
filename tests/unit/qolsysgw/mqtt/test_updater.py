@@ -435,6 +435,7 @@ class TestUnitMqttWrapperQolsys(unittest.TestCase):
                 'name': 'Qolsys Panel',
             },
             'device_class': 'safety',
+            'enabled_by_default': True,
             'json_attributes_topic': ('homeassistant/binary_sensor/'
                                       'testsensor/attributes'),
             'name': 'TestSensor',

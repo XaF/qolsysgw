@@ -115,7 +115,8 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             )
 
     async def _check_sensor_mqtt_messages(self, gw, sensor_flat_name,
-                                          sensor_state, expected_device_class):
+                                          sensor_state, expected_device_class,
+                                          expected_enabled_by_default=True):
         state = sensor_state
 
         mqtt_prefix = f'homeassistant/binary_sensor/{sensor_flat_name}'
@@ -158,6 +159,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'unique_id': (f'qolsys_panel_p{state.partition_id}'
                                   f'z{state.zone_id}'),
                     'device': mock.ANY,
+                    'enabled_by_default': expected_enabled_by_default,
                 },
                 json.loads(mqtt_config['payload']),
             )
@@ -284,6 +286,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_door',
                 sensor_state=sensor100,
                 expected_device_class='door',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 101 is properly configured'):
@@ -305,6 +308,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_window',
                 sensor_state=sensor101,
                 expected_device_class='door',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 110 is properly configured'):
@@ -326,6 +330,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_motion',
                 sensor_state=sensor110,
                 expected_device_class='motion',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 111 is properly configured'):
@@ -347,6 +352,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='panel_motion',
                 sensor_state=sensor111,
                 expected_device_class='motion',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 120 is properly configured'):
@@ -368,6 +374,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_glass_break',
                 sensor_state=sensor120,
                 expected_device_class='vibration',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 121 is properly configured'):
@@ -389,6 +396,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='panel_glass_break',
                 sensor_state=sensor121,
                 expected_device_class='vibration',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 130 is properly configured'):
@@ -410,6 +418,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_phone',
                 sensor_state=sensor130,
                 expected_device_class='presence',
+                expected_enabled_by_default=False,
             )
 
         with self.subTest(msg='Sensor 140 is properly configured'):
@@ -431,6 +440,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_smoke_detector',
                 sensor_state=sensor140,
                 expected_device_class='smoke',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 141 is properly configured'):
@@ -452,6 +462,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_co_detector',
                 sensor_state=sensor141,
                 expected_device_class='gas',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 150 is properly configured'):
@@ -473,6 +484,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_water_detector',
                 sensor_state=sensor150,
                 expected_device_class='moisture',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 200 is properly configured'):
@@ -494,6 +506,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_2nd_door',
                 sensor_state=sensor200,
                 expected_device_class='door',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 210 is properly configured'):
@@ -515,6 +528,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_freeze_sensor',
                 sensor_state=sensor210,
                 expected_device_class='cold',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 220 is properly configured'):
@@ -536,6 +550,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_heat_sensor',
                 sensor_state=sensor220,
                 expected_device_class='heat',
+                expected_enabled_by_default=True,
             )
 
     async def _test_integration_event_info_secure_arm(self, from_secure_arm,
@@ -867,6 +882,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 {
                     'name': 'My Motion',
                     'device_class': 'motion',
+                    'enabled_by_default': True,
                     'state_topic': 'homeassistant/binary_sensor/'
                                    'my_motion/state',
                     'payload_on': 'Open',

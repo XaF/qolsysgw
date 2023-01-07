@@ -5,3 +5,4 @@ qolsys_panel:
   panel_host: {% if IN_WSL %}host.docker.internal{% else %}localhost{% endif %}
   panel_port: {{ PANEL_PORT }}
   panel_token: ThisIsMyToken
+  enable_static_sensors_by_default: true

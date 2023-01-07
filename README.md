@@ -633,6 +633,23 @@ With:
   ```
   </details>
 
+- <details><summary><strong>enable_static_sensors_by_default:</strong>
+  whether or not sensors that will not be updated by the panel (e.g. Bluetooth)
+  should be enabled by default in Home Assistant. Even if setting this to
+  <code>false</code>, you will have the ability to enable them on a
+  sensor-by-sensor basis in Home Assistant. If setting it to <code>true</code>,
+  you will also be able to disable them on a sensor-by-sensor basis in
+  Home Assistant.
+  Defaults to <code>false</code>.</summary>
+
+  ```yaml
+  qolsys_panel:
+    # ...
+    enable_static_sensors_by_default: true
+    # ...
+  ```
+  </details>
+
 
 #### Optional configuration related to MQTT & AppDaemon
 
