@@ -2,7 +2,7 @@ import unittest
 
 from unittest import mock
 
-import testenv  # noqa: F401
+import tests.unit.qolsysgw.mqtt.testenv  # noqa: F401
 
 from mqtt.updater import MqttUpdater
 from mqtt.updater import MqttWrapperFactory

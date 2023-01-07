@@ -4,7 +4,7 @@ import unittest
 
 from unittest import mock
 
-import testenv
+import tests.unit.qolsysgw.qolsys.testenv
 
 from qolsys.control import QolsysControlArmAway
 from qolsys.control import QolsysControlArmHome

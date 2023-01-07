@@ -2,6 +2,7 @@ import logging
 
 from qolsys.exceptions import QolsysGwConfigIncomplete
 from qolsys.exceptions import QolsysGwConfigError
+from qolsys.utils import get_mac_from_host
 
 
 LOGGER = logging.getLogger(__name__)
@@ -111,6 +112,11 @@ class QolsysGatewayConfig(object):
                 f"Invalid arm type '{arm_type}' for custom bypass; must be "
                 f"one of {', '.join(valid_arm_type)}")
         self._override_config['arm_type_custom_bypass'] = arm_type
+
+        if self.get('panel_mac') is None:
+            mac = get_mac_from_host(self.get('panel_host'))
+            if mac:
+                self._override_config['panel_mac'] = mac
 
         # Apply a template to the control and event topics if the unique id
         # is part of the requested topics
