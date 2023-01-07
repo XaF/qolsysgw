@@ -18,6 +18,7 @@ from qolsys.sensors import QolsysSensorHeat
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorWater
+from qolsys.sensors import _QolsysSensorWithoutUpdates
 from qolsys.state import QolsysState
 from qolsys.utils import defaultLoggerCallback
 from qolsys.utils import find_subclass
@@ -477,6 +478,10 @@ class MqttWrapperQolsysSensor(MqttWrapper):
             'availability_mode': 'all',
             'availability': self.configure_availability,
             'json_attributes_topic': self.attributes_topic,
+            'enabled_by_default': (
+                self._cfg.enable_static_sensors_by_default or
+                not isinstance(self._sensor, _QolsysSensorWithoutUpdates)
+            ),
         }
 
         # As we have a unique ID for the panel, we can setup a unique ID for

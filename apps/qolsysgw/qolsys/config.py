@@ -39,6 +39,7 @@ class QolsysGatewayConfig(object):
         'code_trigger_required': False,
         'default_trigger_command': None,
         'default_sensor_device_class': 'safety',
+        'enable_static_sensors_by_default': False,
     }
 
     def __init__(self, args=None, check=True):
