@@ -49,6 +49,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ✨ **[feature]** Add support for `bypass` parameter when arming (#63)
  * 🐛 **[bugfix]** Control commands weren't reading the `delay` and `bypass` parameters (#66)
  * ✨ **[feature]** Add `qolsysgw` error sensor (#68)
+ * 🐛 [bugfix] config parameters shouldn't be overriden by 'None' values (#69)
 {%   endif %}
 {%   if parsed_version < [1, 0, 0] -%}
 ### Version 1.0.0
