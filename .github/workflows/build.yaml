@@ -220,6 +220,9 @@ jobs:
     name: Update changelog
     runs-on: "ubuntu-latest"
 
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-update-changelog
+
     needs:
       - prepare-env
       - unit-integration-tests
@@ -231,7 +234,7 @@ jobs:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
         with:
-          ref: main
+          ref: ${{ github.ref }}
           token: ${{ secrets.COMMIT_TOKEN }}
 
       - name: Update changelog for future release
