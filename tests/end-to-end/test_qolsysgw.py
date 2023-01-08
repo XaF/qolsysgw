@@ -229,6 +229,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_door',
                 'state': 'off',
@@ -241,6 +242,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_window',
                 'state': 'on',
@@ -253,6 +255,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 2,
                     'zone_type': 2,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_motion',
                 'state': 'off',
@@ -265,6 +268,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 119,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.panel_motion',
                 'state': 'off',
@@ -277,6 +281,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 1,
                     'zone_type': 116,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_glass_break',
                 'state': 'off',
@@ -289,6 +294,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 1,
                     'zone_type': 116,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.panel_glass_break',
                 'state': 'off',
@@ -301,6 +307,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 1,
                     'zone_physical_type': 1,
                     'zone_type': 115,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_phone',
                 'state': 'off',
@@ -313,6 +320,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 9,
                     'zone_physical_type': 9,
                     'zone_type': 5,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_smoke_detector',
                 'state': 'off',
@@ -325,6 +333,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_co_detector',
                 'state': 'off',
@@ -337,6 +346,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 8,
                     'zone_type': 15,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_water_detector',
                 'state': 'off',
@@ -366,6 +376,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_2nd_door',
                 'state': 'off',
@@ -378,6 +389,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 6,
                     'zone_type': 17,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_freeze_sensor',
                 'state': 'off',
@@ -390,6 +402,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 10,
                     'zone_type': 8,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_heat_sensor',
                 'state': 'off',
@@ -417,30 +430,43 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
                            200, 210, 220]
         open_entities = [101]
+        tamper_entities = [100, 110, 111, 210]
+        untamper_entities_to_open = [100]
+        untamper_entities_to_closed_short = [110]
+        untamper_entities_to_closed_long = [111]
 
-        for zone_id in closed_entities:
-            events.append({
+        def zone_active_event(zone_id, closed=False):
+            return {
                 'event': 'ZONE_EVENT',
                 'zone_event_type': 'ZONE_ACTIVE',
                 'version': 1,
                 'zone': {
                     'zone_id': zone_id,
-                    'status': 'Open',
+                    'status': 'Closed' if closed else 'Open',
                 },
                 'requestID': '<request_id>',
-            })
+            }
+
+        for zone_id in closed_entities + tamper_entities:
+            events.append(zone_active_event(zone_id, closed=False))
 
         for zone_id in open_entities:
-            events.append({
-                'event': 'ZONE_EVENT',
-                'zone_event_type': 'ZONE_ACTIVE',
-                'version': 1,
-                'zone': {
-                    'zone_id': zone_id,
-                    'status': 'Closed',
-                },
-                'requestID': '<request_id>',
-            })
+            events.append(zone_active_event(zone_id, closed=True))
+
+        for zone_id in untamper_entities_to_closed_short:
+            events.append(zone_active_event(zone_id, closed=True))
+            events.append(zone_active_event(zone_id, closed=True))
+
+        for zone_id in untamper_entities_to_open + untamper_entities_to_closed_long:
+            # Open then closed in the same second = not anymore tampered
+            events.append(zone_active_event(zone_id, closed=False))
+            events.append(zone_active_event(zone_id, closed=True))
+
+        for zone_id in untamper_entities_to_open:
+            events.append(zone_active_event(zone_id, closed=False))
+
+        for zone_id in untamper_entities_to_closed_long:
+            events.append(zone_active_event(zone_id, closed=True))
 
         events.append({
             'event': 'ARMING',
@@ -518,6 +544,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_door',
                 'state': 'on',
@@ -530,6 +557,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_window',
                 'state': 'off',
@@ -542,9 +570,10 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 2,
                     'zone_type': 2,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_motion',
-                'state': 'on',
+                'state': 'off',
             },
             {
                 'attributes': {
@@ -554,9 +583,10 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 119,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.panel_motion',
-                'state': 'on',
+                'state': 'off',
             },
             {
                 'attributes': {
@@ -566,6 +596,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 1,
                     'zone_type': 116,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_glass_break',
                 'state': 'on',
@@ -578,6 +609,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 1,
                     'zone_type': 116,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.panel_glass_break',
                 'state': 'on',
@@ -590,6 +622,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 1,
                     'zone_physical_type': 1,
                     'zone_type': 115,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_phone',
                 'state': 'on',
@@ -602,6 +635,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 9,
                     'zone_physical_type': 9,
                     'zone_type': 5,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_smoke_detector',
                 'state': 'on',
@@ -614,6 +648,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_co_detector',
                 'state': 'on',
@@ -626,6 +661,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 8,
                     'zone_type': 15,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_water_detector',
                 'state': 'on',
@@ -655,6 +691,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 3,
                     'zone_physical_type': 1,
                     'zone_type': 1,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_2nd_door',
                 'state': 'on',
@@ -667,6 +704,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 6,
                     'zone_type': 17,
+                    'tampered': True,
                 },
                 'entity_id': 'binary_sensor.my_freeze_sensor',
                 'state': 'on',
@@ -679,6 +717,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 10,
                     'zone_type': 8,
+                    'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_heat_sensor',
                 'state': 'on',

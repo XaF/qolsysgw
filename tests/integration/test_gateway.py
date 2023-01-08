@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 import testenv  # noqa: F401
 from testbase import TestQolsysGatewayBase
@@ -73,12 +72,12 @@ class TestIntegrationQolsysGateway(TestQolsysGatewayBase):
         )
 
         self.assertEqual(ISODATE, state['payload'])
-        self.assertDictEqual(
+        self.assertJsonDictEqual(
             {
                 'type': 'UnknownQolsysEventException',
                 'desc': f'Event type not found for event {data}',
             },
-            json.loads(attributes['payload']),
+            attributes['payload'],
         )
 
     async def test_integration_gateway_stays_connected_on_unknown_event_type(self):
@@ -111,10 +110,10 @@ class TestIntegrationQolsysGateway(TestQolsysGatewayBase):
         )
 
         self.assertEqual(ISODATE, state['payload'])
-        self.assertDictEqual(
+        self.assertJsonDictEqual(
             {
                 'type': 'UnknownQolsysEventException',
                 'desc': f"Event type '{data['event']}' unsupported for event {data}",
             },
-            json.loads(attributes['payload']),
+            attributes['payload'],
         )
