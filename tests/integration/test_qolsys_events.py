@@ -109,6 +109,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'last_error_desc': state.last_error_desc,
                     'last_error_at': state.last_error_at,
                     'disarm_failed': state.disarm_failed,
+                    'tampered_sensors': None,
                 },
                 mqtt_attributes['payload'],
             )

@@ -217,6 +217,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'disarm_failed': 0,
                     'secure_arm': False,
                     'supported_features': 63,
+                    'tampered_sensors': None,
                 },
                 'entity_id': 'alarm_control_panel.partition0',
                 'state': 'disarmed',
@@ -364,6 +365,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'disarm_failed': 0,
                     'secure_arm': False,
                     'supported_features': 63,
+                    'tampered_sensors': None,
                 },
                 'entity_id': 'alarm_control_panel.partition1',
                 'state': 'disarmed',
@@ -430,7 +432,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
                            200, 210, 220]
         open_entities = [101]
-        tamper_entities = [100, 110, 111, 210]
+        tamper_entities = [100, 110, 111, 210, 220]
         untamper_entities_to_open = [100]
         untamper_entities_to_closed_short = [110]
         untamper_entities_to_closed_long = [111]
@@ -532,6 +534,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'disarm_failed': 1,
                     'secure_arm': False,
                     'supported_features': 63,
+                    'tampered_sensors': None,
                 },
                 'entity_id': 'alarm_control_panel.partition0',
                 'state': 'armed_away',
@@ -679,6 +682,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'disarm_failed': 0,
                     'secure_arm': True,
                     'supported_features': 63,
+                    'tampered_sensors': '210,220',
                 },
                 'entity_id': 'alarm_control_panel.partition1',
                 'state': 'triggered',
@@ -717,7 +721,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 10,
                     'zone_type': 8,
-                    'tampered': False,
+                    'tampered': True,
                 },
                 'entity_id': 'binary_sensor.my_heat_sensor',
                 'state': 'on',
