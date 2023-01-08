@@ -40,8 +40,8 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 {% else -%}
 {% set parsed_version = version_installed.split('-')[0].replace('v', '').split('.') | map('int') | list -%}
 ## ChangeLog
-{%   if true -%}
-### _Next (dev)_
+{%   if parsed_version < [1, 1, 0] -%}
+### Version 1.1.0
 
  * ✨ **[feature]** Add `last_error_type` and `last_error_desc` attributes to partitions (#60)
  * ✨ **[feature]** Add `disarm_failed` counter as partition attribute (#61)
