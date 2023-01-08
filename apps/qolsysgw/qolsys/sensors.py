@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 from qolsys.exceptions import UnableToParseSensorException
 from qolsys.exceptions import UnknownQolsysSensorException
@@ -28,6 +29,7 @@ class QolsysSensor(QolsysObservable):
         'zone_type',
         'zone_physical_type',
         'zone_alarm_type',
+        'tampered',
     ]
 
     def __init__(self, sensor_id: str, name: str, group: str, status: str,
@@ -46,6 +48,10 @@ class QolsysSensor(QolsysObservable):
         self._zone_physical_type = zone_physical_type
         self._zone_alarm_type = zone_alarm_type
         self._partition_id = partition_id
+
+        self._tampered = False
+        self._last_open_tampered_at = None
+        self._last_closed_tampered_at = None
 
     def update(self, sensor: 'QolsysSensor'):
         if self.id != sensor.id:
@@ -112,6 +118,10 @@ class QolsysSensor(QolsysObservable):
         return self._partition_id
 
     @property
+    def tampered(self):
+        return self._tampered
+
+    @property
     def is_open(self):
         return self._status == 'Open'
 
@@ -134,11 +144,40 @@ class QolsysSensor(QolsysObservable):
             self.notify(change=self.NOTIFY_UPDATE_STATUS,
                         prev_value=prev_value, new_value=new_value)
 
+    @tampered.setter
+    def tampered(self, value):
+        new_value = bool(value)
+
+        if self._tampered != new_value:
+            LOGGER.debug(f"Sensor '{self.id}' ({self.name}) tampered updated to '{new_value}'")
+            prev_value = self._tampered
+
+            self._tampered = new_value
+
+            self.notify(change=self.NOTIFY_UPDATE_PATTERN.format(attr='tampered'),
+                        prev_value=prev_value, new_value=new_value)
+            self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
+
+    def _next_status_update_is_status(self):
+        # When we are back from a tamper setting, we get two updates
+        # subsequently as an open, and then a close, in the same second
+        return (self._last_open_tampered_at is not None and
+                self._last_closed_tampered_at is not None and
+                self._last_closed_tampered_at - self._last_open_tampered_at < 1)
+
     def open(self):
-        self.status = 'Open'
+        if self.is_open and not self._next_status_update_is_status():
+            self._last_open_tampered_at = time.time()
+            self.tampered = True
+        else:
+            self.status = 'Open'
 
     def closed(self):
-        self.status = 'Closed'
+        if self.tampered:
+            self._last_closed_tampered_at = time.time()
+            self.tampered = False
+        else:
+            self.status = 'Closed'
 
     def __str__(self):
         return (f"<{type(self).__name__} id={self.id} name={self.name} "

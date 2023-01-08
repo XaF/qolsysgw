@@ -1,3 +1,4 @@
+import json
 import unittest
 
 import testenv  # noqa: F401
@@ -11,6 +12,19 @@ from qolsys.config import QolsysGatewayConfig
 class TestQolsysGatewayBase(unittest.IsolatedAsyncioTestCase):
 
     _TIMEOUT = .1
+
+    def assertJsonDictEqual(self, expected, actual):
+        if not isinstance(actual, dict):
+            actual = json.loads(actual)
+
+        self.assertDictEqual(expected, actual)
+
+    def assertJsonSubDictEqual(self, expected, actual):
+        if not isinstance(actual, dict):
+            actual = json.loads(actual)
+
+        actual_subset = {k: v for k, v in actual.items() if k in expected}
+        self.assertDictEqual(expected, actual_subset)
 
     async def _init_panel_and_gw(self, **kwargs):
         # Start a panel panel

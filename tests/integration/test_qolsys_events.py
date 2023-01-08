@@ -1,5 +1,4 @@
-import json
-
+from copy import deepcopy
 from types import SimpleNamespace
 
 from unittest import mock
@@ -39,7 +38,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
             self.assertIsNotNone(mqtt_config)
             self.maxDiff = None
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'name': state.name,
                     'state_topic': f'{mqtt_prefix}/state',
@@ -73,7 +72,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'unique_id': f'qolsys_panel_p{state.id}',
                     'device': mock.ANY,
                 },
-                json.loads(mqtt_config['payload']),
+                mqtt_config['payload'],
             )
 
         with self.subTest(msg=f'MQTT availability of partition {state.id} is correct'):
@@ -102,7 +101,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
             self.assertIsNotNone(mqtt_attributes)
             self.maxDiff = None
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'alarm_type': state.alarm_type,
                     'secure_arm': state.secure_arm,
@@ -111,7 +110,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'last_error_at': state.last_error_at,
                     'disarm_failed': state.disarm_failed,
                 },
-                json.loads(mqtt_attributes['payload']),
+                mqtt_attributes['payload'],
             )
 
     async def _check_sensor_mqtt_messages(self, gw, sensor_flat_name,
@@ -129,7 +128,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             self.assertIsNotNone(mqtt_config)
 
             self.maxDiff = None
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'name': state.name,
                     'device_class': expected_device_class,
@@ -161,7 +160,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'device': mock.ANY,
                     'enabled_by_default': expected_enabled_by_default,
                 },
-                json.loads(mqtt_config['payload']),
+                mqtt_config['payload'],
             )
 
         with self.subTest(msg=f'MQTT availability of sensor {state.zone_id} is correct'):
@@ -186,15 +185,16 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             )
 
             self.assertIsNotNone(mqtt_attributes)
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'group': state.group,
                     'state': state.state,
                     'zone_physical_type': state.zone_physical_type,
                     'zone_alarm_type': state.zone_alarm_type,
                     'zone_type': state.zone_type,
+                    'tampered': state.tampered,
                 },
-                json.loads(mqtt_attributes['payload']),
+                mqtt_attributes['payload'],
             )
 
     async def test_integration_event_info_summary_initializes_all_entities(self):
@@ -580,11 +580,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         if from_secure_arm != to_secure_arm:
             self.assertIsNotNone(attributes)
-
-            expected = {'secure_arm': to_secure_arm}
-            actual = json.loads(attributes['payload'])
-            actual_subset = {k: v for k, v in actual.items() if k in expected}
-            self.assertDictEqual(expected, actual_subset)
+            self.assertJsonSubDictEqual({'secure_arm': to_secure_arm}, attributes['payload'])
         else:
             self.assertIsNone(attributes)
 
@@ -615,6 +611,224 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             from_secure_arm=False,
             to_secure_arm=False,
         )
+
+    async def _test_integration_event_zone_event_zone_active_tampered_while_closed(self):
+        # Using a sensor that's already closed
+        zone_id = 100
+        entity_id = 'my_door'
+
+        panel, gw, _, _ = await self._ready_panel_and_gw(
+            partition_ids=[0],
+            zone_ids=[zone_id],
+        )
+
+        sensor = gw._state.partition(0).zone(zone_id)
+
+        event_open = {
+            'event': 'ZONE_EVENT',
+            'zone_event_type': 'ZONE_ACTIVE',
+            'version': 1,
+            'zone': {
+                'status': 'Open',
+                'zone_id': zone_id,
+            },
+            'requestID': '<request_id>',
+        }
+
+        event_closed = deepcopy(event_open)
+        event_closed['zone']['status'] = 'Closed'
+
+        with self.subTest(msg='Sensor is open on first open message'):
+            await panel.writeline(event_open)
+
+            state = await gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{entity_id}/state'},
+                raise_on_timeout=True,
+            )
+
+            self.assertTrue(sensor.is_open)
+            self.assertEqual('Open', state['payload'])
+
+        with self.subTest(msg='Sensor is tampered on second open message'):
+            await panel.writeline(event_open)
+
+            attributes = await gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{entity_id}/attributes'},
+                raise_on_timeout=True,
+            )
+
+            self.assertTrue(sensor.tampered)
+            self.assertJsonSubDictEqual({'tampered': True}, attributes['payload'])
+
+        return SimpleNamespace(
+            panel=panel,
+            gw=gw,
+            zone_id=zone_id,
+            entity_id=entity_id,
+            event_open=event_open,
+            event_closed=event_closed,
+            sensor=sensor,
+        )
+
+    async def test_integration_event_zone_event_zone_active_tampered_while_closed_to_closed(self):
+        data = await self._test_integration_event_zone_event_zone_active_tampered_while_closed()
+
+        with self.subTest(msg='Sensor is untampered on first closed message'):
+            await data.panel.writeline(data.event_closed)
+
+            attributes = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/attributes'},
+                raise_on_timeout=True,
+            )
+
+            self.assertFalse(data.sensor.tampered)
+            self.assertJsonSubDictEqual({'tampered': False}, attributes['payload'])
+
+        with self.subTest(msg='Sensor is closed on second closed message'):
+            await data.panel.writeline(data.event_closed)
+
+            state = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/state'},
+                raise_on_timeout=True,
+            )
+
+            self.assertTrue(data.sensor.is_closed)
+            self.assertEqual('Closed', state['payload'])
+
+    async def test_integration_event_zone_event_zone_active_tampered_while_closed_to_open(self):
+        data = await self._test_integration_event_zone_event_zone_active_tampered_while_closed()
+
+        with self.subTest(msg='Sensor is untampered when receiving open and close in the same second'):
+            await data.panel.writeline(data.event_open)
+            await data.panel.writeline(data.event_closed)
+
+            attributes = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/attributes'},
+                raise_on_timeout=True,
+            )
+
+            self.assertFalse(data.sensor.tampered)
+            self.assertJsonSubDictEqual({'tampered': False}, attributes['payload'])
+
+        with self.subTest(msg='Sensor is not tampered when receiving open message next'):
+            await data.panel.writeline(data.event_open)
+
+            attributes = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/attributes'},
+            )
+
+            self.assertTrue(data.sensor.is_open)
+            self.assertIsNone(attributes)
+
+    async def _test_integration_event_zone_event_zone_active_tampered_while_open(self):
+        # Using a sensor that's already open
+        zone_id = 101
+        entity_id = 'my_window'
+
+        panel, gw, _, _ = await self._ready_panel_and_gw(
+            partition_ids=[0],
+            zone_ids=[zone_id],
+        )
+
+        sensor = gw._state.partition(0).zone(zone_id)
+
+        event_open = {
+            'event': 'ZONE_EVENT',
+            'zone_event_type': 'ZONE_ACTIVE',
+            'version': 1,
+            'zone': {
+                'status': 'Open',
+                'zone_id': zone_id,
+            },
+            'requestID': '<request_id>',
+        }
+
+        event_closed = deepcopy(event_open)
+        event_closed['zone']['status'] = 'Closed'
+
+        with self.subTest(msg='Sensor is tampered on second open message'):
+            with mock.patch('time.time', mock.MagicMock(return_value=42)):
+                await panel.writeline(event_open)
+
+                attributes = await gw.wait_for_next_mqtt_publish(
+                    timeout=self._TIMEOUT,
+                    filters={'topic': f'homeassistant/binary_sensor/'
+                                      f'{entity_id}/attributes'},
+                    raise_on_timeout=True,
+                )
+
+            self.assertTrue(sensor.tampered)
+            self.assertEqual(42, sensor._last_open_tampered_at)
+            self.assertJsonSubDictEqual({'tampered': True}, attributes['payload'])
+
+        with self.subTest(msg='Sensor is untampered when receiving open and close in the same second'):
+            await panel.writeline(event_open)
+            await panel.writeline(event_closed)
+
+            attributes = await gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{entity_id}/attributes'},
+                raise_on_timeout=True,
+            )
+
+            self.assertFalse(sensor.tampered)
+            self.assertJsonSubDictEqual({'tampered': False}, attributes['payload'])
+
+        return SimpleNamespace(
+            panel=panel,
+            gw=gw,
+            zone_id=zone_id,
+            entity_id=entity_id,
+            event_open=event_open,
+            event_closed=event_closed,
+            sensor=sensor,
+        )
+
+    async def test_integration_event_zone_event_zone_active_tampered_while_open_to_open(self):
+        data = await self._test_integration_event_zone_event_zone_active_tampered_while_open()
+
+        with self.subTest(msg='Sensor is not tampered when receiving open message next'):
+            await data.panel.writeline(data.event_open)
+
+            attributes = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/attributes'},
+            )
+
+            self.assertFalse(data.sensor.tampered)
+            self.assertTrue(data.sensor.is_open)
+            self.assertIsNone(attributes)
+
+    async def test_integration_event_zone_event_zone_active_tampered_while_open_to_closed(self):
+        data = await self._test_integration_event_zone_event_zone_active_tampered_while_open()
+
+        with self.subTest(msg='Sensor is closed when receiving closed message next'):
+            await data.panel.writeline(data.event_closed)
+
+            state = await data.gw.wait_for_next_mqtt_publish(
+                timeout=self._TIMEOUT,
+                filters={'topic': f'homeassistant/binary_sensor/'
+                                  f'{data.entity_id}/state'},
+                raise_on_timeout=True,
+            )
+
+            self.assertFalse(data.sensor.tampered)
+            self.assertTrue(data.sensor.is_closed)
+            self.assertEqual('Closed', state['payload'])
 
     async def _test_integration_event_zone_event_zone_active(self, from_status, to_status):
         if from_status == 'Closed':
@@ -756,15 +970,16 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         self.assertIsNotNone(attributes)
 
         self.assertEqual('Open', state['payload'])
-        self.assertDictEqual(
+        self.assertJsonDictEqual(
             {
                 'group': 'entryexitdelay',
                 'state': '1',
                 'zone_physical_type': 60,
                 'zone_alarm_type': 61,
                 'zone_type': 62,
+                'tampered': False,
             },
-            json.loads(attributes['payload']),
+            attributes['payload'],
         )
 
         state = gw._state
@@ -878,7 +1093,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         with self.subTest(msg='Check MQTT config of new sensor'):
             self.assertIsNotNone(config)
             self.maxDiff = None
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'name': 'My Motion',
                     'device_class': 'motion',
@@ -912,7 +1127,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     'unique_id': 'qolsys_panel_p0z110',
                     'device': mock.ANY,
                 },
-                json.loads(config['payload']),
+                config['payload'],
             )
 
         with self.subTest(msg='Check MQTT availability of new sensor'):
@@ -925,15 +1140,16 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Check MQTT attributes of new sensor'):
             self.assertIsNotNone(attributes)
-            self.assertDictEqual(
+            self.assertJsonDictEqual(
                 {
                     'group': 'awayinstantmotion',
                     'state': '0',
                     'zone_physical_type': 2,
                     'zone_alarm_type': 3,
                     'zone_type': 2,
+                    'tampered': False,
                 },
-                json.loads(attributes['payload']),
+                attributes['payload'],
             )
 
         state = gw._state
@@ -1133,9 +1349,9 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         if alarm_type:
             self.assertIsNotNone(published_attrs)
-            self.assertEqual(
-                alarm_type,
-                json.loads(published_attrs['payload'])['alarm_type'],
+            self.assertJsonSubDictEqual(
+                {'alarm_type': alarm_type},
+                published_attrs['payload'],
             )
 
             self.assertEqual(alarm_type, partition.alarm_type)
@@ -1205,9 +1421,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         }
         if extra_expect:
             expected.update(extra_expect)
-        actual = json.loads(attributes['payload'])
-        actual_subset = {k: v for k, v in actual.items() if k in expected}
-        self.assertDictEqual(expected, actual_subset)
+        self.assertJsonSubDictEqual(expected, attributes['payload'])
 
         return SimpleNamespace(
             panel=panel,
@@ -1264,11 +1478,5 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
             self.assertIsNotNone(attributes)
 
-            expected = {
-                'disarm_failed': 0,
-            }
-            actual = json.loads(attributes['payload'])
-            actual_subset = {k: v for k, v in actual.items() if k in expected}
-            self.assertDictEqual(expected, actual_subset)
-
+            self.assertJsonSubDictEqual({'disarm_failed': 0}, attributes['payload'])
             self.assertEqual(0, gw._state.partition(0).disarm_failed)

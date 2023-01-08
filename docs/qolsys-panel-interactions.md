@@ -303,6 +303,18 @@ new status (open vs. closed).
 ```
 
 
+##### Special case: sensor tampering
+
+The `ZONE_ACTIVE` zone event type is also used by the panel to indicate that
+a sensor has been tampered with, or has been restored. The following behaviors
+have been identified:
+
+- `Open` and `Closed` have two layers for any given sensor:
+   - An `Open` sensor being `Open` through `ZONE_ACTIVE` is now tampered
+   - A tampered sensor being `Closed` through `ZONE_ACTIVE` is no more tampered
+- Receiving two `ZONE_ACTIVE` for the same tampered sensor in the same second, the first `Open` and the second `Closed`, means the sensor is no more tampered, and the next `ZONE_ACTIVE` message indicates the current status of the sensor (whether it is currently `Open` or `Closed`)
+
+
 #### ZONE_UPDATE
 
 This event happens when a sensor was altered and is back in service, but also

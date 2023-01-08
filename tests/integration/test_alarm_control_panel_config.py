@@ -42,8 +42,7 @@ class TestIntegrationAlarmControlPanelConfig(TestQolsysGatewayBase):
         if payload_expect['command_template_code']:
             expected_command_template['code'] = '{{ code }}'
 
-        command_template = json.loads(payload['command_template'])
-        self.assertDictEqual(expected_command_template, command_template)
+        self.assertJsonDictEqual(expected_command_template, payload['command_template'])
 
     async def test_integration_config_default(self):
         await self._test_config(
