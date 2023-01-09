@@ -315,6 +315,7 @@ class MqttWrapperQolsysPartition(MqttWrapper):
         'ALARM': 'triggered',
         'EXIT_DELAY': 'arming',
         'ARM-AWAY-EXIT-DELAY': 'arming',
+        'ARM-STAY-EXIT-DELAY': 'arming',
     }
 
     def __init__(self, partition: QolsysPartition, *args, **kwargs):

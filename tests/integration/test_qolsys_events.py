@@ -1316,6 +1316,13 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             ha_status='arming',
         )
 
+    async def test_integration_event_arming_arm_stay_exit_delay_if_disarm(self):
+        await self._test_integration_event_arming(
+            from_status='DISARM',
+            to_status='ARM-STAY-EXIT-DELAY',
+            ha_status='arming',
+        )
+
     async def _test_integration_event_alarm(self, alarm_type=''):
         panel, gw, _, _ = await self._ready_panel_and_gw()
 
