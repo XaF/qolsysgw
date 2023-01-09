@@ -244,7 +244,9 @@ The `status` field contains the current status of the alarm, which are:
 - `ARM_AWAY` when the alarm is armed in away mode
 - `ENTRY_DELAY` when the alarm is pending to be triggered, but we have time to disarm with the code
 - `ALARM` when the alarm is triggered
-- `EXIT_DELAY` when the alarm is arming, giving time to leave the place before being armed (also `ARM-AWAY-EXIT-DELAY` on some panels, it seems)
+- `EXIT_DELAY` when the alarm is arming, giving time to leave the place before being armed (in the
+  `SUMMARY` message, this will take the shape of `ARM-AWAY-EXIT-DELAY` or `ARM-STAY-EXIT-DELAY`
+  depending on which arming type will be enabled after the delay)
 
 The `zone_list` field contains a list of sensors, for which the possible `type` values are:
 - `Door_Window` for door/window sensors
@@ -253,9 +255,11 @@ The `zone_list` field contains a list of sensors, for which the possible `type` 
 - `Glass Break` for the glass break detection
 - `Panel Glass Break` for the glass break detection through the panel's microphone
 - `Bluetooth` for the bluetooth devices linked to the panel
-- `Smoke Detector` for the smoke detectors
-- `CO Detector` for the CO detectors
+- `SmokeDetector` for the smoke detectors
+- `CODetector` for the CO detectors
 - `Water` for the water leaks detectors
+- `Freeze` for freeze sensors
+- `Heat` for heat sensors
 
 #### SECURE_ARM
 
