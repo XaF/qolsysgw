@@ -118,12 +118,10 @@ class _QolsysControlCheckCode(QolsysControl):
         if self._PANEL_CODE_REQUIRED == 'secure_arm':
             self._PANEL_CODE_REQUIRED = self._secure_arm
 
-        self._code_required = getattr(cfg, self._CODE_REQUIRED_ATTR) or \
-            self._PANEL_CODE_REQUIRED
-
         self._panel_code = cfg.panel_user_code
 
-        self._check_code = self._code_required and not cfg.ha_check_user_code
+        code_required_from_ha = getattr(cfg, self._CODE_REQUIRED_ATTR)
+        self._check_code = code_required_from_ha and not cfg.ha_check_user_code
         if self._check_code:
             self._valid_code = cfg.ha_user_code or cfg.panel_user_code
 
