@@ -260,6 +260,7 @@ The `zone_list` field contains a list of sensors, for which the possible `type` 
 - `Water` for the water leaks detectors
 - `Freeze` for freeze sensors
 - `Heat` for heat sensors
+- `Tilt` for tilt sensors (garage doors)
 
 #### SECURE_ARM
 

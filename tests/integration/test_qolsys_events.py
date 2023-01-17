@@ -18,6 +18,7 @@ from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
 from qolsys.sensors import QolsysSensorSmokeDetector
+from qolsys.sensors import QolsysSensorTilt
 from qolsys.sensors import QolsysSensorWater
 
 
@@ -252,7 +253,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(3, len(partition1.sensors))
+            self.assertEqual(4, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -550,6 +551,28 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_heat_sensor',
                 sensor_state=sensor220,
                 expected_device_class='heat',
+                expected_enabled_by_default=True,
+            )
+
+        with self.subTest(msg='Sensor 230 is properly configured'):
+            sensor230 = partition1.zone(230)
+            self.assertEqual(QolsysSensorTilt, sensor230.__class__)
+            self.assertEqual('002-0030', sensor230.id)
+            self.assertEqual('My Tilt Sensor', sensor230.name)
+            self.assertEqual('garageTilt1', sensor230.group)
+            self.assertEqual('Closed', sensor230.status)
+            self.assertEqual('0', sensor230.state)
+            self.assertEqual(230, sensor230.zone_id)
+            self.assertEqual(1, sensor230.zone_physical_type)
+            self.assertEqual(3, sensor230.zone_alarm_type)
+            self.assertEqual(16, sensor230.zone_type)
+            self.assertEqual(1, sensor230.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_tilt_sensor',
+                sensor_state=sensor230,
+                expected_device_class='garage_door',
                 expected_enabled_by_default=True,
             )
 
