@@ -45,6 +45,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 
  * ✨ **[feature]** Add support for tampered sensors (#74)
  * 🐛 **[bugfix]** Add support for `ARM-STAY-EXIT-DELAY` partition state
+ * ✨ **[feature]** Add support for `Tilt` sensors (#78)
 {%   endif %}
 {%   if parsed_version < [1, 1, 0] -%}
 ### Version 1.1.0
