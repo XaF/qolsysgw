@@ -752,6 +752,7 @@ With:
 
 - [The known Qolsys Panel interactions](./docs/qolsys-panel-interactions.md)
 - [Qolsys Gateway's control commands](./docs/qolsysgw-control-commands.md)
+- [Qolsys Gateway's entities](./docs/qolsysgw-entities.md)
 
 
 ## Acknowledgements and thanks
