@@ -130,6 +130,16 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
             panel_user_code='1337',
         )
 
+    async def test_integration_control_disarm_with_panel_code_no_disarm_code_required_no_ha_check_user_code(self):
+        await self._test_control_arming(
+            control_action='DISARM',
+            partition_status='ARM_AWAY',
+            arming_type='DISARM',
+            panel_user_code='1337',
+            code_disarm_required=False,
+            ha_check_user_code=False,
+        )
+
     async def test_integration_control_disarm_with_panel_code_and_user_control_token(self):
         await self._test_control_arming(
             control_action='DISARM',
