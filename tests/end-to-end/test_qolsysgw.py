@@ -2,6 +2,7 @@ import contextlib
 import copier
 import random
 import re
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -42,12 +43,16 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
     TIMEOUT = 10
 
     def _docker_compose(self, *cmd):
+        command = ['docker', 'compose'] + list(cmd)
+        print(f'Running: {shlex.join(command)}')
         run = subprocess.run(
-            ['docker', 'compose'] + list(cmd),
+            command,
             cwd=self._tmpdir.name,
             capture_output=True,
             check=True,
         )
+        print(f'Standard Output: {run.stdout.decode()}')
+        print(f'Error Output: {run.stderr.decode()}')
         return run
 
     def _docker_compose_up(self):
@@ -55,7 +60,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
 
         # Find container names, so we can use them after to read logs
         container_pattern = re.compile(
-            r'^(?:Container|Creating)\s*'
+            r'^\s*(?:Container|Creating)\s*'
             r'(?P<container_name>[^ ]*[-_]'
             r'(?P<container>[^ ]*)[-_][0-9]*)'
             r'\s*(?:Started|\.\.\.\s*done)\r?$',
