@@ -19,6 +19,7 @@ from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
+from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorTilt
 from qolsys.sensors import QolsysSensorWater
@@ -255,7 +256,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(6, len(partition1.sensors))
+            self.assertEqual(7, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -618,6 +619,28 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 gw=gw,
                 sensor_flat_name='my_auxiliary_pendant_sensor',
                 sensor_state=sensor250,
+                expected_device_class='safety',
+                expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 260 is properly configured'):
+            sensor260 = partition1.zone(260)
+            self.assertEqual(QolsysSensorSiren, sensor260.__class__)
+            self.assertEqual('002-0060', sensor260.id)
+            self.assertEqual('My Siren Sensor', sensor260.name)
+            self.assertEqual('Siren', sensor260.group)
+            self.assertEqual('Closed', sensor260.status)
+            self.assertEqual('0', sensor260.state)
+            self.assertEqual(260, sensor260.zone_id)
+            self.assertEqual(1, sensor260.zone_physical_type)
+            self.assertEqual(3, sensor260.zone_alarm_type)
+            self.assertEqual(14, sensor260.zone_type)
+            self.assertEqual(1, sensor260.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_siren_sensor',
+                sensor_state=sensor260,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
