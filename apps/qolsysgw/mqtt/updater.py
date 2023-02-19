@@ -500,8 +500,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         # together; this will also allow to interact with the partition in
         # the UI, change it's name, assign it to areas, etc.
         payload['unique_id'] = f"{self._cfg.panel_unique_id}_"\
-                               f"p{self._sensor.partition_id}"\
-                               f"z{self._sensor.zone_id}"
+                               f"s{normalize_name_to_id(self._sensor.id)}"
         payload['device'] = self.device_payload
 
         return payload

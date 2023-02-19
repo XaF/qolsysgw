@@ -304,6 +304,7 @@ class TestUnitMqttWrapperQolsys(unittest.TestCase):
         sensor.name = 'TestSensor'
         sensor.partition_id = partition.id
         sensor.zone_id = 69
+        sensor.id = '012-ID-1337'
         wrapped_sensor = MqttWrapperQolsysSensor(
             sensor=sensor, mqtt_publish=mqtt_publish, cfg=cfg,
             mqtt_plugin_cfg=mqtt_plugin_cfg, session_token=session_token)
@@ -443,7 +444,7 @@ class TestUnitMqttWrapperQolsys(unittest.TestCase):
             'payload_on': 'Open',
             'state_topic': ('homeassistant/binary_sensor/'
                             'testsensor/state'),
-            'unique_id': 'qolsys_panel_p42z69',
+            'unique_id': 'qolsys_panel_s012_id_1337',
         }
 
         self.assertDictEqual(expected, actual)
