@@ -47,6 +47,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * 🗑️ **[cleanup]** remove redundant code in sensor classes (#89)
  * ✨ **[feature]** Add support for `Keypad` sensors (#90)
  * ✨ **[feature]** Add support for `Auxiliary Pendant` sensors (#91)
+ * ✨ **[feature]** Add support for `Siren` sensors (#92)
 {%   endif %}
 {%   if parsed_version < [1, 2, 0] -%}
 ### Version 1.2.0
