@@ -81,14 +81,22 @@ jobs:
 
       - name: Lint code
         id: lint_code
-        run: |
-          flake8 apps/
+        uses: "mfish33/flake8-github-action@e1dac96843cc0190c801887d40ec5a64976cdec3"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          checkName: 'unit-integration-tests'
+          path: 'apps/'
         continue-on-error: true
 
       - name: Lint tests
         id: lint_tests
-        run: |
-          flake8 tests/
+        uses: "mfish33/flake8-github-action@e1dac96843cc0190c801887d40ec5a64976cdec3"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          checkName: 'unit-integration-tests'
+          path: 'tests/'
         continue-on-error: true
 
       - name: Run unit & integration tests
