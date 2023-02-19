@@ -14,6 +14,7 @@ from qolsys.sensors import QolsysSensorDoorWindow
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
+from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
@@ -253,7 +254,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(4, len(partition1.sensors))
+            self.assertEqual(5, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -574,6 +575,28 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_state=sensor230,
                 expected_device_class='garage_door',
                 expected_enabled_by_default=True,
+            )
+
+        with self.subTest(msg='Sensor 240 is properly configured'):
+            sensor240 = partition1.zone(240)
+            self.assertEqual(QolsysSensorKeypad, sensor240.__class__)
+            self.assertEqual('002-0040', sensor240.id)
+            self.assertEqual('My Keypad Sensor', sensor240.name)
+            self.assertEqual('fixedintrusion', sensor240.group)
+            self.assertEqual('Closed', sensor240.status)
+            self.assertEqual('0', sensor240.state)
+            self.assertEqual(240, sensor240.zone_id)
+            self.assertEqual(4, sensor240.zone_physical_type)
+            self.assertEqual(0, sensor240.zone_alarm_type)
+            self.assertEqual(104, sensor240.zone_type)
+            self.assertEqual(1, sensor240.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_keypad_sensor',
+                sensor_state=sensor240,
+                expected_device_class='safety',
+                expected_enabled_by_default=False,
             )
 
     async def _test_integration_event_info_secure_arm(self, from_secure_arm,
