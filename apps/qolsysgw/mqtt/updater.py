@@ -9,6 +9,7 @@ from mqtt.utils import normalize_name_to_id
 from qolsys.config import QolsysGatewayConfig
 from qolsys.partition import QolsysPartition
 from qolsys.sensors import QolsysSensor
+from qolsys.sensors import QolsysSensorAuxiliaryPendant
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
@@ -438,6 +439,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorHeat: 'heat',
         QolsysSensorTilt: 'garage_door',
         QolsysSensorKeypad: 'safety',
+        QolsysSensorAuxiliaryPendant: 'safety',
     }
 
     def __init__(self, sensor: QolsysSensor, *args, **kwargs):

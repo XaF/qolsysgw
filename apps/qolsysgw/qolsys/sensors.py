@@ -308,3 +308,9 @@ class QolsysSensorKeypad(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Keypad', data, common)
+
+
+class QolsysSensorAuxiliaryPendant(QolsysSensor, _QolsysSensorWithoutUpdates):
+    @classmethod
+    def from_json(cls, data, common=None):
+        return cls.from_json_subclass('Auxiliary Pendant', data, common)
