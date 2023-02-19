@@ -397,7 +397,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='panel_glass_break',
                 sensor_state=sensor121,
                 expected_device_class='vibration',
-                expected_enabled_by_default=True,
+                expected_enabled_by_default=False,
             )
 
         with self.subTest(msg='Sensor 130 is properly configured'):

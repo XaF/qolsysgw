@@ -228,7 +228,7 @@ class QolsysSensor(QolsysObservable):
         return cls(**common)
 
 
-class _QolsysSensorWithoutUpdates(QolsysSensor):
+class _QolsysSensorWithoutUpdates(object):
     pass
 
 
@@ -265,13 +265,13 @@ class QolsysSensorGlassBreak(QolsysSensor):
         return cls.from_json_subclass('GlassBreak', data, common)
 
 
-class QolsysSensorPanelGlassBreak(QolsysSensorGlassBreak):
+class QolsysSensorPanelGlassBreak(QolsysSensorGlassBreak, _QolsysSensorWithoutUpdates):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Panel Glass Break', data, common)
 
 
-class QolsysSensorBluetooth(_QolsysSensorWithoutUpdates):
+class QolsysSensorBluetooth(QolsysSensor, _QolsysSensorWithoutUpdates):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
