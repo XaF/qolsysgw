@@ -15,6 +15,7 @@ from qolsys.sensors import QolsysSensorDoorWindow
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
+from qolsys.sensors import QolsysSensorKeyFob
 from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
@@ -256,7 +257,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(7, len(partition1.sensors))
+            self.assertEqual(8, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -641,6 +642,28 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 gw=gw,
                 sensor_flat_name='my_siren_sensor',
                 sensor_state=sensor260,
+                expected_device_class='safety',
+                expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 270 is properly configured'):
+            sensor270 = partition1.zone(270)
+            self.assertEqual(QolsysSensorKeyFob, sensor270.__class__)
+            self.assertEqual('002-0070', sensor270.id)
+            self.assertEqual('My KeyFob Sensor', sensor270.name)
+            self.assertEqual('mobileintrusion', sensor270.group)
+            self.assertEqual('Closed', sensor270.status)
+            self.assertEqual('0', sensor270.state)
+            self.assertEqual(270, sensor270.zone_id)
+            self.assertEqual(3, sensor270.zone_physical_type)
+            self.assertEqual(0, sensor270.zone_alarm_type)
+            self.assertEqual(102, sensor270.zone_type)
+            self.assertEqual(1, sensor270.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_keyfob_sensor',
+                sensor_state=sensor270,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
