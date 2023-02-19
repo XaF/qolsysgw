@@ -44,6 +44,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 ### _Next (dev)_
 
  * ♻️ **[refactor]** disabling 'Panel Glass Break' sensor as it is not receiving updates (#88)
+ * 🗑️ **[cleanup]** remove redundant code in sensor classes (#89)
 {%   endif %}
 {%   if parsed_version < [1, 2, 0] -%}
 ### Version 1.2.0
