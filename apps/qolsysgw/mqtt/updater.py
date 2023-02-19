@@ -15,6 +15,7 @@ from qolsys.sensors import QolsysSensorDoorWindow
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
+from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorTilt
@@ -436,6 +437,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorFreeze: 'cold',
         QolsysSensorHeat: 'heat',
         QolsysSensorTilt: 'garage_door',
+        QolsysSensorKeypad: 'safety',
     }
 
     def __init__(self, sensor: QolsysSensor, *args, **kwargs):
