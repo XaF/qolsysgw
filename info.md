@@ -49,6 +49,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ✨ **[feature]** Add support for `Auxiliary Pendant` sensors (#91)
  * ✨ **[feature]** Add support for `Siren` sensors (#92)
  * ✨ **[feature]** Add support for `KeyFob` sensors (#93)
+ * 🐛 **[bugfix]** change sensors unique IDs to be recognized upon reinstall (#95)
 {%   endif %}
 {%   if parsed_version < [1, 2, 0] -%}
 ### Version 1.2.0
