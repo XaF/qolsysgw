@@ -119,6 +119,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             )
 
     async def _check_sensor_mqtt_messages(self, gw, sensor_flat_name,
+                                          sensor_unique_id,
                                           sensor_state, expected_device_class,
                                           expected_enabled_by_default=True):
         state = sensor_state
@@ -160,8 +161,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                         },
                     ],
                     'json_attributes_topic': f'{mqtt_prefix}/attributes',
-                    'unique_id': (f'qolsys_panel_p{state.partition_id}'
-                                  f'z{state.zone_id}'),
+                    'unique_id': f'qolsys_panel_s{sensor_unique_id}',
                     'device': mock.ANY,
                     'enabled_by_default': expected_enabled_by_default,
                 },
@@ -289,6 +289,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_door',
+                sensor_unique_id='001_0000',
                 sensor_state=sensor100,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
@@ -311,6 +312,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_window',
+                sensor_unique_id='001_0001',
                 sensor_state=sensor101,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
@@ -333,6 +335,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_motion',
+                sensor_unique_id='001_0010',
                 sensor_state=sensor110,
                 expected_device_class='motion',
                 expected_enabled_by_default=True,
@@ -355,6 +358,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='panel_motion',
+                sensor_unique_id='001_0011',
                 sensor_state=sensor111,
                 expected_device_class='motion',
                 expected_enabled_by_default=True,
@@ -377,6 +381,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_glass_break',
+                sensor_unique_id='001_0020',
                 sensor_state=sensor120,
                 expected_device_class='vibration',
                 expected_enabled_by_default=True,
@@ -399,6 +404,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='panel_glass_break',
+                sensor_unique_id='001_0021',
                 sensor_state=sensor121,
                 expected_device_class='vibration',
                 expected_enabled_by_default=False,
@@ -421,6 +427,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_phone',
+                sensor_unique_id='001_0030',
                 sensor_state=sensor130,
                 expected_device_class='presence',
                 expected_enabled_by_default=False,
@@ -443,6 +450,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_smoke_detector',
+                sensor_unique_id='001_0040',
                 sensor_state=sensor140,
                 expected_device_class='smoke',
                 expected_enabled_by_default=True,
@@ -465,6 +473,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_co_detector',
+                sensor_unique_id='001_0041',
                 sensor_state=sensor141,
                 expected_device_class='gas',
                 expected_enabled_by_default=True,
@@ -487,6 +496,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_water_detector',
+                sensor_unique_id='001_0050',
                 sensor_state=sensor150,
                 expected_device_class='moisture',
                 expected_enabled_by_default=True,
@@ -509,6 +519,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_2nd_door',
+                sensor_unique_id='002_0000',
                 sensor_state=sensor200,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
@@ -531,6 +542,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_freeze_sensor',
+                sensor_unique_id='002_0010',
                 sensor_state=sensor210,
                 expected_device_class='cold',
                 expected_enabled_by_default=True,
@@ -553,6 +565,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_heat_sensor',
+                sensor_unique_id='002_0020',
                 sensor_state=sensor220,
                 expected_device_class='heat',
                 expected_enabled_by_default=True,
@@ -575,6 +588,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_tilt_sensor',
+                sensor_unique_id='002_0030',
                 sensor_state=sensor230,
                 expected_device_class='garage_door',
                 expected_enabled_by_default=True,
@@ -597,6 +611,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_keypad_sensor',
+                sensor_unique_id='002_0040',
                 sensor_state=sensor240,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
@@ -619,6 +634,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_auxiliary_pendant_sensor',
+                sensor_unique_id='002_0050',
                 sensor_state=sensor250,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
@@ -641,6 +657,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_siren_sensor',
+                sensor_unique_id='002_0060',
                 sensor_state=sensor260,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
@@ -663,6 +680,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_keyfob_sensor',
+                sensor_unique_id='002_0070',
                 sensor_state=sensor270,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
@@ -1239,7 +1257,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                     ],
                     'json_attributes_topic': 'homeassistant/binary_sensor/'
                                              'my_motion/attributes',
-                    'unique_id': 'qolsys_panel_p0z110',
+                    'unique_id': 'qolsys_panel_s001_0010',
                     'device': mock.ANY,
                 },
                 config['payload'],
