@@ -40,8 +40,8 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 {% else -%}
 {% set parsed_version = version_installed.split('-')[0].replace('v', '').split('.') | map('int') | list -%}
 ## ChangeLog
-{%   if true -%}
-### _Next (dev)_
+{%   if parsed_version < [1, 3, 0] -%}
+### Version 1.3.0
 
  * ♻️ **[refactor]** disabling 'Panel Glass Break' sensor as it is not receiving updates (#88)
  * 🗑️ **[cleanup]** remove redundant code in sensor classes (#89)
