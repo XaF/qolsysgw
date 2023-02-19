@@ -46,6 +46,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
  * ♻️ **[refactor]** disabling 'Panel Glass Break' sensor as it is not receiving updates (#88)
  * 🗑️ **[cleanup]** remove redundant code in sensor classes (#89)
  * ✨ **[feature]** Add support for `Keypad` sensors (#90)
+ * ✨ **[feature]** Add support for `Auxiliary Pendant` sensors (#91)
 {%   endif %}
 {%   if parsed_version < [1, 2, 0] -%}
 ### Version 1.2.0
