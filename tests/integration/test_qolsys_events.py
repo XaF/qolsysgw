@@ -8,6 +8,7 @@ from testbase import TestQolsysGatewayBase
 
 from testutils.mock_types import ISODATE
 
+from qolsys.sensors import QolsysSensorAuxiliaryPendant
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
@@ -254,7 +255,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(5, len(partition1.sensors))
+            self.assertEqual(6, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -595,6 +596,28 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 gw=gw,
                 sensor_flat_name='my_keypad_sensor',
                 sensor_state=sensor240,
+                expected_device_class='safety',
+                expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 250 is properly configured'):
+            sensor250 = partition1.zone(250)
+            self.assertEqual(QolsysSensorAuxiliaryPendant, sensor250.__class__)
+            self.assertEqual('002-0050', sensor250.id)
+            self.assertEqual('My Auxiliary Pendant Sensor', sensor250.name)
+            self.assertEqual('fixedmedical', sensor250.group)
+            self.assertEqual('Closed', sensor250.status)
+            self.assertEqual('0', sensor250.state)
+            self.assertEqual(250, sensor250.zone_id)
+            self.assertEqual(1, sensor250.zone_physical_type)
+            self.assertEqual(0, sensor250.zone_alarm_type)
+            self.assertEqual(21, sensor250.zone_type)
+            self.assertEqual(1, sensor250.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_auxiliary_pendant_sensor',
+                sensor_state=sensor250,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
