@@ -233,18 +233,12 @@ class _QolsysSensorWithoutUpdates(object):
 
 
 class QolsysSensorDoorWindow(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Door_Window', data, common)
 
 
 class QolsysSensorMotion(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Motion', data, common)
@@ -257,9 +251,6 @@ class QolsysSensorPanelMotion(QolsysSensorMotion):
 
 
 class QolsysSensorGlassBreak(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('GlassBreak', data, common)
@@ -272,63 +263,42 @@ class QolsysSensorPanelGlassBreak(QolsysSensorGlassBreak, _QolsysSensorWithoutUp
 
 
 class QolsysSensorBluetooth(QolsysSensor, _QolsysSensorWithoutUpdates):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Bluetooth', data, common)
 
 
 class QolsysSensorSmokeDetector(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('SmokeDetector', data, common)
 
 
 class QolsysSensorCODetector(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('CODetector', data, common)
 
 
 class QolsysSensorWater(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Water', data, common)
 
 
 class QolsysSensorFreeze(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Freeze', data, common)
 
 
 class QolsysSensorHeat(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Heat', data, common)
 
 
 class QolsysSensorTilt(QolsysSensor):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('Tilt', data, common)
