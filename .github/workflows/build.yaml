@@ -62,7 +62,7 @@ jobs:
           # container
           PYTHON_VERSION=$(\
             curl -s https://raw.githubusercontent.com/AppDaemon/appdaemon/dev/Dockerfile | \
-            grep -oP "(?<=python:)[0-9\.]*")
+            grep -oP "(?<=python:)[0-9\.]*" | head -n1)
           echo "PYTHON_VERSION=${PYTHON_VERSION}" | tee -a "$GITHUB_ENV"
 
           PYTHON_MAJOR=${PYTHON_VERSION%%.*}
@@ -191,7 +191,7 @@ jobs:
           # container
           PYTHON_VERSION=$(\
             curl -s https://raw.githubusercontent.com/AppDaemon/appdaemon/dev/Dockerfile | \
-            grep -oP "(?<=python:)[0-9\.]*")
+            grep -oP "(?<=python:)[0-9\.]*" | head -n1)
           echo "PYTHON_VERSION=${PYTHON_VERSION}" | tee -a "$GITHUB_ENV"
 
           PYTHON_MAJOR=${PYTHON_VERSION%%.*}
