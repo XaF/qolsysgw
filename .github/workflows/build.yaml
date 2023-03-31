@@ -17,10 +17,12 @@ jobs:
     name: Prepare environment
     runs-on: "ubuntu-latest"
     outputs:
-      requires_tests: ${{ github.event_name == 'schedule' || steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true' || steps.changed-files.outputs.any_modified == 'true' || env.PUBLISH_RELEASE == 'true' }}
+      requires_tests: ${{ env.REQUIRES_TESTS }}
       publish_release: ${{ env.PUBLISH_RELEASE }}
       release_version: ${{ env.RELEASE_VERSION }}
       release_desc: ${{ env.RELEASE_DESC }}
+      python_version: ${{ env.PYTHON_VERSION }}
+      python_major: ${{ env.PYTHON_MAJOR }}
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
@@ -44,29 +46,47 @@ jobs:
         run: |
           .github/workflows/scripts/release.py --printenv | tee -a "$GITHUB_ENV"
 
+      - name: Identify if testing is required
+        run: |
+          echo "REQUIRES_TESTS=${{ github.event_name == 'schedule' || steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true' || steps.changed-files.outputs.any_modified == 'true' || env.PUBLISH_RELEASE == 'true' }}" | tee -a "$GITHUB_ENV"
 
-  unit-integration-tests:
-    name: Unit & integration tests
-    runs-on: "ubuntu-latest"
-    needs:
-      - prepare-env
-    if: needs.prepare-env.outputs.requires_tests == 'true'
-    steps:
-      - name: Checkout current commit
-        uses: "actions/checkout@v3"
-
-      - name: Prepare environment
+      - name: Find python version from AppDaemon's Dockerfile
+        if: env.REQUIRES_TESTS == 'true'
         run: |
           # Get the python version from the AppDaemon's Dockerfile
           # which was used to build the latest AppDaemon's docker
           # container
           PYTHON_VERSION=$(\
             curl -s https://raw.githubusercontent.com/AppDaemon/appdaemon/dev/Dockerfile | \
-            grep -oP "(?<=python:)[0-9\.]*" | head -n1)
+            grep -oP "(?<=PYTHON_RELEASE=)[0-9\.]*" | head -n1)
           echo "PYTHON_VERSION=${PYTHON_VERSION}" | tee -a "$GITHUB_ENV"
 
           PYTHON_MAJOR=${PYTHON_VERSION%%.*}
           echo "PYTHON_MAJOR=${PYTHON_MAJOR}" | tee -a "$GITHUB_ENV"
+
+          # Exit in error if we were unable to find the python version
+          if [ -z "$PYTHON_VERSION" ] || [ -z "$PYTHON_MAJOR" ]; then
+            echo >&2 "Error: unable to find Python version from AppDaemon"
+            exit 1
+          fi
+
+
+  unit-integration-tests:
+    name: Unit & integration tests
+    runs-on: "ubuntu-latest"
+
+    needs:
+      - prepare-env
+
+    if: needs.prepare-env.outputs.requires_tests == 'true'
+
+    env:
+      PYTHON_VERSION: ${{ needs.prepare-env.outputs.python_version }}
+      PYTHON_MAJOR: ${{ needs.prepare-env.outputs.python_major }}
+
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v3"
 
       - name: Install python
         uses: "actions/setup-python@v4"
@@ -172,9 +192,17 @@ jobs:
   end-to-end-tests:
     name: End-to-end tests
     runs-on: "ubuntu-latest"
+
     needs:
+      - prepare-env
       - unit-integration-tests
+
     if: needs.unit-integration-tests.result == 'success'
+
+    env:
+      PYTHON_VERSION: ${{ needs.prepare-env.outputs.python_version }}
+      PYTHON_MAJOR: ${{ needs.prepare-env.outputs.python_major }}
+
     steps:
       - name: Checkout current commit
         uses: "actions/checkout@v3"
@@ -183,19 +211,6 @@ jobs:
         run: |
           docker version
           docker compose version
-
-      - name: Prepare environment
-        run: |
-          # Get the python version from the AppDaemon's Dockerfile
-          # which was used to build the latest AppDaemon's docker
-          # container
-          PYTHON_VERSION=$(\
-            curl -s https://raw.githubusercontent.com/AppDaemon/appdaemon/dev/Dockerfile | \
-            grep -oP "(?<=python:)[0-9\.]*" | head -n1)
-          echo "PYTHON_VERSION=${PYTHON_VERSION}" | tee -a "$GITHUB_ENV"
-
-          PYTHON_MAJOR=${PYTHON_VERSION%%.*}
-          echo "PYTHON_MAJOR=${PYTHON_MAJOR}" | tee -a "$GITHUB_ENV"
 
       - name: Install python
         uses: "actions/setup-python@v4"
