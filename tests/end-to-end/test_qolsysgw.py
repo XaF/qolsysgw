@@ -481,7 +481,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 'attributes': {
                     'device_class': 'heat',
                     'friendly_name': 'My Temperature Sensor',
-                    'group': 'temperature',
+                    'group': 'Temperature',
                     'zone_alarm_type': 0,
                     'zone_physical_type': 1,
                     'zone_type': 8,
@@ -511,7 +511,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         ]
 
         closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
-                           200, 210, 220, 230, 240, 250, 260, 270, 280]
+                           200, 210, 220, 221, 230, 240, 250, 260, 270]
         open_entities = [101]
         tamper_entities = [100, 110, 111, 210]
         untamper_entities_to_open = [100]
@@ -807,6 +807,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             },
             {
                 'attributes': {
+                    'device_class': 'heat',
+                    'friendly_name': 'My Temperature Sensor',
+                    'group': 'Temperature',
+                    'zone_alarm_type': 0,
+                    'zone_physical_type': 1,
+                    'zone_type': 8,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.my_temperature_sensor',
+                'state': 'on',
+            },
+            {
+                'attributes': {
                     'device_class': 'garage_door',
                     'friendly_name': 'My Tilt Sensor',
                     'group': 'garageTilt1',
@@ -865,19 +878,6 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'zone_alarm_type': 0,
                     'zone_physical_type': 3,
                     'zone_type': 102,
-                    'tampered': False,
-                },
-                'entity_id': 'binary_sensor.my_keyfob_sensor',
-                'state': 'on',
-            },
-            {
-                'attributes': {
-                    'device_class': 'heat',
-                    'friendly_name': 'My Temperature Sensor',
-                    'group': 'temperature',
-                    'zone_alarm_type': 0,
-                    'zone_physical_type': 1,
-                    'zone_type': 8,
                     'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_keyfob_sensor',
