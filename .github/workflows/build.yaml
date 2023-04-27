@@ -75,6 +75,9 @@ jobs:
     name: Unit & integration tests
     runs-on: "ubuntu-latest"
 
+    permissions:
+      pull-requests: write
+
     needs:
       - prepare-env
 
