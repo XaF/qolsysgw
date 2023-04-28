@@ -75,10 +75,6 @@ jobs:
     name: Unit & integration tests
     runs-on: "ubuntu-latest"
 
-    permissions:
-      pull-requests: write
-      issues: write
-
     needs:
       - prepare-env
 
@@ -161,7 +157,7 @@ jobs:
 
       - name: Post comment of pytest coverage
         uses: MishaKav/pytest-coverage-comment@main
-        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request'
+        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
         with:
           create-new-comment: true
           pytest-coverage-path: ./pytest-coverage.txt
