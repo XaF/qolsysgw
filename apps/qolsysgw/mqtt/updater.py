@@ -495,12 +495,21 @@ class MqttWrapperQolsysSensor(MqttWrapper):
             ),
         }
 
-        # As we have a unique ID for the panel, we can setup a unique ID for
-        # the partition, and create a device to link all of our partitions
-        # together; this will also allow to interact with the partition in
-        # the UI, change it's name, assign it to areas, etc.
-        payload['unique_id'] = f"{self._cfg.panel_unique_id}_"\
-                               f"s{normalize_name_to_id(self._sensor.id)}"
+        # We want a unique id for each sensor, but we want the sensor unique
+        # id to be configurable, so we will support a number of parameters to
+        # allow the user to customize the unique id.
+        payload['unique_id'] = normalize_name_to_id(
+            self._cfg.sensor_unique_id_template.format(
+                panel_unique_id=self._cfg.panel_unique_id,
+                sensor_id=self._sensor.id,
+                sensor_zone_id=self._sensor.zone_id,
+                sensor_zone_type=self._sensor.zone_type,
+                sensor_zone_physical_type=self._sensor.zone_physical_type,
+                sensor_zone_alarm_type=self._sensor.zone_alarm_type,
+                sensor_name=self._sensor.name,
+                sensor_group=self._sensor.group,
+            )
+        )
         payload['device'] = self.device_payload
 
         return payload

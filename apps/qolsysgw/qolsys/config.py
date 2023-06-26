@@ -18,6 +18,7 @@ class QolsysGatewayConfig(object):
         'panel_token': _SENTINEL,
         'panel_user_code': None,
         'panel_unique_id': 'qolsys_panel',
+        'sensor_unique_id_template': '{panel_unique_id}_s{sensor_id}',
         'panel_device_name': 'Qolsys Panel',
         'arm_away_exit_delay': None,
         'arm_stay_exit_delay': None,
