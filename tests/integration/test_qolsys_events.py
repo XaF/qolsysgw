@@ -22,9 +22,10 @@ from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
 from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
-from qolsys.sensors import QolsysSensorTemperature
 from qolsys.sensors import QolsysSensorTakeoverModule
+from qolsys.sensors import QolsysSensorTemperature
 from qolsys.sensors import QolsysSensorTilt
+from qolsys.sensors import QolsysSensorTranslator
 from qolsys.sensors import QolsysSensorWater
 
 
@@ -259,7 +260,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(10, len(partition1.sensors))
+            self.assertEqual(11, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -730,6 +731,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_takeovermodule_sensor',
                 sensor_unique_id='002_0080',
                 sensor_state=sensor280,
+                expected_device_class='safety',
+                expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 281 is properly configured'):
+            sensor281 = partition1.zone(281)
+            self.assertEqual(QolsysSensorTranslator, sensor281.__class__)
+            self.assertEqual('002-0081', sensor281.id)
+            self.assertEqual('My Translator Sensor', sensor281.name)
+            self.assertEqual('translator', sensor281.group)
+            self.assertEqual('Closed', sensor281.status)
+            self.assertEqual('0', sensor281.state)
+            self.assertEqual(281, sensor281.zone_id)
+            self.assertEqual(14, sensor281.zone_physical_type)
+            self.assertEqual(0, sensor281.zone_alarm_type)
+            self.assertEqual(20, sensor281.zone_type)
+            self.assertEqual(1, sensor281.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_translator_sensor',
+                sensor_unique_id='002_0081',
+                sensor_state=sensor281,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
