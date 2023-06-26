@@ -97,7 +97,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         ha_port = get_free_port() if in_wsl() else 8123
 
         # Copy files to work with the panel
-        copier.copy(
+        copier.run_copy(
             testenv.FIXTURES_DIR,
             self._tmpdir.name,
             data={
