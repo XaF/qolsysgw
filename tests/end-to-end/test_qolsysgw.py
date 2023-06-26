@@ -503,6 +503,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 'entity_id': 'binary_sensor.my_takeovermodule_sensor',
                 'state': 'off',
             },
+            {
+                'attributes': {
+                    'device_class': 'safety',
+                    'friendly_name': 'My Translator Sensor',
+                    'group': 'translator',
+                    'zone_alarm_type': 0,
+                    'zone_physical_type': 14,
+                    'zone_type': 20,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.my_translator_sensor',
+                'state': 'off',
+            },
         ]
         self._check_entity_states(ctx, expected_states, msg='Initial state')
 
@@ -525,7 +538,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
 
         closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
                            200, 210, 220, 221, 230, 240, 250, 260, 270,
-                           280]
+                           280, 281]
         open_entities = [101]
         tamper_entities = [100, 110, 111, 210]
         untamper_entities_to_open = [100]
@@ -908,6 +921,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_takeovermodule_sensor',
+                'state': 'on',
+            },
+            {
+                'attributes': {
+                    'device_class': 'safety',
+                    'friendly_name': 'My Translator Sensor',
+                    'group': 'translator',
+                    'zone_alarm_type': 0,
+                    'zone_physical_type': 14,
+                    'zone_type': 20,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.my_translator_sensor',
                 'state': 'on',
             },
         ]

@@ -338,3 +338,9 @@ class QolsysSensorTakeoverModule(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('TakeoverModule', data, common)
+
+
+class QolsysSensorTranslator(QolsysSensor, _QolsysSensorWithoutUpdates):
+    @classmethod
+    def from_json(cls, data, common=None):
+        return cls.from_json_subclass('Translator', data, common)
