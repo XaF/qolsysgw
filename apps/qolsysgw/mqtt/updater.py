@@ -21,6 +21,7 @@ from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
+from qolsys.sensors import QolsysSensorTakeoverModule
 from qolsys.sensors import QolsysSensorTemperature
 from qolsys.sensors import QolsysSensorTilt
 from qolsys.sensors import QolsysSensorWater
@@ -446,6 +447,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorSiren: 'safety',
         QolsysSensorKeyFob: 'safety',
         QolsysSensorTemperature: 'heat',
+        QolsysSensorTakeoverModule: 'safety',
     }
 
     def __init__(self, sensor: QolsysSensor, *args, **kwargs):
