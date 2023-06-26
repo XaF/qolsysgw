@@ -45,6 +45,7 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 
  * ✨ **[feature]** Add support for `Temperature` sensor (#100)
  * ✨ **[feature]** Add support for `TakeoverModule` sensor (#110)
+ * ✨ **[feature]** Add support for `Translator` sensor (#111)
 {%   endif %}
 {%   if parsed_version < [1, 3, 0] -%}
 ### Version 1.3.0
