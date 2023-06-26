@@ -22,6 +22,7 @@ from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
 from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
+from qolsys.sensors import QolsysSensorTemperature
 from qolsys.sensors import QolsysSensorTilt
 from qolsys.sensors import QolsysSensorWater
 
@@ -257,7 +258,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(8, len(partition1.sensors))
+            self.assertEqual(9, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -567,6 +568,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_flat_name='my_heat_sensor',
                 sensor_unique_id='002_0020',
                 sensor_state=sensor220,
+                expected_device_class='heat',
+                expected_enabled_by_default=True,
+            )
+
+        with self.subTest(msg='Sensor 221 is properly configured'):
+            sensor221 = partition1.zone(221)
+            self.assertEqual(QolsysSensorTemperature, sensor221.__class__)
+            self.assertEqual('002-0021', sensor221.id)
+            self.assertEqual('My Temperature Sensor', sensor221.name)
+            self.assertEqual('Temperature', sensor221.group)
+            self.assertEqual('Closed', sensor221.status)
+            self.assertEqual('0', sensor221.state)
+            self.assertEqual(221, sensor221.zone_id)
+            self.assertEqual(1, sensor221.zone_physical_type)
+            self.assertEqual(0, sensor221.zone_alarm_type)
+            self.assertEqual(8, sensor221.zone_type)
+            self.assertEqual(1, sensor221.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_temperature_sensor',
+                sensor_unique_id='002_0021',
+                sensor_state=sensor221,
                 expected_device_class='heat',
                 expected_enabled_by_default=True,
             )

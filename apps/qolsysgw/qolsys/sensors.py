@@ -326,3 +326,9 @@ class QolsysSensorKeyFob(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
     def from_json(cls, data, common=None):
         return cls.from_json_subclass('KeyFob', data, common)
+
+
+class QolsysSensorTemperature(QolsysSensor):
+    @classmethod
+    def from_json(cls, data, common=None):
+        return cls.from_json_subclass('Temperature', data, common)
