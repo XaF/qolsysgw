@@ -28,7 +28,7 @@ jobs:
 
       - name: Get the changed files that would require tests
         id: changed-files
-        uses: "tj-actions/changed-files@v35"
+        uses: "tj-actions/changed-files@v36"
         if: github.event_name != 'schedule'
         with:
           files: |
@@ -136,6 +136,7 @@ jobs:
           done
 
       - name: Post comment of pytest coverage
+        continue-on-error: true
         uses: MishaKav/pytest-coverage-comment@main
         if: steps.tests.outcome == 'success' && github.event_name == 'pull_request'
         with:
