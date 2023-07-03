@@ -55,6 +55,14 @@ class QolsysSensor(QolsysObservable):
         self._last_open_tampered_at = None
         self._last_closed_tampered_at = None
 
+    @property
+    def partition(self) -> QolsysPartition:
+        return self._partition
+
+    @partition.setter
+    def partition(self, partition: QolsysPartition):
+        self._partition = partition
+
     def update(self, sensor: 'QolsysSensor'):
         if self.id != sensor.id:
             LOGGER.warning(f"Updating sensor '{self.id}' ({self.name}) with "
@@ -89,6 +97,9 @@ class QolsysSensor(QolsysObservable):
         # zone_id we have seen with this id. If it is, we return the sensor
         # id directly, if not, we will want to append the zone_id to ensure
         # distinct sensor unique ids
+        if self._partition is None:
+            raise AttributeError("Partition not set for sensor")
+
         first_sensor = self._partition.sensor(self._id)
         if first_sensor is None or first_sensor.zone_id != self._zone_id:
             return f"{self._id}_{self._zone_id}"

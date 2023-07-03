@@ -305,6 +305,7 @@ class TestUnitMqttWrapperQolsys(unittest.TestCase):
         sensor.partition_id = partition.id
         sensor.zone_id = 69
         sensor.id = '012-ID-1337'
+        sensor.unique_id = sensor.id
         wrapped_sensor = MqttWrapperQolsysSensor(
             sensor=sensor, mqtt_publish=mqtt_publish, cfg=cfg,
             mqtt_plugin_cfg=mqtt_plugin_cfg, session_token=session_token)

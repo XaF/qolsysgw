@@ -267,7 +267,7 @@ class _QolsysEventZoneEventFullZone(QolsysEventZoneEvent):
 
         zone = data.get('zone')
         try:
-            sensor = QolsysSensor.from_json(zone)
+            sensor = QolsysSensor.from_json(zone, None)
 
             return cls(
                 request_id=data.get('requestID'),
