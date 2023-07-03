@@ -5,6 +5,7 @@ import time
 from qolsys.exceptions import UnableToParseSensorException
 from qolsys.exceptions import UnknownQolsysSensorException
 from qolsys.observable import QolsysObservable
+from qolsys.partition import QolsysPartition
 from qolsys.utils import find_subclass
 
 
@@ -35,7 +36,7 @@ class QolsysSensor(QolsysObservable):
     def __init__(self, sensor_id: str, name: str, group: str, status: str,
                  state: str, zone_id: int, zone_type: int,
                  zone_physical_type: int, zone_alarm_type: int,
-                 partition_id: int) -> None:
+                 partition_id: int, partition: QolsysPartition) -> None:
         super().__init__()
 
         self._id = sensor_id
@@ -48,6 +49,7 @@ class QolsysSensor(QolsysObservable):
         self._zone_physical_type = zone_physical_type
         self._zone_alarm_type = zone_alarm_type
         self._partition_id = partition_id
+        self._partition = partition
 
         self._tampered = False
         self._last_open_tampered_at = None
@@ -80,6 +82,17 @@ class QolsysSensor(QolsysObservable):
     @property
     def id(self):
         return self._id
+
+    @property
+    def unique_id(self):
+        # Check if this sensor's zone_id is the same as the first sensor's
+        # zone_id we have seen with this id. If it is, we return the sensor
+        # id directly, if not, we will want to append the zone_id to ensure
+        # distinct sensor unique ids
+        first_sensor = self._partition.sensor(self._id)
+        if first_sensor is None or first_sensor.zone_id != self._zone_id:
+            return f"{self._id}_{self._zone_id}"
+        return self.id
 
     @property
     def name(self):
@@ -189,7 +202,7 @@ class QolsysSensor(QolsysObservable):
                 f"partition_id={self.partition_id}>")
 
     @classmethod
-    def from_json(cls, data):
+    def from_json(cls, data, partition):
         if isinstance(data, str):
             data = json.loads(data)
 
@@ -206,7 +219,7 @@ class QolsysSensor(QolsysObservable):
                 f"Sensor type '{sensor_type}' unsupported for sensor {data}"
             )
 
-        return klass.from_json(data, common=cls.from_json_common_data(data))
+        return klass.from_json(data, partition, common=cls.from_json_common_data(data))
 
     @classmethod
     def from_json_common_data(cls, data):
@@ -216,7 +229,7 @@ class QolsysSensor(QolsysObservable):
         return common_data
 
     @classmethod
-    def from_json_subclass(cls, subtype, data, common=None):
+    def from_json_subclass(cls, subtype, data, partition, common=None):
         sensor_type = data.get('type')
         if sensor_type != subtype:
             raise UnableToParseSensorException(
@@ -225,7 +238,7 @@ class QolsysSensor(QolsysObservable):
         if common is None:
             common = cls.from_json_common_data(data)
 
-        return cls(**common)
+        return cls(partition=partition, **common)
 
 
 class _QolsysSensorWithoutUpdates(object):
@@ -234,113 +247,113 @@ class _QolsysSensorWithoutUpdates(object):
 
 class QolsysSensorDoorWindow(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Door_Window', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Door_Window', data, partition, common)
 
 
 class QolsysSensorMotion(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Motion', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Motion', data, partition, common)
 
 
 class QolsysSensorPanelMotion(QolsysSensorMotion):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Panel Motion', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Panel Motion', data, partition, common)
 
 
 class QolsysSensorGlassBreak(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('GlassBreak', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('GlassBreak', data, partition, common)
 
 
 class QolsysSensorPanelGlassBreak(QolsysSensorGlassBreak, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Panel Glass Break', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Panel Glass Break', data, partition, common)
 
 
 class QolsysSensorBluetooth(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Bluetooth', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Bluetooth', data, partition, common)
 
 
 class QolsysSensorSmokeDetector(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('SmokeDetector', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('SmokeDetector', data, partition, common)
 
 
 class QolsysSensorCODetector(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('CODetector', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('CODetector', data, partition, common)
 
 
 class QolsysSensorWater(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Water', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Water', data, partition, common)
 
 
 class QolsysSensorFreeze(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Freeze', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Freeze', data, partition, common)
 
 
 class QolsysSensorHeat(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Heat', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Heat', data, partition, common)
 
 
 class QolsysSensorTilt(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Tilt', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Tilt', data, partition, common)
 
 
 class QolsysSensorKeypad(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Keypad', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Keypad', data, partition, common)
 
 
 class QolsysSensorAuxiliaryPendant(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Auxiliary Pendant', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Auxiliary Pendant', data, partition, common)
 
 
 class QolsysSensorSiren(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Siren', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Siren', data, partition, common)
 
 
 class QolsysSensorKeyFob(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('KeyFob', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('KeyFob', data, partition, common)
 
 
 class QolsysSensorTemperature(QolsysSensor):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Temperature', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Temperature', data, partition, common)
 
 
 class QolsysSensorTakeoverModule(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('TakeoverModule', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('TakeoverModule', data, partition, common)
 
 
 class QolsysSensorTranslator(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
-    def from_json(cls, data, common=None):
-        return cls.from_json_subclass('Translator', data, common)
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Translator', data, partition, common)

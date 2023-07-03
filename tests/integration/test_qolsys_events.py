@@ -260,7 +260,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(11, len(partition1.sensors))
+            self.assertEqual(12, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -733,6 +733,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_state=sensor280,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 200802 is properly configured'):
+            sensor200802 = partition1.zone(200802)
+            self.assertEqual(QolsysSensorDoorWindow, sensor200802.__class__)
+            self.assertEqual('002-0080', sensor200802.id)
+            self.assertEqual('My TakeoverModule Door Sensor', sensor200802.name)
+            self.assertEqual('entryexitlongdelay', sensor200802.group)
+            self.assertEqual('Closed', sensor200802.status)
+            self.assertEqual('0', sensor200802.state)
+            self.assertEqual(200802, sensor200802.zone_id)
+            self.assertEqual(1, sensor200802.zone_physical_type)
+            self.assertEqual(3, sensor200802.zone_alarm_type)
+            self.assertEqual(1, sensor200802.zone_type)
+            self.assertEqual(1, sensor200802.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_takeovermodule_door_sensor',
+                sensor_unique_id='002_0080_200802',
+                sensor_state=sensor200802,
+                expected_device_class='door',
+                expected_enabled_by_default=True,
             )
 
         with self.subTest(msg='Sensor 281 is properly configured'):
