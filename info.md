@@ -40,8 +40,8 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 {% else -%}
 {% set parsed_version = version_installed.split('-')[0].replace('v', '').split('.') | map('int') | list -%}
 ## ChangeLog
-{%   if true -%}
-### _Next (dev)_
+{%   if parsed_version < [1, 4, 0] -%}
+### Version 1.4.0
 
  * ✨ **[feature]** Add support for `Temperature` sensor (#100)
  * ✨ **[feature]** Add support for `TakeoverModule` sensor (#110)
