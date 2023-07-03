@@ -200,10 +200,26 @@ class QolsysGateway(Mqtt):
         elif isinstance(event, QolsysEventZoneEventUpdate):
             LOGGER.debug(f'UPDATE zone={event.zone}')
 
+            # This event provides a full zone object, so we need to provide
+            # it our current partition object
+            partition = self._state.partition(event.zone.partition_id)
+            if partition is None:
+                LOGGER.warning(f'Partition {event.zone.partition_id} not found')
+                return
+            event.zone.partition = partition
+
             self._state.zone_update(event.zone)
 
         elif isinstance(event, QolsysEventZoneEventAdd):
             LOGGER.debug(f'ADD zone={event.zone}')
+
+            # This event provides a full zone object, so we need to provide
+            # it our current partition object
+            partition = self._state.partition(event.zone.partition_id)
+            if partition is None:
+                LOGGER.warning(f'Partition {event.zone.partition_id} not found')
+                return
+            event.zone.partition = partition
 
             self._state.zone_add(event.zone)
 

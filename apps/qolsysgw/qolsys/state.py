@@ -63,6 +63,12 @@ class QolsysState(QolsysObservable):
             if zone is not None:
                 return zone
 
+    def sensor(self, sensor_id):
+        for partition in self.partitions:
+            sensor = partition.sensor(sensor_id)
+            if sensor is not None:
+                return sensor
+
     def zone_update(self, sensor):
         # Find where the zone is currently at
         current_zone = self.zone(sensor.zone_id)

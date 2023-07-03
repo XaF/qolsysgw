@@ -143,6 +143,13 @@ class QolsysPartition(QolsysObservable):
     def zone(self, zone_id, default=None):
         return self._sensors.get(zone_id, default)
 
+    def sensor(self, sensor_id, default=None):
+        for sensor in self._sensors.values():
+            if sensor.id == sensor_id:
+                return sensor
+
+        return default
+
     def add_sensor(self, sensor):
         psensor = self._sensors.get(sensor.zone_id)
         if psensor is not None:

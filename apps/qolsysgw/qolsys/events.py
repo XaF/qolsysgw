@@ -126,7 +126,7 @@ class QolsysEventInfoSummary(QolsysEventInfo):
             zone_list = partition_info['zone_list']
             for sensor_info in zone_list:
                 try:
-                    partition.add_sensor(QolsysSensor.from_json(sensor_info))
+                    partition.add_sensor(QolsysSensor.from_json(sensor_info, partition))
                 except UnknownQolsysSensorException:
                     LOGGER.warning(f"sensor of unknown type: {sensor_info}")
 
@@ -267,7 +267,7 @@ class _QolsysEventZoneEventFullZone(QolsysEventZoneEvent):
 
         zone = data.get('zone')
         try:
-            sensor = QolsysSensor.from_json(zone)
+            sensor = QolsysSensor.from_json(zone, None)
 
             return cls(
                 request_id=data.get('requestID'),
