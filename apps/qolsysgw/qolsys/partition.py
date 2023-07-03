@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 
 from qolsys.observable import QolsysObservable
+from qolsys.sensors import QolsysSensor
 
 
 LOGGER = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ class QolsysPartition(QolsysObservable):
         self._last_error_desc = None
         self._last_error_at = None
         self._disarm_failed = 0
+        self._tampered_sensors = []
 
     @property
     def id(self):
@@ -73,11 +75,16 @@ class QolsysPartition(QolsysObservable):
     def disarm_failed(self):
         return self._disarm_failed
 
+    @property
+    def tampered_sensors(self):
+        return self._tampered_sensors
+
     @status.setter
     def status(self, value):
         new_value = value.upper()
         if self._status != new_value:
-            LOGGER.debug(f"Partition '{self.id}' ({self.name}) status updated to '{new_value}'")
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) status "
+                         f"updated to '{new_value}'")
             prev_value = self._status
 
             self._status = new_value
@@ -95,7 +102,8 @@ class QolsysPartition(QolsysObservable):
     def secure_arm(self, value):
         new_value = bool(value)
         if self._secure_arm != new_value:
-            LOGGER.debug(f"Partition '{self.id}' ({self.name}) secure arm updated to '{new_value}'")
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) secure arm "
+                         f"updated to '{new_value}'")
             prev_value = self._secure_arm
             self._secure_arm = new_value
 
@@ -108,7 +116,8 @@ class QolsysPartition(QolsysObservable):
             value = value.upper()
 
         if self._alarm_type != value:
-            LOGGER.debug(f"Partition '{self.id}' ({self.name}) alarm type updated to '{value}'")
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) alarm type "
+                         f"updated to '{value}'")
             prev_value = self._alarm_type
             self._alarm_type = value
 
@@ -120,10 +129,29 @@ class QolsysPartition(QolsysObservable):
         new_value = int(value)
 
         if self._disarm_failed != new_value:
-            LOGGER.debug(f"Partition '{self.id}' ({self.name}) disarm failed updated to '{value}'")
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) disarm failed "
+                         f"updated to '{new_value}'")
             self._disarm_failed = new_value
 
             self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
+
+    @tampered_sensors.setter
+    def tampered_sensors(self, value):
+        new_value = sorted(value)
+
+        if self._tampered_sensors != new_value:
+            LOGGER.debug(f"Partition '{self.id}' ({self.name}) tampered "
+                         f"sensors updated to '{new_value}'")
+            self._tampered_sensors = new_value
+
+            self.notify(change=self.NOTIFY_UPDATE_ATTRIBUTES)
+
+    def _update_tampered_sensors(self):
+        self.tampered_sensors = sorted([
+            zone_id
+            for zone_id, zone in self._sensors.items()
+            if zone.tampered
+        ])
 
     def triggered(self, alarm_type: str = None):
         self.status = 'ALARM'
@@ -160,6 +188,7 @@ class QolsysPartition(QolsysObservable):
             return
 
         self._sensors[sensor.zone_id] = sensor
+        sensor.register(self, callback=self._update_sensor_callback)
         self.notify(change=self.NOTIFY_ADD_SENSOR, new_value=sensor)
 
     def update_sensor(self, sensor):
@@ -177,8 +206,15 @@ class QolsysPartition(QolsysObservable):
 
         del self._sensors[zone_id]
 
+        zone.unregister(self)
+
         self.notify(change=self.NOTIFY_REMOVE_SENSOR,
                     prev_value=zone)
+
+    def _update_sensor_callback(self, sensor: QolsysSensor, change,
+                                prev_value=None, new_value=None):
+        if change == QolsysSensor.NOTIFY_UPDATE_PATTERN.format(attr='tampered'):
+            self._update_tampered_sensors()
 
     def __str__(self):
         return (f"<QolsysPartition id={self.id} name={self.name} "
