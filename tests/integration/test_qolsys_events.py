@@ -1218,7 +1218,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         partition1 = state.partition(1)
         self.assertEqual(2, len(partition1.sensors))
 
-        sensor = partition1.zone(100)
+        sensor = partition1.zone(10000)
         self.assertEqual('1', sensor.state)
         self.assertEqual(60, sensor.zone_physical_type)
         self.assertEqual(61, sensor.zone_alarm_type)
