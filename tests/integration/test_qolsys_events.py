@@ -275,462 +275,462 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             )
 
         # Check the sensors information
-        with self.subTest(msg='Sensor 100 is properly configured'):
-            sensor100 = partition0.zone(100)
-            self.assertEqual(QolsysSensorDoorWindow, sensor100.__class__)
-            self.assertEqual('001-0000', sensor100.id)
-            self.assertEqual('My Door', sensor100.name)
-            self.assertEqual('entryexitdelay', sensor100.group)
-            self.assertEqual('Closed', sensor100.status)
-            self.assertEqual('0', sensor100.state)
-            self.assertEqual(100, sensor100.zone_id)
-            self.assertEqual(1, sensor100.zone_physical_type)
-            self.assertEqual(3, sensor100.zone_alarm_type)
-            self.assertEqual(1, sensor100.zone_type)
-            self.assertEqual(0, sensor100.partition_id)
+        with self.subTest(msg='Sensor 10000 is properly configured'):
+            sensor10000 = partition0.zone(10000)
+            self.assertEqual(QolsysSensorDoorWindow, sensor10000.__class__)
+            self.assertEqual('001-0000', sensor10000.id)
+            self.assertEqual('My Door', sensor10000.name)
+            self.assertEqual('entryexitdelay', sensor10000.group)
+            self.assertEqual('Closed', sensor10000.status)
+            self.assertEqual('0', sensor10000.state)
+            self.assertEqual(10000, sensor10000.zone_id)
+            self.assertEqual(1, sensor10000.zone_physical_type)
+            self.assertEqual(3, sensor10000.zone_alarm_type)
+            self.assertEqual(1, sensor10000.zone_type)
+            self.assertEqual(0, sensor10000.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_door',
                 sensor_unique_id='001_0000',
-                sensor_state=sensor100,
+                sensor_state=sensor10000,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 101 is properly configured'):
-            sensor101 = partition0.zone(101)
-            self.assertEqual(QolsysSensorDoorWindow, sensor101.__class__)
-            self.assertEqual('001-0001', sensor101.id)
-            self.assertEqual('My Window', sensor101.name)
-            self.assertEqual('entryexitlongdelay', sensor101.group)
-            self.assertEqual('Open', sensor101.status)
-            self.assertEqual('0', sensor101.state)
-            self.assertEqual(101, sensor101.zone_id)
-            self.assertEqual(1, sensor101.zone_physical_type)
-            self.assertEqual(3, sensor101.zone_alarm_type)
-            self.assertEqual(1, sensor101.zone_type)
-            self.assertEqual(0, sensor101.partition_id)
+        with self.subTest(msg='Sensor 10001 is properly configured'):
+            sensor10001 = partition0.zone(10001)
+            self.assertEqual(QolsysSensorDoorWindow, sensor10001.__class__)
+            self.assertEqual('001-0001', sensor10001.id)
+            self.assertEqual('My Window', sensor10001.name)
+            self.assertEqual('entryexitlongdelay', sensor10001.group)
+            self.assertEqual('Open', sensor10001.status)
+            self.assertEqual('0', sensor10001.state)
+            self.assertEqual(10001, sensor10001.zone_id)
+            self.assertEqual(1, sensor10001.zone_physical_type)
+            self.assertEqual(3, sensor10001.zone_alarm_type)
+            self.assertEqual(1, sensor10001.zone_type)
+            self.assertEqual(0, sensor10001.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_window',
                 sensor_unique_id='001_0001',
-                sensor_state=sensor101,
+                sensor_state=sensor10001,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 110 is properly configured'):
-            sensor110 = partition0.zone(110)
-            self.assertEqual(QolsysSensorMotion, sensor110.__class__)
-            self.assertEqual('001-0010', sensor110.id)
-            self.assertEqual('My Motion', sensor110.name)
-            self.assertEqual('awayinstantmotion', sensor110.group)
-            self.assertEqual('Closed', sensor110.status)
-            self.assertEqual('0', sensor110.state)
-            self.assertEqual(110, sensor110.zone_id)
-            self.assertEqual(2, sensor110.zone_physical_type)
-            self.assertEqual(3, sensor110.zone_alarm_type)
-            self.assertEqual(2, sensor110.zone_type)
-            self.assertEqual(0, sensor110.partition_id)
+        with self.subTest(msg='Sensor 10010 is properly configured'):
+            sensor10010 = partition0.zone(10010)
+            self.assertEqual(QolsysSensorMotion, sensor10010.__class__)
+            self.assertEqual('001-0010', sensor10010.id)
+            self.assertEqual('My Motion', sensor10010.name)
+            self.assertEqual('awayinstantmotion', sensor10010.group)
+            self.assertEqual('Closed', sensor10010.status)
+            self.assertEqual('0', sensor10010.state)
+            self.assertEqual(10010, sensor10010.zone_id)
+            self.assertEqual(2, sensor10010.zone_physical_type)
+            self.assertEqual(3, sensor10010.zone_alarm_type)
+            self.assertEqual(2, sensor10010.zone_type)
+            self.assertEqual(0, sensor10010.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_motion',
                 sensor_unique_id='001_0010',
-                sensor_state=sensor110,
+                sensor_state=sensor10010,
                 expected_device_class='motion',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 111 is properly configured'):
-            sensor111 = partition0.zone(111)
-            self.assertEqual(QolsysSensorPanelMotion, sensor111.__class__)
-            self.assertEqual('001-0011', sensor111.id)
-            self.assertEqual('Panel Motion', sensor111.name)
-            self.assertEqual('safetymotion', sensor111.group)
-            self.assertEqual('Closed', sensor111.status)
-            self.assertEqual('0', sensor111.state)
-            self.assertEqual(111, sensor111.zone_id)
-            self.assertEqual(1, sensor111.zone_physical_type)
-            self.assertEqual(3, sensor111.zone_alarm_type)
-            self.assertEqual(119, sensor111.zone_type)
-            self.assertEqual(0, sensor111.partition_id)
+        with self.subTest(msg='Sensor 10011 is properly configured'):
+            sensor10011 = partition0.zone(10011)
+            self.assertEqual(QolsysSensorPanelMotion, sensor10011.__class__)
+            self.assertEqual('001-0011', sensor10011.id)
+            self.assertEqual('Panel Motion', sensor10011.name)
+            self.assertEqual('safetymotion', sensor10011.group)
+            self.assertEqual('Closed', sensor10011.status)
+            self.assertEqual('0', sensor10011.state)
+            self.assertEqual(10011, sensor10011.zone_id)
+            self.assertEqual(1, sensor10011.zone_physical_type)
+            self.assertEqual(3, sensor10011.zone_alarm_type)
+            self.assertEqual(119, sensor10011.zone_type)
+            self.assertEqual(0, sensor10011.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='panel_motion',
                 sensor_unique_id='001_0011',
-                sensor_state=sensor111,
+                sensor_state=sensor10011,
                 expected_device_class='motion',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 120 is properly configured'):
-            sensor120 = partition0.zone(120)
-            self.assertEqual(QolsysSensorGlassBreak, sensor120.__class__)
-            self.assertEqual('001-0020', sensor120.id)
-            self.assertEqual('My Glass Break', sensor120.name)
-            self.assertEqual('glassbreakawayonly', sensor120.group)
-            self.assertEqual('Closed', sensor120.status)
-            self.assertEqual('0', sensor120.state)
-            self.assertEqual(120, sensor120.zone_id)
-            self.assertEqual(1, sensor120.zone_physical_type)
-            self.assertEqual(0, sensor120.zone_alarm_type)
-            self.assertEqual(116, sensor120.zone_type)
-            self.assertEqual(0, sensor120.partition_id)
+        with self.subTest(msg='Sensor 10020 is properly configured'):
+            sensor10020 = partition0.zone(10020)
+            self.assertEqual(QolsysSensorGlassBreak, sensor10020.__class__)
+            self.assertEqual('001-0020', sensor10020.id)
+            self.assertEqual('My Glass Break', sensor10020.name)
+            self.assertEqual('glassbreakawayonly', sensor10020.group)
+            self.assertEqual('Closed', sensor10020.status)
+            self.assertEqual('0', sensor10020.state)
+            self.assertEqual(10020, sensor10020.zone_id)
+            self.assertEqual(1, sensor10020.zone_physical_type)
+            self.assertEqual(0, sensor10020.zone_alarm_type)
+            self.assertEqual(116, sensor10020.zone_type)
+            self.assertEqual(0, sensor10020.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_glass_break',
                 sensor_unique_id='001_0020',
-                sensor_state=sensor120,
+                sensor_state=sensor10020,
                 expected_device_class='vibration',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 121 is properly configured'):
-            sensor121 = partition0.zone(121)
-            self.assertEqual(QolsysSensorPanelGlassBreak, sensor121.__class__)
-            self.assertEqual('001-0021', sensor121.id)
-            self.assertEqual('Panel Glass Break', sensor121.name)
-            self.assertEqual('glassbreakawayonly', sensor121.group)
-            self.assertEqual('Closed', sensor121.status)
-            self.assertEqual('0', sensor121.state)
-            self.assertEqual(121, sensor121.zone_id)
-            self.assertEqual(1, sensor121.zone_physical_type)
-            self.assertEqual(0, sensor121.zone_alarm_type)
-            self.assertEqual(116, sensor121.zone_type)
-            self.assertEqual(0, sensor121.partition_id)
+        with self.subTest(msg='Sensor 10021 is properly configured'):
+            sensor10021 = partition0.zone(10021)
+            self.assertEqual(QolsysSensorPanelGlassBreak, sensor10021.__class__)
+            self.assertEqual('001-0021', sensor10021.id)
+            self.assertEqual('Panel Glass Break', sensor10021.name)
+            self.assertEqual('glassbreakawayonly', sensor10021.group)
+            self.assertEqual('Closed', sensor10021.status)
+            self.assertEqual('0', sensor10021.state)
+            self.assertEqual(10021, sensor10021.zone_id)
+            self.assertEqual(1, sensor10021.zone_physical_type)
+            self.assertEqual(0, sensor10021.zone_alarm_type)
+            self.assertEqual(116, sensor10021.zone_type)
+            self.assertEqual(0, sensor10021.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='panel_glass_break',
                 sensor_unique_id='001_0021',
-                sensor_state=sensor121,
+                sensor_state=sensor10021,
                 expected_device_class='vibration',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 130 is properly configured'):
-            sensor130 = partition0.zone(130)
-            self.assertEqual(QolsysSensorBluetooth, sensor130.__class__)
-            self.assertEqual('001-0030', sensor130.id)
-            self.assertEqual('My Phone', sensor130.name)
-            self.assertEqual('mobileintrusion', sensor130.group)
-            self.assertEqual('Closed', sensor130.status)
-            self.assertEqual('0', sensor130.state)
-            self.assertEqual(130, sensor130.zone_id)
-            self.assertEqual(1, sensor130.zone_physical_type)
-            self.assertEqual(1, sensor130.zone_alarm_type)
-            self.assertEqual(115, sensor130.zone_type)
-            self.assertEqual(0, sensor130.partition_id)
+        with self.subTest(msg='Sensor 10030 is properly configured'):
+            sensor10030 = partition0.zone(10030)
+            self.assertEqual(QolsysSensorBluetooth, sensor10030.__class__)
+            self.assertEqual('001-0030', sensor10030.id)
+            self.assertEqual('My Phone', sensor10030.name)
+            self.assertEqual('mobileintrusion', sensor10030.group)
+            self.assertEqual('Closed', sensor10030.status)
+            self.assertEqual('0', sensor10030.state)
+            self.assertEqual(10030, sensor10030.zone_id)
+            self.assertEqual(1, sensor10030.zone_physical_type)
+            self.assertEqual(1, sensor10030.zone_alarm_type)
+            self.assertEqual(115, sensor10030.zone_type)
+            self.assertEqual(0, sensor10030.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_phone',
                 sensor_unique_id='001_0030',
-                sensor_state=sensor130,
+                sensor_state=sensor10030,
                 expected_device_class='presence',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 140 is properly configured'):
-            sensor140 = partition0.zone(140)
-            self.assertEqual(QolsysSensorSmokeDetector, sensor140.__class__)
-            self.assertEqual('001-0040', sensor140.id)
-            self.assertEqual('My Smoke Detector', sensor140.name)
-            self.assertEqual('smoke_heat', sensor140.group)
-            self.assertEqual('Closed', sensor140.status)
-            self.assertEqual('0', sensor140.state)
-            self.assertEqual(140, sensor140.zone_id)
-            self.assertEqual(9, sensor140.zone_physical_type)
-            self.assertEqual(9, sensor140.zone_alarm_type)
-            self.assertEqual(5, sensor140.zone_type)
-            self.assertEqual(0, sensor140.partition_id)
+        with self.subTest(msg='Sensor 10040 is properly configured'):
+            sensor10040 = partition0.zone(10040)
+            self.assertEqual(QolsysSensorSmokeDetector, sensor10040.__class__)
+            self.assertEqual('001-0040', sensor10040.id)
+            self.assertEqual('My Smoke Detector', sensor10040.name)
+            self.assertEqual('smoke_heat', sensor10040.group)
+            self.assertEqual('Closed', sensor10040.status)
+            self.assertEqual('0', sensor10040.state)
+            self.assertEqual(10040, sensor10040.zone_id)
+            self.assertEqual(9, sensor10040.zone_physical_type)
+            self.assertEqual(9, sensor10040.zone_alarm_type)
+            self.assertEqual(5, sensor10040.zone_type)
+            self.assertEqual(0, sensor10040.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_smoke_detector',
                 sensor_unique_id='001_0040',
-                sensor_state=sensor140,
+                sensor_state=sensor10040,
                 expected_device_class='smoke',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 141 is properly configured'):
-            sensor141 = partition0.zone(141)
-            self.assertEqual(QolsysSensorCODetector, sensor141.__class__)
-            self.assertEqual('001-0041', sensor141.id)
-            self.assertEqual('My CO Detector', sensor141.name)
-            self.assertEqual('entryexitdelay', sensor141.group)
-            self.assertEqual('Closed', sensor141.status)
-            self.assertEqual('0', sensor141.state)
-            self.assertEqual(141, sensor141.zone_id)
-            self.assertEqual(1, sensor141.zone_physical_type)
-            self.assertEqual(3, sensor141.zone_alarm_type)
-            self.assertEqual(1, sensor141.zone_type)
-            self.assertEqual(0, sensor141.partition_id)
+        with self.subTest(msg='Sensor 10041 is properly configured'):
+            sensor10041 = partition0.zone(10041)
+            self.assertEqual(QolsysSensorCODetector, sensor10041.__class__)
+            self.assertEqual('001-0041', sensor10041.id)
+            self.assertEqual('My CO Detector', sensor10041.name)
+            self.assertEqual('entryexitdelay', sensor10041.group)
+            self.assertEqual('Closed', sensor10041.status)
+            self.assertEqual('0', sensor10041.state)
+            self.assertEqual(10041, sensor10041.zone_id)
+            self.assertEqual(1, sensor10041.zone_physical_type)
+            self.assertEqual(3, sensor10041.zone_alarm_type)
+            self.assertEqual(1, sensor10041.zone_type)
+            self.assertEqual(0, sensor10041.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_co_detector',
                 sensor_unique_id='001_0041',
-                sensor_state=sensor141,
+                sensor_state=sensor10041,
                 expected_device_class='gas',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 150 is properly configured'):
-            sensor150 = partition0.zone(150)
-            self.assertEqual(QolsysSensorWater, sensor150.__class__)
-            self.assertEqual('001-0050', sensor150.id)
-            self.assertEqual('My Water Detector', sensor150.name)
-            self.assertEqual('WaterSensor', sensor150.group)
-            self.assertEqual('Closed', sensor150.status)
-            self.assertEqual('0', sensor150.state)
-            self.assertEqual(150, sensor150.zone_id)
-            self.assertEqual(8, sensor150.zone_physical_type)
-            self.assertEqual(0, sensor150.zone_alarm_type)
-            self.assertEqual(15, sensor150.zone_type)
-            self.assertEqual(0, sensor150.partition_id)
+        with self.subTest(msg='Sensor 10050 is properly configured'):
+            sensor10050 = partition0.zone(10050)
+            self.assertEqual(QolsysSensorWater, sensor10050.__class__)
+            self.assertEqual('001-0050', sensor10050.id)
+            self.assertEqual('My Water Detector', sensor10050.name)
+            self.assertEqual('WaterSensor', sensor10050.group)
+            self.assertEqual('Closed', sensor10050.status)
+            self.assertEqual('0', sensor10050.state)
+            self.assertEqual(10050, sensor10050.zone_id)
+            self.assertEqual(8, sensor10050.zone_physical_type)
+            self.assertEqual(0, sensor10050.zone_alarm_type)
+            self.assertEqual(15, sensor10050.zone_type)
+            self.assertEqual(0, sensor10050.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_water_detector',
                 sensor_unique_id='001_0050',
-                sensor_state=sensor150,
+                sensor_state=sensor10050,
                 expected_device_class='moisture',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 200 is properly configured'):
-            sensor200 = partition1.zone(200)
-            self.assertEqual(QolsysSensorDoorWindow, sensor200.__class__)
-            self.assertEqual('002-0000', sensor200.id)
-            self.assertEqual('My 2nd Door', sensor200.name)
-            self.assertEqual('instantperimeter', sensor200.group)
-            self.assertEqual('Closed', sensor200.status)
-            self.assertEqual('0', sensor200.state)
-            self.assertEqual(200, sensor200.zone_id)
-            self.assertEqual(1, sensor200.zone_physical_type)
-            self.assertEqual(3, sensor200.zone_alarm_type)
-            self.assertEqual(1, sensor200.zone_type)
-            self.assertEqual(1, sensor200.partition_id)
+        with self.subTest(msg='Sensor 20000 is properly configured'):
+            sensor20000 = partition1.zone(20000)
+            self.assertEqual(QolsysSensorDoorWindow, sensor20000.__class__)
+            self.assertEqual('002-0000', sensor20000.id)
+            self.assertEqual('My 2nd Door', sensor20000.name)
+            self.assertEqual('instantperimeter', sensor20000.group)
+            self.assertEqual('Closed', sensor20000.status)
+            self.assertEqual('0', sensor20000.state)
+            self.assertEqual(20000, sensor20000.zone_id)
+            self.assertEqual(1, sensor20000.zone_physical_type)
+            self.assertEqual(3, sensor20000.zone_alarm_type)
+            self.assertEqual(1, sensor20000.zone_type)
+            self.assertEqual(1, sensor20000.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_2nd_door',
                 sensor_unique_id='002_0000',
-                sensor_state=sensor200,
+                sensor_state=sensor20000,
                 expected_device_class='door',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 210 is properly configured'):
-            sensor210 = partition1.zone(210)
-            self.assertEqual(QolsysSensorFreeze, sensor210.__class__)
-            self.assertEqual('002-0010', sensor210.id)
-            self.assertEqual('My Freeze Sensor', sensor210.name)
-            self.assertEqual('freeze', sensor210.group)
-            self.assertEqual('Closed', sensor210.status)
-            self.assertEqual('0', sensor210.state)
-            self.assertEqual(210, sensor210.zone_id)
-            self.assertEqual(6, sensor210.zone_physical_type)
-            self.assertEqual(0, sensor210.zone_alarm_type)
-            self.assertEqual(17, sensor210.zone_type)
-            self.assertEqual(1, sensor210.partition_id)
+        with self.subTest(msg='Sensor 20010 is properly configured'):
+            sensor20010 = partition1.zone(20010)
+            self.assertEqual(QolsysSensorFreeze, sensor20010.__class__)
+            self.assertEqual('002-0010', sensor20010.id)
+            self.assertEqual('My Freeze Sensor', sensor20010.name)
+            self.assertEqual('freeze', sensor20010.group)
+            self.assertEqual('Closed', sensor20010.status)
+            self.assertEqual('0', sensor20010.state)
+            self.assertEqual(20010, sensor20010.zone_id)
+            self.assertEqual(6, sensor20010.zone_physical_type)
+            self.assertEqual(0, sensor20010.zone_alarm_type)
+            self.assertEqual(17, sensor20010.zone_type)
+            self.assertEqual(1, sensor20010.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_freeze_sensor',
                 sensor_unique_id='002_0010',
-                sensor_state=sensor210,
+                sensor_state=sensor20010,
                 expected_device_class='cold',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 220 is properly configured'):
-            sensor220 = partition1.zone(220)
-            self.assertEqual(QolsysSensorHeat, sensor220.__class__)
-            self.assertEqual('002-0020', sensor220.id)
-            self.assertEqual('My Heat Sensor', sensor220.name)
-            self.assertEqual('smoke_heat', sensor220.group)
-            self.assertEqual('Closed', sensor220.status)
-            self.assertEqual('0', sensor220.state)
-            self.assertEqual(220, sensor220.zone_id)
-            self.assertEqual(10, sensor220.zone_physical_type)
-            self.assertEqual(0, sensor220.zone_alarm_type)
-            self.assertEqual(8, sensor220.zone_type)
-            self.assertEqual(1, sensor220.partition_id)
+        with self.subTest(msg='Sensor 20020 is properly configured'):
+            sensor20020 = partition1.zone(20020)
+            self.assertEqual(QolsysSensorHeat, sensor20020.__class__)
+            self.assertEqual('002-0020', sensor20020.id)
+            self.assertEqual('My Heat Sensor', sensor20020.name)
+            self.assertEqual('smoke_heat', sensor20020.group)
+            self.assertEqual('Closed', sensor20020.status)
+            self.assertEqual('0', sensor20020.state)
+            self.assertEqual(20020, sensor20020.zone_id)
+            self.assertEqual(10, sensor20020.zone_physical_type)
+            self.assertEqual(0, sensor20020.zone_alarm_type)
+            self.assertEqual(8, sensor20020.zone_type)
+            self.assertEqual(1, sensor20020.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_heat_sensor',
                 sensor_unique_id='002_0020',
-                sensor_state=sensor220,
+                sensor_state=sensor20020,
                 expected_device_class='heat',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 221 is properly configured'):
-            sensor221 = partition1.zone(221)
-            self.assertEqual(QolsysSensorTemperature, sensor221.__class__)
-            self.assertEqual('002-0021', sensor221.id)
-            self.assertEqual('My Temperature Sensor', sensor221.name)
-            self.assertEqual('Temperature', sensor221.group)
-            self.assertEqual('Closed', sensor221.status)
-            self.assertEqual('0', sensor221.state)
-            self.assertEqual(221, sensor221.zone_id)
-            self.assertEqual(1, sensor221.zone_physical_type)
-            self.assertEqual(0, sensor221.zone_alarm_type)
-            self.assertEqual(8, sensor221.zone_type)
-            self.assertEqual(1, sensor221.partition_id)
+        with self.subTest(msg='Sensor 20021 is properly configured'):
+            sensor20021 = partition1.zone(20021)
+            self.assertEqual(QolsysSensorTemperature, sensor20021.__class__)
+            self.assertEqual('002-0021', sensor20021.id)
+            self.assertEqual('My Temperature Sensor', sensor20021.name)
+            self.assertEqual('Temperature', sensor20021.group)
+            self.assertEqual('Closed', sensor20021.status)
+            self.assertEqual('0', sensor20021.state)
+            self.assertEqual(20021, sensor20021.zone_id)
+            self.assertEqual(1, sensor20021.zone_physical_type)
+            self.assertEqual(0, sensor20021.zone_alarm_type)
+            self.assertEqual(8, sensor20021.zone_type)
+            self.assertEqual(1, sensor20021.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_temperature_sensor',
                 sensor_unique_id='002_0021',
-                sensor_state=sensor221,
+                sensor_state=sensor20021,
                 expected_device_class='heat',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 230 is properly configured'):
-            sensor230 = partition1.zone(230)
-            self.assertEqual(QolsysSensorTilt, sensor230.__class__)
-            self.assertEqual('002-0030', sensor230.id)
-            self.assertEqual('My Tilt Sensor', sensor230.name)
-            self.assertEqual('garageTilt1', sensor230.group)
-            self.assertEqual('Closed', sensor230.status)
-            self.assertEqual('0', sensor230.state)
-            self.assertEqual(230, sensor230.zone_id)
-            self.assertEqual(1, sensor230.zone_physical_type)
-            self.assertEqual(3, sensor230.zone_alarm_type)
-            self.assertEqual(16, sensor230.zone_type)
-            self.assertEqual(1, sensor230.partition_id)
+        with self.subTest(msg='Sensor 20030 is properly configured'):
+            sensor20030 = partition1.zone(20030)
+            self.assertEqual(QolsysSensorTilt, sensor20030.__class__)
+            self.assertEqual('002-0030', sensor20030.id)
+            self.assertEqual('My Tilt Sensor', sensor20030.name)
+            self.assertEqual('garageTilt1', sensor20030.group)
+            self.assertEqual('Closed', sensor20030.status)
+            self.assertEqual('0', sensor20030.state)
+            self.assertEqual(20030, sensor20030.zone_id)
+            self.assertEqual(1, sensor20030.zone_physical_type)
+            self.assertEqual(3, sensor20030.zone_alarm_type)
+            self.assertEqual(16, sensor20030.zone_type)
+            self.assertEqual(1, sensor20030.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_tilt_sensor',
                 sensor_unique_id='002_0030',
-                sensor_state=sensor230,
+                sensor_state=sensor20030,
                 expected_device_class='garage_door',
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 240 is properly configured'):
-            sensor240 = partition1.zone(240)
-            self.assertEqual(QolsysSensorKeypad, sensor240.__class__)
-            self.assertEqual('002-0040', sensor240.id)
-            self.assertEqual('My Keypad Sensor', sensor240.name)
-            self.assertEqual('fixedintrusion', sensor240.group)
-            self.assertEqual('Closed', sensor240.status)
-            self.assertEqual('0', sensor240.state)
-            self.assertEqual(240, sensor240.zone_id)
-            self.assertEqual(4, sensor240.zone_physical_type)
-            self.assertEqual(0, sensor240.zone_alarm_type)
-            self.assertEqual(104, sensor240.zone_type)
-            self.assertEqual(1, sensor240.partition_id)
+        with self.subTest(msg='Sensor 20040 is properly configured'):
+            sensor20040 = partition1.zone(20040)
+            self.assertEqual(QolsysSensorKeypad, sensor20040.__class__)
+            self.assertEqual('002-0040', sensor20040.id)
+            self.assertEqual('My Keypad Sensor', sensor20040.name)
+            self.assertEqual('fixedintrusion', sensor20040.group)
+            self.assertEqual('Closed', sensor20040.status)
+            self.assertEqual('0', sensor20040.state)
+            self.assertEqual(20040, sensor20040.zone_id)
+            self.assertEqual(4, sensor20040.zone_physical_type)
+            self.assertEqual(0, sensor20040.zone_alarm_type)
+            self.assertEqual(104, sensor20040.zone_type)
+            self.assertEqual(1, sensor20040.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_keypad_sensor',
                 sensor_unique_id='002_0040',
-                sensor_state=sensor240,
+                sensor_state=sensor20040,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 250 is properly configured'):
-            sensor250 = partition1.zone(250)
-            self.assertEqual(QolsysSensorAuxiliaryPendant, sensor250.__class__)
-            self.assertEqual('002-0050', sensor250.id)
-            self.assertEqual('My Auxiliary Pendant Sensor', sensor250.name)
-            self.assertEqual('fixedmedical', sensor250.group)
-            self.assertEqual('Closed', sensor250.status)
-            self.assertEqual('0', sensor250.state)
-            self.assertEqual(250, sensor250.zone_id)
-            self.assertEqual(1, sensor250.zone_physical_type)
-            self.assertEqual(0, sensor250.zone_alarm_type)
-            self.assertEqual(21, sensor250.zone_type)
-            self.assertEqual(1, sensor250.partition_id)
+        with self.subTest(msg='Sensor 20050 is properly configured'):
+            sensor20050 = partition1.zone(20050)
+            self.assertEqual(QolsysSensorAuxiliaryPendant, sensor20050.__class__)
+            self.assertEqual('002-0050', sensor20050.id)
+            self.assertEqual('My Auxiliary Pendant Sensor', sensor20050.name)
+            self.assertEqual('fixedmedical', sensor20050.group)
+            self.assertEqual('Closed', sensor20050.status)
+            self.assertEqual('0', sensor20050.state)
+            self.assertEqual(20050, sensor20050.zone_id)
+            self.assertEqual(1, sensor20050.zone_physical_type)
+            self.assertEqual(0, sensor20050.zone_alarm_type)
+            self.assertEqual(21, sensor20050.zone_type)
+            self.assertEqual(1, sensor20050.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_auxiliary_pendant_sensor',
                 sensor_unique_id='002_0050',
-                sensor_state=sensor250,
+                sensor_state=sensor20050,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 260 is properly configured'):
-            sensor260 = partition1.zone(260)
-            self.assertEqual(QolsysSensorSiren, sensor260.__class__)
-            self.assertEqual('002-0060', sensor260.id)
-            self.assertEqual('My Siren Sensor', sensor260.name)
-            self.assertEqual('Siren', sensor260.group)
-            self.assertEqual('Closed', sensor260.status)
-            self.assertEqual('0', sensor260.state)
-            self.assertEqual(260, sensor260.zone_id)
-            self.assertEqual(1, sensor260.zone_physical_type)
-            self.assertEqual(3, sensor260.zone_alarm_type)
-            self.assertEqual(14, sensor260.zone_type)
-            self.assertEqual(1, sensor260.partition_id)
+        with self.subTest(msg='Sensor 20060 is properly configured'):
+            sensor20060 = partition1.zone(20060)
+            self.assertEqual(QolsysSensorSiren, sensor20060.__class__)
+            self.assertEqual('002-0060', sensor20060.id)
+            self.assertEqual('My Siren Sensor', sensor20060.name)
+            self.assertEqual('Siren', sensor20060.group)
+            self.assertEqual('Closed', sensor20060.status)
+            self.assertEqual('0', sensor20060.state)
+            self.assertEqual(20060, sensor20060.zone_id)
+            self.assertEqual(1, sensor20060.zone_physical_type)
+            self.assertEqual(3, sensor20060.zone_alarm_type)
+            self.assertEqual(14, sensor20060.zone_type)
+            self.assertEqual(1, sensor20060.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_siren_sensor',
                 sensor_unique_id='002_0060',
-                sensor_state=sensor260,
+                sensor_state=sensor20060,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 270 is properly configured'):
-            sensor270 = partition1.zone(270)
-            self.assertEqual(QolsysSensorKeyFob, sensor270.__class__)
-            self.assertEqual('002-0070', sensor270.id)
-            self.assertEqual('My KeyFob Sensor', sensor270.name)
-            self.assertEqual('mobileintrusion', sensor270.group)
-            self.assertEqual('Closed', sensor270.status)
-            self.assertEqual('0', sensor270.state)
-            self.assertEqual(270, sensor270.zone_id)
-            self.assertEqual(3, sensor270.zone_physical_type)
-            self.assertEqual(0, sensor270.zone_alarm_type)
-            self.assertEqual(102, sensor270.zone_type)
-            self.assertEqual(1, sensor270.partition_id)
+        with self.subTest(msg='Sensor 20070 is properly configured'):
+            sensor20070 = partition1.zone(20070)
+            self.assertEqual(QolsysSensorKeyFob, sensor20070.__class__)
+            self.assertEqual('002-0070', sensor20070.id)
+            self.assertEqual('My KeyFob Sensor', sensor20070.name)
+            self.assertEqual('mobileintrusion', sensor20070.group)
+            self.assertEqual('Closed', sensor20070.status)
+            self.assertEqual('0', sensor20070.state)
+            self.assertEqual(20070, sensor20070.zone_id)
+            self.assertEqual(3, sensor20070.zone_physical_type)
+            self.assertEqual(0, sensor20070.zone_alarm_type)
+            self.assertEqual(102, sensor20070.zone_type)
+            self.assertEqual(1, sensor20070.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_keyfob_sensor',
                 sensor_unique_id='002_0070',
-                sensor_state=sensor270,
+                sensor_state=sensor20070,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
 
-        with self.subTest(msg='Sensor 280 is properly configured'):
-            sensor280 = partition1.zone(280)
-            self.assertEqual(QolsysSensorTakeoverModule, sensor280.__class__)
-            self.assertEqual('002-0080', sensor280.id)
-            self.assertEqual('My TakeoverModule Sensor', sensor280.name)
-            self.assertEqual('takeovermodule', sensor280.group)
-            self.assertEqual('Closed', sensor280.status)
-            self.assertEqual('0', sensor280.state)
-            self.assertEqual(280, sensor280.zone_id)
-            self.assertEqual(13, sensor280.zone_physical_type)
-            self.assertEqual(0, sensor280.zone_alarm_type)
-            self.assertEqual(18, sensor280.zone_type)
-            self.assertEqual(1, sensor280.partition_id)
+        with self.subTest(msg='Sensor 20080 is properly configured'):
+            sensor20080 = partition1.zone(20080)
+            self.assertEqual(QolsysSensorTakeoverModule, sensor20080.__class__)
+            self.assertEqual('002-0080', sensor20080.id)
+            self.assertEqual('My TakeoverModule Sensor', sensor20080.name)
+            self.assertEqual('takeovermodule', sensor20080.group)
+            self.assertEqual('Closed', sensor20080.status)
+            self.assertEqual('0', sensor20080.state)
+            self.assertEqual(20080, sensor20080.zone_id)
+            self.assertEqual(13, sensor20080.zone_physical_type)
+            self.assertEqual(0, sensor20080.zone_alarm_type)
+            self.assertEqual(18, sensor20080.zone_type)
+            self.assertEqual(1, sensor20080.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_takeovermodule_sensor',
                 sensor_unique_id='002_0080',
-                sensor_state=sensor280,
+                sensor_state=sensor20080,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
@@ -758,25 +758,25 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 expected_enabled_by_default=True,
             )
 
-        with self.subTest(msg='Sensor 281 is properly configured'):
-            sensor281 = partition1.zone(281)
-            self.assertEqual(QolsysSensorTranslator, sensor281.__class__)
-            self.assertEqual('002-0081', sensor281.id)
-            self.assertEqual('My Translator Sensor', sensor281.name)
-            self.assertEqual('translator', sensor281.group)
-            self.assertEqual('Closed', sensor281.status)
-            self.assertEqual('0', sensor281.state)
-            self.assertEqual(281, sensor281.zone_id)
-            self.assertEqual(14, sensor281.zone_physical_type)
-            self.assertEqual(0, sensor281.zone_alarm_type)
-            self.assertEqual(20, sensor281.zone_type)
-            self.assertEqual(1, sensor281.partition_id)
+        with self.subTest(msg='Sensor 20081 is properly configured'):
+            sensor20081 = partition1.zone(20081)
+            self.assertEqual(QolsysSensorTranslator, sensor20081.__class__)
+            self.assertEqual('002-0081', sensor20081.id)
+            self.assertEqual('My Translator Sensor', sensor20081.name)
+            self.assertEqual('translator', sensor20081.group)
+            self.assertEqual('Closed', sensor20081.status)
+            self.assertEqual('0', sensor20081.state)
+            self.assertEqual(20081, sensor20081.zone_id)
+            self.assertEqual(14, sensor20081.zone_physical_type)
+            self.assertEqual(0, sensor20081.zone_alarm_type)
+            self.assertEqual(20, sensor20081.zone_type)
+            self.assertEqual(1, sensor20081.partition_id)
 
             await self._check_sensor_mqtt_messages(
                 gw=gw,
                 sensor_flat_name='my_translator_sensor',
                 sensor_unique_id='002_0081',
-                sensor_state=sensor281,
+                sensor_state=sensor20081,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
             )
@@ -786,7 +786,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             secure_arm=from_secure_arm,
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
         )
 
         event = {
@@ -842,7 +842,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active_tampered_while_closed(self):
         # Using a sensor that's already closed
-        zone_id = 100
+        zone_id = 10000
         entity_id = 'my_door'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -962,7 +962,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active_tampered_while_open(self):
         # Using a sensor that's already open
-        zone_id = 101
+        zone_id = 10001
         entity_id = 'my_window'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -1060,10 +1060,10 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active(self, from_status, to_status):
         if from_status == 'Closed':
-            zone_id = 100
+            zone_id = 10000
             entity_id = 'my_door'
         else:
-            zone_id = 101
+            zone_id = 10001
             entity_id = 'my_window'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -1129,7 +1129,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_active_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[101],
+            zone_ids=[10001],
         )
 
         event = {
@@ -1138,7 +1138,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             'version': 1,
             'zone': {
                 'status': 'Closed',
-                'zone_id': 100,
+                'zone_id': 10000,
             },
             'requestID': '<request_id>',
         }
@@ -1157,7 +1157,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_update_existing_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0, 1],
-            zone_ids=[100, 200],
+            zone_ids=[10000, 20000],
         )
 
         event = {
@@ -1170,7 +1170,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'entryexitdelay',
                 'status': 'Open',
                 'state': '1',
-                'zone_id': 100,
+                'zone_id': 10000,
                 'zone_physical_type': 60,
                 'zone_alarm_type': 61,
                 'zone_type': 62,
@@ -1218,7 +1218,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         partition1 = state.partition(1)
         self.assertEqual(2, len(partition1.sensors))
 
-        sensor = partition1.zone(100)
+        sensor = partition1.zone(10000)
         self.assertEqual('1', sensor.state)
         self.assertEqual(60, sensor.zone_physical_type)
         self.assertEqual(61, sensor.zone_alarm_type)
@@ -1230,7 +1230,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_update_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[101],
+            zone_ids=[10001],
         )
 
         event = {
@@ -1243,7 +1243,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'entryexitdelay',
                 'status': 'Open',
                 'state': '1',
-                'zone_id': 100,
+                'zone_id': 10000,
                 'zone_physical_type': 60,
                 'zone_alarm_type': 61,
                 'zone_type': 62,
@@ -1267,7 +1267,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_add(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
         )
 
         event = {
@@ -1280,7 +1280,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'awayinstantmotion',
                 'status': 'Closed',
                 'state': '0',
-                'zone_id': 110,
+                'zone_id': 10010,
                 'zone_physical_type': 2,
                 'zone_alarm_type': 3,
                 'zone_type': 2,
@@ -1386,26 +1386,26 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             partition0 = state.partition(0)
             self.assertEqual(2, len(partition0.sensors))
 
-        with self.subTest(msg='Sensor 110 is properly configured'):
-            sensor110 = partition0.zone(110)
-            self.assertEqual(QolsysSensorMotion, sensor110.__class__)
-            self.assertEqual('001-0010', sensor110.id)
-            self.assertEqual('My Motion', sensor110.name)
-            self.assertEqual('awayinstantmotion', sensor110.group)
-            self.assertEqual('Closed', sensor110.status)
-            self.assertEqual('0', sensor110.state)
-            self.assertEqual(110, sensor110.zone_id)
-            self.assertEqual(2, sensor110.zone_physical_type)
-            self.assertEqual(3, sensor110.zone_alarm_type)
-            self.assertEqual(2, sensor110.zone_type)
-            self.assertEqual(0, sensor110.partition_id)
+        with self.subTest(msg='Sensor 10010 is properly configured'):
+            sensor10010 = partition0.zone(10010)
+            self.assertEqual(QolsysSensorMotion, sensor10010.__class__)
+            self.assertEqual('001-0010', sensor10010.id)
+            self.assertEqual('My Motion', sensor10010.name)
+            self.assertEqual('awayinstantmotion', sensor10010.group)
+            self.assertEqual('Closed', sensor10010.status)
+            self.assertEqual('0', sensor10010.state)
+            self.assertEqual(10010, sensor10010.zone_id)
+            self.assertEqual(2, sensor10010.zone_physical_type)
+            self.assertEqual(3, sensor10010.zone_alarm_type)
+            self.assertEqual(2, sensor10010.zone_type)
+            self.assertEqual(0, sensor10010.partition_id)
 
         self.assertTrue(panel.is_client_connected)
 
     async def _test_integration_event_arming(self, from_status, to_status, ha_status=None):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
             partition_status={
                 0: from_status,
             },
@@ -1624,7 +1624,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         else:
             panel, gw, _, _ = await self._ready_panel_and_gw(
                 partition_ids=[0],
-                zone_ids=[100],
+                zone_ids=[10000],
                 partition_status={
                     0: 'ARM_STAY',
                 },
