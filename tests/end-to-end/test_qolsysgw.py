@@ -536,14 +536,15 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             },
         ]
 
-        closed_entities = [100, 110, 111, 120, 121, 130, 140, 141, 150,
-                           200, 210, 220, 221, 230, 240, 250, 260, 270,
-                           280, 200802, 281]
-        open_entities = [101]
-        tamper_entities = [100, 110, 111, 210]
-        untamper_entities_to_open = [100]
-        untamper_entities_to_closed_short = [110]
-        untamper_entities_to_closed_long = [111]
+        closed_entities = [10000, 10010, 10011, 10020, 10021, 10030, 10040,
+                           10041, 10050,
+                           20000, 20010, 20020, 20021, 20030, 20040, 20050,
+                           20060, 20070, 20080, 200802, 20081]
+        open_entities = [10001]
+        tamper_entities = [10000, 10010, 10011, 20010]
+        untamper_entities_to_open = [10000]
+        untamper_entities_to_closed_short = [10010]
+        untamper_entities_to_closed_long = [10011]
 
         def zone_active_event(zone_id, closed=False):
             return {
