@@ -786,7 +786,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             secure_arm=from_secure_arm,
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
         )
 
         event = {
@@ -842,7 +842,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active_tampered_while_closed(self):
         # Using a sensor that's already closed
-        zone_id = 100
+        zone_id = 10000
         entity_id = 'my_door'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -962,7 +962,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active_tampered_while_open(self):
         # Using a sensor that's already open
-        zone_id = 101
+        zone_id = 10001
         entity_id = 'my_window'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -1060,10 +1060,10 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
     async def _test_integration_event_zone_event_zone_active(self, from_status, to_status):
         if from_status == 'Closed':
-            zone_id = 100
+            zone_id = 10000
             entity_id = 'my_door'
         else:
-            zone_id = 101
+            zone_id = 10001
             entity_id = 'my_window'
 
         panel, gw, _, _ = await self._ready_panel_and_gw(
@@ -1129,7 +1129,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_active_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[101],
+            zone_ids=[10001],
         )
 
         event = {
@@ -1138,7 +1138,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             'version': 1,
             'zone': {
                 'status': 'Closed',
-                'zone_id': 100,
+                'zone_id': 10000,
             },
             'requestID': '<request_id>',
         }
@@ -1157,7 +1157,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_update_existing_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0, 1],
-            zone_ids=[100, 200],
+            zone_ids=[10000, 20000],
         )
 
         event = {
@@ -1170,7 +1170,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'entryexitdelay',
                 'status': 'Open',
                 'state': '1',
-                'zone_id': 100,
+                'zone_id': 10000,
                 'zone_physical_type': 60,
                 'zone_alarm_type': 61,
                 'zone_type': 62,
@@ -1230,7 +1230,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_update_unknown_zone(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[101],
+            zone_ids=[10001],
         )
 
         event = {
@@ -1243,7 +1243,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'entryexitdelay',
                 'status': 'Open',
                 'state': '1',
-                'zone_id': 100,
+                'zone_id': 10000,
                 'zone_physical_type': 60,
                 'zone_alarm_type': 61,
                 'zone_type': 62,
@@ -1267,7 +1267,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def test_integration_event_zone_event_zone_add(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
         )
 
         event = {
@@ -1280,7 +1280,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 'group': 'awayinstantmotion',
                 'status': 'Closed',
                 'state': '0',
-                'zone_id': 110,
+                'zone_id': 10010,
                 'zone_physical_type': 2,
                 'zone_alarm_type': 3,
                 'zone_type': 2,
@@ -1405,7 +1405,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
     async def _test_integration_event_arming(self, from_status, to_status, ha_status=None):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
             partition_status={
                 0: from_status,
             },
@@ -1624,7 +1624,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
         else:
             panel, gw, _, _ = await self._ready_panel_and_gw(
                 partition_ids=[0],
-                zone_ids=[100],
+                zone_ids=[10000],
                 partition_status={
                     0: 'ARM_STAY',
                 },

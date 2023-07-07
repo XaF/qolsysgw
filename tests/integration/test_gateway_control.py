@@ -9,7 +9,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
     async def test_integration_control_with_wrong_session_token(self):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
         )
 
         control = {
@@ -41,7 +41,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                                    **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
             partition_status={
                 0: partition_status,
             },
@@ -407,7 +407,7 @@ class TestIntegrationQolsysGatewayControl(TestQolsysGatewayBase):
                                     **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
             **kwargs,
         )
 

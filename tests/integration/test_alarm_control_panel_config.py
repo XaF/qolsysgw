@@ -9,7 +9,7 @@ class TestIntegrationAlarmControlPanelConfig(TestQolsysGatewayBase):
     async def _test_config(self, payload_expect, **kwargs):
         panel, gw, _, _ = await self._ready_panel_and_gw(
             partition_ids=[0],
-            zone_ids=[100],
+            zone_ids=[10000],
             **kwargs,
         )
 
