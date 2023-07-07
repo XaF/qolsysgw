@@ -1386,19 +1386,19 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             partition0 = state.partition(0)
             self.assertEqual(2, len(partition0.sensors))
 
-        with self.subTest(msg='Sensor 110 is properly configured'):
-            sensor110 = partition0.zone(110)
-            self.assertEqual(QolsysSensorMotion, sensor110.__class__)
-            self.assertEqual('001-0010', sensor110.id)
-            self.assertEqual('My Motion', sensor110.name)
-            self.assertEqual('awayinstantmotion', sensor110.group)
-            self.assertEqual('Closed', sensor110.status)
-            self.assertEqual('0', sensor110.state)
-            self.assertEqual(110, sensor110.zone_id)
-            self.assertEqual(2, sensor110.zone_physical_type)
-            self.assertEqual(3, sensor110.zone_alarm_type)
-            self.assertEqual(2, sensor110.zone_type)
-            self.assertEqual(0, sensor110.partition_id)
+        with self.subTest(msg='Sensor 10010 is properly configured'):
+            sensor10010 = partition0.zone(10010)
+            self.assertEqual(QolsysSensorMotion, sensor10010.__class__)
+            self.assertEqual('001-0010', sensor10010.id)
+            self.assertEqual('My Motion', sensor10010.name)
+            self.assertEqual('awayinstantmotion', sensor10010.group)
+            self.assertEqual('Closed', sensor10010.status)
+            self.assertEqual('0', sensor10010.state)
+            self.assertEqual(10010, sensor10010.zone_id)
+            self.assertEqual(2, sensor10010.zone_physical_type)
+            self.assertEqual(3, sensor10010.zone_alarm_type)
+            self.assertEqual(2, sensor10010.zone_type)
+            self.assertEqual(0, sensor10010.partition_id)
 
         self.assertTrue(panel.is_client_connected)
 
