@@ -368,3 +368,9 @@ class QolsysSensorTranslator(QolsysSensor, _QolsysSensorWithoutUpdates):
     @classmethod
     def from_json(cls, data, partition, common=None):
         return cls.from_json_subclass('Translator', data, partition, common)
+
+
+class QolsysSensorDoorbell(QolsysSensor):
+    @classmethod
+    def from_json(cls, data, partition, common=None):
+        return cls.from_json_subclass('Doorbell', data, partition, common)

@@ -528,6 +528,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 expected_enabled_by_default=True,
             )
 
+        with self.subTest(msg='Sensor 20001 is properly configured'):
+            sensor20001 = partition1.zone(20001)
+            self.assertEqual(QolsysSensorDoorbell, sensor20001.__class__)
+            self.assertEqual('002-0001', sensor20001.id)
+            self.assertEqual('My Doorbell Sensor', sensor20001.name)
+            self.assertEqual('localsafety', sensor20001.group)
+            self.assertEqual('Closed', sensor20001.status)
+            self.assertEqual('0', sensor20001.state)
+            self.assertEqual(20001, sensor20001.zone_id)
+            self.assertEqual(1, sensor20001.zone_physical_type)
+            self.assertEqual(3, sensor20001.zone_alarm_type)
+            self.assertEqual(109, sensor20001.zone_type)
+            self.assertEqual(1, sensor20001.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_doorbell_sensor',
+                sensor_unique_id='002_0001',
+                sensor_state=sensor20001,
+                expected_device_class='sound',
+                expected_enabled_by_default=True,
+            )
+
         with self.subTest(msg='Sensor 20010 is properly configured'):
             sensor20010 = partition1.zone(20010)
             self.assertEqual(QolsysSensorFreeze, sensor20010.__class__)

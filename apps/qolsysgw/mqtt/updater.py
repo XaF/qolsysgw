@@ -13,6 +13,7 @@ from qolsys.sensors import QolsysSensorAuxiliaryPendant
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
+from qolsys.sensors import QolsysSensorDoorbell
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
@@ -433,23 +434,24 @@ class MqttWrapperQolsysSensor(MqttWrapper):
     PAYLOAD_OFF = 'Closed'
 
     QOLSYS_TO_HA_DEVICE_CLASS = {
-        QolsysSensorDoorWindow: 'door',
-        QolsysSensorMotion: 'motion',
-        QolsysSensorGlassBreak: 'vibration',
-        QolsysSensorBluetooth: 'presence',
-        QolsysSensorSmokeDetector: 'smoke',
-        QolsysSensorCODetector: 'gas',
-        QolsysSensorWater: 'moisture',
-        QolsysSensorFreeze: 'cold',
-        QolsysSensorHeat: 'heat',
-        QolsysSensorTilt: 'garage_door',
-        QolsysSensorKeypad: 'safety',
         QolsysSensorAuxiliaryPendant: 'safety',
-        QolsysSensorSiren: 'safety',
+        QolsysSensorBluetooth: 'presence',
+        QolsysSensorCODetector: 'gas',
+        QolsysSensorDoorWindow: 'door',
+        QolsysSensorDoorbell: 'sound',
+        QolsysSensorFreeze: 'cold',
+        QolsysSensorGlassBreak: 'vibration',
+        QolsysSensorHeat: 'heat',
         QolsysSensorKeyFob: 'safety',
-        QolsysSensorTemperature: 'heat',
+        QolsysSensorKeypad: 'safety',
+        QolsysSensorMotion: 'motion',
+        QolsysSensorSiren: 'safety',
+        QolsysSensorSmokeDetector: 'smoke',
         QolsysSensorTakeoverModule: 'safety',
+        QolsysSensorTemperature: 'heat',
+        QolsysSensorTilt: 'garage_door',
         QolsysSensorTranslator: 'safety',
+        QolsysSensorWater: 'moisture',
     }
 
     def __init__(self, sensor: QolsysSensor, *args, **kwargs):
