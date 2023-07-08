@@ -388,6 +388,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             },
             {
                 'attributes': {
+                    'device_class': 'sound',
+                    'friendly_name': 'My Doorbell Sensor',
+                    'group': 'localsafety',
+                    'zone_alarm_type': 3,
+                    'zone_physical_type': 1,
+                    'zone_type': 109,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.my_doorbell_sensor',
+                'state': 'off',
+            },
+            {
+                'attributes': {
                     'device_class': 'cold',
                     'friendly_name': 'My Freeze Sensor',
                     'group': 'freeze',
@@ -536,15 +549,48 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             },
         ]
 
-        closed_entities = [10000, 10010, 10011, 10020, 10021, 10030, 10040,
-                           10041, 10050,
-                           20000, 20010, 20020, 20021, 20030, 20040, 20050,
-                           20060, 20070, 20080, 200802, 20081]
-        open_entities = [10001]
-        tamper_entities = [10000, 10010, 10011, 20010]
-        untamper_entities_to_open = [10000]
-        untamper_entities_to_closed_short = [10010]
-        untamper_entities_to_closed_long = [10011]
+        closed_entities = [
+            10000,
+            10010,
+            10011,
+            10020,
+            10021,
+            10030,
+            10040,
+            10041,
+            10050,
+            20000,
+            20001,
+            20010,
+            20020,
+            20021,
+            20030,
+            20040,
+            20050,
+            20060,
+            20070,
+            20080,
+            200802,
+            20081,
+        ]
+        open_entities = [
+            10001,
+        ]
+        tamper_entities = [
+            10000,
+            10010,
+            10011,
+            20010,
+        ]
+        untamper_entities_to_open = [
+            10000,
+        ]
+        untamper_entities_to_closed_short = [
+            10010,
+        ]
+        untamper_entities_to_closed_long = [
+            10011,
+        ]
 
         def zone_active_event(zone_id, closed=False):
             return {
@@ -805,6 +851,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'tampered': False,
                 },
                 'entity_id': 'binary_sensor.my_2nd_door',
+                'state': 'on',
+            },
+            {
+                'attributes': {
+                    'device_class': 'sound',
+                    'friendly_name': 'My Doorbell Sensor',
+                    'group': 'localsafety',
+                    'zone_alarm_type': 3,
+                    'zone_physical_type': 1,
+                    'zone_type': 109,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.my_doorbell_sensor',
                 'state': 'on',
             },
             {

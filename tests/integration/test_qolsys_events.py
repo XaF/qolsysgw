@@ -12,6 +12,7 @@ from qolsys.sensors import QolsysSensorAuxiliaryPendant
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
+from qolsys.sensors import QolsysSensorDoorbell
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
@@ -260,7 +261,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(12, len(partition1.sensors))
+            self.assertEqual(13, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -525,6 +526,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_unique_id='002_0000',
                 sensor_state=sensor20000,
                 expected_device_class='door',
+                expected_enabled_by_default=True,
+            )
+
+        with self.subTest(msg='Sensor 20001 is properly configured'):
+            sensor20001 = partition1.zone(20001)
+            self.assertEqual(QolsysSensorDoorbell, sensor20001.__class__)
+            self.assertEqual('002-0001', sensor20001.id)
+            self.assertEqual('My Doorbell Sensor', sensor20001.name)
+            self.assertEqual('localsafety', sensor20001.group)
+            self.assertEqual('Closed', sensor20001.status)
+            self.assertEqual('0', sensor20001.state)
+            self.assertEqual(20001, sensor20001.zone_id)
+            self.assertEqual(1, sensor20001.zone_physical_type)
+            self.assertEqual(3, sensor20001.zone_alarm_type)
+            self.assertEqual(109, sensor20001.zone_type)
+            self.assertEqual(1, sensor20001.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_doorbell_sensor',
+                sensor_unique_id='002_0001',
+                sensor_state=sensor20001,
+                expected_device_class='sound',
                 expected_enabled_by_default=True,
             )
 
