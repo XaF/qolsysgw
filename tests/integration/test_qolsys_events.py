@@ -12,6 +12,7 @@ from qolsys.sensors import QolsysSensorAuxiliaryPendant
 from qolsys.sensors import QolsysSensorBluetooth
 from qolsys.sensors import QolsysSensorCODetector
 from qolsys.sensors import QolsysSensorDoorWindow
+from qolsys.sensors import QolsysSensorDoorbell
 from qolsys.sensors import QolsysSensorFreeze
 from qolsys.sensors import QolsysSensorGlassBreak
 from qolsys.sensors import QolsysSensorHeat
