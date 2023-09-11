@@ -1,4 +1,5 @@
 import asyncio
+import json
 import requests
 import time
 
@@ -49,7 +50,28 @@ class HomeAssistantRestAPI(requests.Session):
                 await asyncio.sleep(.5)
 
         if not resp and raise_if_timeout:
-            raise RuntimeError('Timeout before entity ready')
+            reason = 'unknown reason'
+            resp = self.states()
+            if not resp.ok:
+                reason = 'could not get states from home assistant API'
+            else:
+                entities = resp.json()
+                entity_obj = [e for e in entities if e['entity_id'] == entity]
+                if not entity_obj:
+                    reason = 'entity not found in home assistant (entities: {})'.format(
+                        ', '.join([e['entity_id'] for e in entities]))
+                else:
+                    entity_obj = entity[0]
+                    sentinel = object()
+                    diff_filters = [
+                        "{}={} (expected: {})".format(
+                            k, entity_obj.get(k, sentinel), v)
+                        for k, v in filters.items()
+                        if entity_obj.get(k, sentinel) != v
+                    ]
+                    reason = 'entity found but did not match filters: {}'.format(', '.join(diff_filters))
+
+            raise RuntimeError('Timeout before entity {} ready: {}'.format(entity, reason))
 
         return resp
 

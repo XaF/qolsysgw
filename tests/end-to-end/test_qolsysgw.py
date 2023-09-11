@@ -1,5 +1,6 @@
 import contextlib
 import copier
+import os
 import random
 import re
 import shlex
@@ -23,8 +24,8 @@ from testutils.mock_types import ISODATE_S
 from testutils.utils import get_free_port
 
 
-def in_wsl():
-    return 'microsoft-standard' in uname().release
+def running_in_ci():
+    return 'CI' in os.environ
 
 
 class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
@@ -89,12 +90,25 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
 
     @contextlib.asynccontextmanager
     async def get_context(self):
-        # Start a panel panel
+        # Start a panel
         panel = PanelServer()
-        await panel.start()
+
+        # Sometimes there's weird issues with ports, give it a few tries
+        for i in reversed(range(10)):
+            # Try starting the panel
+            await panel.start()
+
+            # Check that we can connect to it
+            try:
+                await panel.test_connection()
+            except Exception:
+                if not i:
+                    raise
+
+                panel.stop()
 
         # Get a free port for Home Assistant
-        ha_port = get_free_port() if in_wsl() else 8123
+        ha_port = 8123 if running_in_ci() else get_free_port()
 
         # Copy files to work with the panel
         copier.run_copy(
@@ -106,7 +120,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 'HA_PORT': ha_port,
                 'HA_TOKEN': self.HA_TOKEN,
                 'PANEL_PORT': panel.port,
-                'IN_WSL': in_wsl(),
+                'RUNNING_IN_CI': running_in_ci(),
             }
         )
 
@@ -180,7 +194,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     if state['entity_id'] == entity_id
                 ]
 
-                self.assertEqual(1, len(actual))
+                self.assertEqual(1, len(actual), f"Entity {entity_id} not found")
                 actual = actual[0]
 
                 self.maxDiff = None

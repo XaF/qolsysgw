@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os.path
+import socket
 import ssl
 import time
 
@@ -28,9 +29,10 @@ class PanelServer(object):
 
         self._keep_listening = True
 
+        self._address = 'localhost'
         server = await asyncio.start_server(
             self._serve_client,
-            'localhost',
+            self._address,
             port,
             ssl=ssl_ctx,
         )
@@ -39,6 +41,16 @@ class PanelServer(object):
         self._port = connected_port
 
         return server
+
+    async def test_connection(self):
+        s = socket.socket()
+        try:
+            s.connect((self._address, self._port))
+            return True
+        except socket.error as e:
+            raise RuntimeError("Connection to mock panel ({}, {}) failed: {}".format(self._address, self._port, e))
+        finally:
+            s.close()
 
     @property
     def port(self):

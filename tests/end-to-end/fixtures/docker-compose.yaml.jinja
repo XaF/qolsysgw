@@ -3,15 +3,15 @@ services:
   # HomeAssistant
   homeassistant:
     image: homeassistant/home-assistant
-{% if IN_WSL %}
+{% if RUNNING_IN_CI %}
+    network_mode: host
+    extra_hosts:
+      - "mosquitto:host-gateway"
+{% else %}
     networks:
       - qolsysgw
     ports:
       - "{{ HA_PORT }}:8123"
-{% else %}
-    network_mode: host
-    extra_hosts:
-      - "mosquitto:host-gateway"
 {% endif %}
     volumes:
       - {{ WORKSPACE }}/homeassistant:/config
@@ -21,11 +21,11 @@ services:
   # MQTT
   mosquitto:
     image: eclipse-mosquitto
-{% if IN_WSL %}
+{% if RUNNING_IN_CI %}
+    network_mode: host
+{% else %}
     networks:
       - qolsysgw
-{% else %}
-    network_mode: host
 {% endif %}
     volumes:
       - {{ WORKSPACE }}/mosquitto:/mosquitto/config
@@ -34,18 +34,18 @@ services:
   # AppDaemon
   appdaemon:
     image: acockburn/appdaemon
-{% if IN_WSL %}
+{% if RUNNING_IN_CI %}
+    network_mode: host
+{% else %}
     networks:
       - qolsysgw
-{% else %}
-    network_mode: host
 {% endif %}
     extra_hosts:
-{% if IN_WSL %}
-      - "host.docker.internal:host-gateway"
-{% else %}
+{% if RUNNING_IN_CI %}
       - "homeassistant:host-gateway"
       - "mosquitto:host-gateway"
+{% else %}
+      - "host.docker.internal:host-gateway"
 {% endif %}
     volumes:
       - {{ WORKSPACE }}/appdaemon:/conf
@@ -55,7 +55,7 @@ services:
       - mosquitto
     restart: unless-stopped
 
-{% if IN_WSL %}
+{% if not RUNNING_IN_CI %}
 networks:
   qolsysgw:
     name: qolsysgw-network
