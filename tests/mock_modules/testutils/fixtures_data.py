@@ -345,7 +345,7 @@ def get_summary(secure_arm=False, partition_ids=None,
 
     # Prepare the entity ids so we can go over those easily
     entity_ids = [
-        z['name'].lower().replace(' ', '_')
+        "qolsys_panel_{}".format(z['name'].lower().replace(' ', '_'))
         for p in event['partition_list']
         for z in p['zone_list']
     ]
