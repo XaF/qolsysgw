@@ -10,7 +10,6 @@ import unittest
 
 from unittest import mock
 
-from platform import uname
 from types import SimpleNamespace
 
 import testenv  # noqa: F401
