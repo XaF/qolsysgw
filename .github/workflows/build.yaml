@@ -25,7 +25,7 @@ jobs:
       python_major: ${{ env.PYTHON_MAJOR }}
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
         if: github.event_name != 'schedule'
 
       - name: Get the changed files that would require tests
@@ -86,7 +86,7 @@ jobs:
 
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: Install python
         uses: "actions/setup-python@v4"
@@ -206,7 +206,7 @@ jobs:
 
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: Print docker versions
         run: |
@@ -248,7 +248,7 @@ jobs:
 
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.COMMIT_TOKEN }}
@@ -283,7 +283,7 @@ jobs:
 
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: Release version
         uses: ncipollo/release-action@v1
@@ -309,7 +309,7 @@ jobs:
 
     steps:
       - name: Checkout current commit
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: Check and auto-merge on minor changes
         uses: ahmadnassri/action-dependabot-auto-merge@v2
