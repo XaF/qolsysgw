@@ -57,6 +57,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
 
     def _docker_compose_up(self):
         run = self._docker_compose('up', '-d')
+        self._docker_is_up = True
 
         # Find container names, so we can use them after to read logs
         container_pattern = re.compile(
@@ -74,7 +75,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
 
     def _docker_compose_down(self):
         self.CONTAINERS = {}
-        return self._docker_compose('down')
+        run = self._docker_compose('down')
+        self._docker_is_up = False
+        return run
 
     def setUp(self):
         self.CONTAINERS = {}
@@ -84,8 +87,9 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         )
 
     def tearDown(self):
-        # Stop and destroy containers
-        self._docker_compose_down()
+        if hasattr(self, '_docker_is_up') and self._docker_is_up:
+            # Stop and destroy containers
+            self._docker_compose_down()
 
     @contextlib.asynccontextmanager
     async def get_context(self):
