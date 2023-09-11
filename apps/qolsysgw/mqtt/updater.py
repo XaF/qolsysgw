@@ -266,10 +266,8 @@ class MqttWrapperQolsysState(MqttWrapper):
         )
 
     def configure_payload(self, **kwargs):
-        panel_name = self._cfg.panel_device_name
-
         payload = {
-            'name': f'{panel_name} Last Error',
+            'name': 'Last Error',
             'device_class': 'timestamp',
             'state_topic': self.state_topic,
             'availability_mode': 'all',
