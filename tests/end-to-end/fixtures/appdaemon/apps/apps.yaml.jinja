@@ -2,7 +2,7 @@ qolsys_panel:
   module: gateway
   class: QolsysGateway
   log_level: DEBUG
-  panel_host: {% if IN_WSL %}host.docker.internal{% else %}localhost{% endif %}
+  panel_host: {% if RUNNING_IN_CI %}localhost{% else %}host.docker.internal{% endif %}
   panel_port: {{ PANEL_PORT }}
   panel_token: ThisIsMyToken
   enable_static_sensors_by_default: true

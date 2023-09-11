@@ -97,4 +97,10 @@ class TestQolsysGatewayBase(unittest.IsolatedAsyncioTestCase):
             filters={'topic': summary.last_topic},
         )
 
+        # Strip 'qolsys_panel_' prefix from all entity ids
+        summary.entity_ids = [
+            eid.removeprefix('qolsys_panel_')
+            for eid in summary.entity_ids
+        ]
+
         return panel, gw, summary.entity_ids, summary.topics
