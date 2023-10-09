@@ -33,7 +33,7 @@ jobs:
           .github/workflows/scripts/release.py --release-next "${{ github.event.inputs.version }}" | tee -a "$GITHUB_ENV"
 
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           file_pattern: "info.md"
           commit_message: ${{ env.RELEASE_EMOJI }} Release version ${{ env.RELEASE_VERSION }}
