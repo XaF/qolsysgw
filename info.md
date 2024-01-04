@@ -40,8 +40,8 @@ You can refer to the [README](https://github.com/XaF/qolsysgw#readme) for the de
 {% else -%}
 {% set parsed_version = version_installed.split('-')[0].replace('v', '').split('.') | map('int') | list -%}
 ## ChangeLog
-{%   if true -%}
-### _Next (dev)_
+{%   if parsed_version < [1, 5, 1] -%}
+### Version 1.5.1
 
  * 🐛 **[bugfix]** fix: 🐛 replace accents and others when generating ids (#142)
 {%   endif %}
