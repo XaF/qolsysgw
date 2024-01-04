@@ -104,6 +104,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             # Check that we can connect to it
             try:
                 await panel.test_connection()
+                break
             except Exception:
                 if not i:
                     raise
@@ -1019,7 +1020,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
     async def _check_panel_actions(self, ctx):
         partition0 = 'alarm_control_panel.qolsys_panel_partition0'
         partition1 = 'alarm_control_panel.qolsys_panel_partition1'
-        code = f'{random.randint(0,999999)}'.zfill(6)
+        code = f'{random.randint(0, 999999)}'.zfill(6)
 
         # Arming partition 0 so we can test the disarm on it
         event = {
