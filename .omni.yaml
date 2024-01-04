@@ -1,2 +1,23 @@
 up:
-  - python
+  - python:
+      pip:
+        - ./tests/requirements-tools.txt
+        - ./tests/requirements.txt
+        - ./tests/end-to-end/requirements.txt
+
+commands:
+  test:
+    desc: Run all tests
+    run: |
+      omni test lint
+      omni test unit
+    subcommands:
+      lint:
+        desc: Run lint
+        run: flake8 apps/ tests/
+      unit:
+        desc: Run unit and integration tests
+        run: pytest --cache-clear tests/unit/ tests/integration/ "$@"
+      e2e:
+        desc: Run end-to-end tests
+        run: pytest --cache-clear tests/end-to-end/

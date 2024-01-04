@@ -15,7 +15,15 @@ class TestUnitNormalizeNameToId(unittest.TestCase):
 
     def test_unit_returns_value_with_special_chars_replaced(self):
         self.assertEqual('n0r_v_aliz3d',
-                         normalize_name_to_id('n0r|v|aliz3d'))
+                         normalize_name_to_id('n0r|v!aliz3d'))
+
+    def test_unit_returns_value_with_special_chars_unicode_1_replaced(self):
+        self.assertEqual('kozuscek',
+                         normalize_name_to_id('køžuščêk'))
+
+    def test_unit_returns_value_with_special_chars_unicode_2_replaced(self):
+        self.assertEqual('__',
+                         normalize_name_to_id('北亰'))
 
 
 if __name__ == '__main__':
