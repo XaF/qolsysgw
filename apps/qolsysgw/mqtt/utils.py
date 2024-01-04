@@ -26,5 +26,5 @@ def rmdiacritics(char):
 
 def normalize_name_to_id(name):
     ascii_name = ''.join([rmdiacritics(c) for c in name])
-    clean_name = re.sub(r'[^a-zA-Z0-9_-]', '_', ascii_name)
+    clean_name = re.sub(r'[^a-zA-Z0-9_]', '_', ascii_name)
     return clean_name.lower()
