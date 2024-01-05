@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 
 from unittest import mock
 from copy import deepcopy
@@ -12,6 +13,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ADBase(object):
+    def __init__(self, *args, **kwargs):
+        self.name = uuid.uuid4()
+
     def get_ad_api(self):
         raise RuntimeError('Not defined yet')
 
