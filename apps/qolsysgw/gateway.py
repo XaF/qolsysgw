@@ -60,6 +60,14 @@ class AppDaemonLoggingHandler(logging.Handler):
         self._app.log(message, level=record.levelname)
 
 
+def fqcn(o):
+    cls = o if type(o) == type else o.__class__
+    mod = cls.__module__
+    if mod == 'builtins':
+        return cls.__qualname__
+    return f'{mod}.{cls.__qualname__}'
+
+
 class QolsysGateway(Mqtt):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
