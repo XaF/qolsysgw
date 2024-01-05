@@ -123,7 +123,7 @@ jobs:
 
       - name: Identify bot comments to hide
         uses: actions/github-script@v7
-        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request'
+        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
         with:
           script: |
             const { data: comments } = await github.rest.issues.listComments({
@@ -141,7 +141,7 @@ jobs:
             }
 
       - name: Minimize comments from previous run
-        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request' && env.BOT_COMMENTS
+        if: steps.tests.outcome == 'success' && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && env.BOT_COMMENTS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
