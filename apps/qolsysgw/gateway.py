@@ -61,7 +61,7 @@ class AppDaemonLoggingHandler(logging.Handler):
 
 
 def fqcn(o):
-    cls = o if type(o) == type else o.__class__
+    cls = o if type(o) == type else o.__class__  # noqa: E721
     mod = cls.__module__
     if mod == 'builtins':
         return cls.__qualname__
