@@ -30,12 +30,28 @@ from qolsys.state import QolsysState
 LOGGER = logging.getLogger(__name__)
 
 
+class AppDaemonLoggingFilter(logging.Filter):
+    def __init__(self, app, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._app = app
+
+    def filter(self, record):
+        record.app_name = self._app.name
+        return True
+
+
 class AppDaemonLoggingHandler(logging.Handler):
     def __init__(self, app):
         super().__init__()
         self._app = app
 
+    def check_app(self, app):
+        return self._app.name == app.name
+
     def emit(self, record):
+        if hasattr(record, 'app_name') and record.app_name != self._app.name:
+            return
+
         message = record.getMessage()
         if record.exc_info:
             message += '\nTraceback (most recent call last):\n'
@@ -60,9 +76,16 @@ class QolsysGateway(Mqtt):
         rlogger = logging.getLogger()
         rlogger.handlers = [
             h for h in rlogger.handlers
-            if type(h).__name__ != AppDaemonLoggingHandler.__name__
+            if (fqcn(h) != fqcn(AppDaemonLoggingHandler) or
+                not hasattr(h, 'check_app') or not h.check_app(self))
         ]
         rlogger.addHandler(AppDaemonLoggingHandler(self))
+
+        # Add a filter on the main LOGGER object to add the application
+        # name in the logs, store that filter in the app object so we
+        # could also use it from other modules
+        self._log_filter = AppDaemonLoggingFilter(self)
+        LOGGER.addFilter(self._log_filter)
 
         # We want to grab all the logs, AppDaemon will
         # then care about filtering those we asked for
