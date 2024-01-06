@@ -375,6 +375,7 @@ class QolsysSensorDoorbell(QolsysSensor):
     def from_json(cls, data, partition, common=None):
         return cls.from_json_subclass('Doorbell', data, partition, common)
 
+
 class QolsysSensorShock(QolsysSensor):
     @classmethod
     def from_json(cls, data, partition, common=None):
