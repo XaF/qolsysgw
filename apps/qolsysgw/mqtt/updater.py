@@ -445,7 +445,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorKeypad: 'safety',
         QolsysSensorMotion: 'motion',
         QolsysSensorSiren: 'safety',
-        QolsysSensorShock: 'safety',
+        QolsysSensorShock: 'vibration',
         QolsysSensorSmokeDetector: 'smoke',
         QolsysSensorTakeoverModule: 'safety',
         QolsysSensorTemperature: 'heat',
