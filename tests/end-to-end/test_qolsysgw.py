@@ -99,7 +99,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
         # Sometimes there's weird issues with ports, give it a few tries
         for i in reversed(range(10)):
             # Try starting the panel
-            await panel.start()
+            await panel.start(port=12345 if running_in_ci() else 0)
 
             # Check that we can connect to it
             try:
