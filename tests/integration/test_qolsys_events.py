@@ -21,8 +21,8 @@ from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
-from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorShock
+from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorTakeoverModule
 from qolsys.sensors import QolsysSensorTemperature
@@ -811,7 +811,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
             self.assertEqual(QolsysSensorShock, sensor20090.__class__)
             self.assertEqual('002-0090', sensor20090.id)
             self.assertEqual('My Shock Sensor', sensor20090.name)
-            self.assertEqual('Shock', sensor20090.group)
+            self.assertEqual('shock', sensor20090.group)
             self.assertEqual('Closed', sensor20090.status)
             self.assertEqual('0', sensor20090.state)
             self.assertEqual(20090, sensor20090.zone_id)
