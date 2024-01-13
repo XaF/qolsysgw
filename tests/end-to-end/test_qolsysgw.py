@@ -603,6 +603,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             20080,
             200802,
             20081,
+            20090,
         ]
         open_entities = [
             10001,
