@@ -20,6 +20,7 @@ from qolsys.sensors import QolsysSensorHeat
 from qolsys.sensors import QolsysSensorKeyFob
 from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
+from qolsys.sensors import QolsysSensorShock
 from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorTakeoverModule
@@ -443,6 +444,7 @@ class MqttWrapperQolsysSensor(MqttWrapper):
         QolsysSensorKeyFob: 'safety',
         QolsysSensorKeypad: 'safety',
         QolsysSensorMotion: 'motion',
+        QolsysSensorShock: 'vibration',
         QolsysSensorSiren: 'safety',
         QolsysSensorSmokeDetector: 'smoke',
         QolsysSensorTakeoverModule: 'safety',

@@ -21,6 +21,7 @@ from qolsys.sensors import QolsysSensorKeypad
 from qolsys.sensors import QolsysSensorMotion
 from qolsys.sensors import QolsysSensorPanelGlassBreak
 from qolsys.sensors import QolsysSensorPanelMotion
+from qolsys.sensors import QolsysSensorShock
 from qolsys.sensors import QolsysSensorSiren
 from qolsys.sensors import QolsysSensorSmokeDetector
 from qolsys.sensors import QolsysSensorTakeoverModule
@@ -261,7 +262,7 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
 
         with self.subTest(msg='Partition 1 is properly configured'):
             partition1 = state.partition(1)
-            self.assertEqual(13, len(partition1.sensors))
+            self.assertEqual(14, len(partition1.sensors))
             self.assertEqual(1, partition1.id)
             self.assertEqual('partition1', partition1.name)
             self.assertEqual('DISARM', partition1.status)
@@ -803,6 +804,29 @@ class TestIntegrationQolsysEvents(TestQolsysGatewayBase):
                 sensor_state=sensor20081,
                 expected_device_class='safety',
                 expected_enabled_by_default=False,
+            )
+
+        with self.subTest(msg='Sensor 20090 is properly configured'):
+            sensor20090 = partition1.zone(20090)
+            self.assertEqual(QolsysSensorShock, sensor20090.__class__)
+            self.assertEqual('002-0090', sensor20090.id)
+            self.assertEqual('My Shock Sensor', sensor20090.name)
+            self.assertEqual('shock', sensor20090.group)
+            self.assertEqual('Closed', sensor20090.status)
+            self.assertEqual('0', sensor20090.state)
+            self.assertEqual(20090, sensor20090.zone_id)
+            self.assertEqual(12, sensor20090.zone_physical_type)
+            self.assertEqual(0, sensor20090.zone_alarm_type)
+            self.assertEqual(107, sensor20090.zone_type)
+            self.assertEqual(1, sensor20090.partition_id)
+
+            await self._check_sensor_mqtt_messages(
+                gw=gw,
+                sensor_flat_name='my_shock_sensor',
+                sensor_unique_id='002_0090',
+                sensor_state=sensor20090,
+                expected_device_class='vibration',
+                expected_enabled_by_default=True,
             )
 
     async def _test_integration_event_info_secure_arm(self, from_secure_arm,

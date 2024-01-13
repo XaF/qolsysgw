@@ -547,6 +547,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 'entity_id': 'binary_sensor.qolsys_panel_my_translator_sensor',
                 'state': 'off',
             },
+            {
+                'attributes': {
+                    'device_class': 'vibration',
+                    'friendly_name': 'Qolsys Panel My Shock Sensor',
+                    'group': 'shock',
+                    'zone_alarm_type': 0,
+                    'zone_physical_type': 12,
+                    'zone_type': 107,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.qolsys_panel_my_shock_sensor',
+                'state': 'off',
+            },
         ]
         self._check_entity_states(ctx, expected_states, msg='Initial state')
 
@@ -590,6 +603,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
             20080,
             200802,
             20081,
+            20090,
         ]
         open_entities = [
             10001,
@@ -1012,6 +1026,19 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                     'tampered': False,
                 },
                 'entity_id': 'binary_sensor.qolsys_panel_my_translator_sensor',
+                'state': 'on',
+            },
+            {
+                'attributes': {
+                    'device_class': 'vibration',
+                    'friendly_name': 'Qolsys Panel My Shock Sensor',
+                    'group': 'shock',
+                    'zone_alarm_type': 0,
+                    'zone_physical_type': 12,
+                    'zone_type': 107,
+                    'tampered': False,
+                },
+                'entity_id': 'binary_sensor.qolsys_panel_my_shock_sensor',
                 'state': 'on',
             },
         ]
