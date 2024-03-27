@@ -29,8 +29,9 @@ jobs:
         env:
           GITHUB_EVENT: ${{ toJSON(github.event) }}
           GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_NEXT: ${{ github.event.inputs.version }}
         run: |
-          .github/workflows/scripts/release.py --release-next "${{ github.event.inputs.version }}" | tee -a "$GITHUB_ENV"
+          .github/workflows/scripts/release.py --release-next "$RELEASE_NEXT" | tee -a "$GITHUB_ENV"
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
