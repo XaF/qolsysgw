@@ -151,7 +151,8 @@ jobs:
                 clientMutationId
               }
             }
-          EOM)
+          EOM
+          )
 
           for commentId in ${{ env.BOT_COMMENTS }}; do
             hub api graphql -f id="$commentId" -f query="$QUERY"
