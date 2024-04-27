@@ -1,3 +1,2 @@
-pydantic<2
 copier>=9.2.0
 requests
