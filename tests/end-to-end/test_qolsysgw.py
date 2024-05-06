@@ -188,6 +188,7 @@ class TestEndtoendQolsysGw(unittest.IsolatedAsyncioTestCase):
                 **expected_state,
                 'context': mock.ANY,
                 'last_changed': ISODATE,
+                'last_reported': ISODATE,
                 'last_updated': ISODATE,
             }
 
