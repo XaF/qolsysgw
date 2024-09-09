@@ -300,6 +300,32 @@ jobs:
           skipIfReleaseExists: true
 
 
+  push_library:
+    name: Push library to PyPI
+    runs-on: ubuntu-latest
+
+    needs:
+      - prepare-env
+      - push_release
+
+    steps:
+      - name: Checkout current commit
+        uses: "actions/checkout@v4"
+
+      - name: Install Hatch
+        uses: pypa/hatch@install
+
+      - name: Create version file
+        env:
+          VERSION: ${{ needs.prepare-env.outputs.release_version }}
+        run: |
+          echo "__version__ = \"${VERSION}\"" | tee build_version.py
+
+      - name: Publish to PyPI
+        run: |
+          hatch publish
+
+
   auto-merge:
     name: "Auto-merge Dependabot pull requests"
     runs-on: ubuntu-latest

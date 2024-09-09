@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qolsys"
+description = "Qolsys IQ Panel 2+ gateway API"
+dynamic = ["version"]
+dependencies = []
+requires-python = ">=3.8"
+authors = [
+  {name = "Raphaël Beamonte", email = "raphael.beamonte@gmail.com"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["qolsys", "iq panel", "gateway", "api"]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 4 - Beta",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Developers",
+
+  # Pick your license as you wish (see also "license" above)
+  "License :: OSI Approved :: MIT License",
+
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/xaf/qolsysgw"
+Documentation = "https://github.com/xaf/qolsysgw"
+Repository = "https://github.com/xaf/qolsysgw.git"
+Issues = "https://github.com/xaf/qolsysgw/issues"
+Changelog = "https://github.com/xaf/qolsysgw/commits/main/"
+
+[tool.hatch.version]
+path = "build_version.py"
+
+[tool.hatch.build]
+skip-excluded-dirs = true
+
+[tool.hatch.build.targets.sdist]
+packages = ["apps/qolsysgw/qolsys"]
+only-include = ["apps/qolsysgw/qolsys"]
+sources = ["apps/qolsysgw"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["apps/qolsysgw/qolsys"]
+only-include = ["apps/qolsysgw/qolsys"]
+sources = ["apps/qolsysgw"]

@@ -1,3 +1,8 @@
 .*.swp
 .coverage
 __pycache__/
+
+# Library file to store version number
+/build_version.py
+# Library dist directory
+/dist

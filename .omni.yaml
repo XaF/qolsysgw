@@ -4,6 +4,8 @@ up:
         - ./tests/requirements-tools.txt
         - ./tests/requirements.txt
         - ./tests/end-to-end/requirements.txt
+  - github-releases:
+      pypa/hatch: latest
 
 commands:
   test:
@@ -21,3 +23,34 @@ commands:
       e2e:
         desc: Run end-to-end tests
         run: pytest --cache-clear tests/end-to-end/
+
+  build:
+    desc: Build the package
+    run: |
+      # Empty the build directory
+      rm -rf dist/
+      # Get the latest git tag
+      git_version=$(git describe --tags --dirty --always)
+      # Replace the first dash by a plus
+      version=$(echo ${git_version} | sed 's/-/+/')
+      # Write the version to the build version file
+      echo "__version__ = \"${version}\"" > build_version.py
+      # Build the package
+      hatch build
+      # Clean up
+      rm build_version.py
+
+  publish:
+    desc: Publish the package
+    run: |
+      # Get the latest git tag
+      git_version=$(git describe --tags --dirty --always)
+      clean_version=$(git describe --tags --abbrev=0)
+      # Check if the version values are the same
+      if [ "${git_version}" != "${clean_version}" ]; then
+        echo "The current version is not clean."
+        exit 1
+      fi
+
+      omni build
+      hatch publish
