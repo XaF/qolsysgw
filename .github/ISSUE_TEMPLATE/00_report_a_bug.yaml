@@ -28,6 +28,7 @@ body:
         - IQ Pro
         - Other (specify in the description)
       multiple: false
+    validations:
       required: true
         
   - type: input
@@ -35,6 +36,7 @@ body:
     attributes:
       label: Version of qolsysgw
       description: This is needed to identify issues that are specific to a version
+    validations:
       required: true
           
   - type: textarea
