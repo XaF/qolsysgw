@@ -22,17 +22,20 @@ body:
       label: Version of the panel
       description: This is needed to know which Panel special case you might encounters, and identify similar issues
       options:
-        - label: IQ Panel 2
-        - label: IQ Panel 2+
-        - label: IQ Panel 4
-        - label: IQ Pro
-        - label: Other (specify in the description)
+        - IQ Panel 2
+        - IQ Panel 2+
+        - IQ Panel 4
+        - IQ Pro
+        - Other (specify in the description)
+      multiple: false
+      required: true
         
   - type: input
     id: gw_version
     attributes:
       label: Version of qolsysgw
       description: This is needed to identify issues that are specific to a version
+      required: true
           
   - type: textarea
     id: description
